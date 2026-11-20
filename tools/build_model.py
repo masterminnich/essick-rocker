@@ -23,7 +23,6 @@ PRM = {  # sizes not (yet) measured from photos
     "fleg_thickness_across": (33.0, "cloud+tape", "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"),
     "bleg_thickness_across": (38.0, "cloud+tape", "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"),
     "arm_thickness": (25.0, "assumed", "not measurable yet; caliper A1-A3 will replace"),
-    "slat_thickness": (9.5, "cloud", "front/back face point layers about 8-10 mm apart"),
     "seat_edge_thickness": (40.0, "fitted", "side-edge face traced 39-45 mm at the back, thinner to the front; constant here"),
     "crest_height": (77.5, "tape", "IMG_1555 read 3.05 in"),
 }
@@ -140,10 +139,25 @@ w_side_up = np.interp(zu, zz[ok], np.array(wside)[ok] * np.cos(np.arctan(np.abs(
 _t2 = np.gradient(low_center_uvd[:, :2], axis=0); _t2 /= np.linalg.norm(_t2, axis=1, keepdims=True)
 w_side = np.r_[bl_w * np.abs(_t2[:, 1]), w_side_up]        # horizontal width -> width perpendicular to the leg
 w_side = np.convolve(np.r_[w_side[:1].repeat(3), w_side, w_side[-1:].repeat(3)], np.ones(7) / 7, "valid")
-meshes["BLEG_R"] = sweep(allc, e_acr, e_side, np.full(len(allc), P("bleg_thickness_across")), w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
+def sheet_tables(sheet):
+    """(z, y, arc length v) tables of a sheet written by tools/sheet_ortho.py (tabulated or polynomial profile)"""
+    if "table" in sheet: tb = np.array(sheet["table"]); zt_ = np.linspace(tb[0, 0], tb[-1, 0], 2000); yt_ = np.interp(zt_, tb[:, 0], tb[:, 1])
+    else: zt_ = np.linspace(sheet["z"][0], sheet["z"][1], 2000); yt_ = np.polyval(np.array(sheet["coef"]), zt_)
+    return zt_, yt_, np.r_[0, np.cumsum(np.hypot(np.diff(zt_), np.diff(yt_)))]
+w_acr = np.full(len(allc), P("bleg_thickness_across")); bl_src = "v1 (side plane + assumed thickness)"
+if (ROOT / "parts/back_legs.json").exists():
+    BL = json.load(open(ROOT / "parts/back_legs.json")); zt_b, yt_b, st_b = sheet_tables(BL["sheet"])
+    vleg = np.interp(allc[:, 2], zt_b, st_b); v_lo, v_hi = BL["v_range"]; vc = np.clip(vleg, v_lo + 10, v_hi - 10)
+    xin, xout = np.polyval(BL["symmetric"]["inner"], vc), np.polyval(BL["symmetric"]["outer"], vc)
+    t = np.clip((allc[:, 2] - allc[0, 2]) / (np.interp(v_lo + 10, st_b, zt_b) - allc[0, 2]), 0, 1)       # 0 at the rocker, 1 where the back-view trace starts
+    xc_new = (1 - t) * allc[:, 0] + t * (xin + xout) / 2; w_acr = (1 - t) * w_acr + t * (xout - xin)
+    allc = np.c_[xc_new, allc[:, 1:]]; bl_src = "fitted (unrolled back view, by-eye seeded edges, L+R averaged) above the seat; blended to the side plane at the rocker"
+    tan = np.gradient(allc, axis=0); tan /= np.linalg.norm(tan, axis=1, keepdims=True)
+    e_acr = np.tile([1.0, 0, 0], (len(allc), 1)); e_acr = e_acr - tan * np.sum(tan * e_acr, 1)[:, None]; e_acr /= np.linalg.norm(e_acr, axis=1, keepdims=True); e_side = np.cross(tan, e_acr)
+meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
 report["back_leg"] = {"lower": "fitted (side face orthophoto; front edge good, rear edge rough)", "upper": "cloud (centreline + extents, mirrored L+R)",
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
-                      "across_extent_cloud_mm": [float(np.nanmin(wacr)), float(np.nanmax(wacr))], "top_centre": up_center[-1].round(1).tolist(), "splay_top_x_mm": float(up_center[-1, 0])}
+                      "across": bl_src, "width_across_mm": {f"z{int(z)}": float(np.interp(z, allc[:, 2], w_acr)) for z in (100, 300, 450, 600, 800, 1000)}, "top_centre": up_center[-1].round(1).tolist(), "splay_top_x_mm": float(up_center[-1, 0])}
 
 # ---------------------------------------------------------------- seat
 seat_z = lambda y: 338 + 0.155 * y
@@ -222,41 +236,27 @@ for x0 in xb:
     s = K[np.abs(K[:, 0] - x0) < 26]; yf.append(np.percentile(s[:, 1], 96) if len(s) > 10 else np.nan); yr.append(np.percentile(s[:, 1], 4) if len(s) > 10 else np.nan)
 yf, yr = np.array(yf), np.array(yr); g = np.isfinite(yf)
 cf = np.polyfit(np.abs(xb[g]), yf[g], 2); cr = np.polyfit(np.abs(xb[g]), yr[g], 2)      # even in x (symmetric)
-xs = np.linspace(-268, 268, 45); crest_out = np.r_[np.c_[xs, np.polyval(cf, np.abs(xs))], np.c_[xs[::-1], np.polyval(cr, np.abs(xs[::-1]))]]
+xs = np.linspace(-258, 258, 45); crest_out = np.r_[np.c_[xs, np.polyval(cf, np.abs(xs))], np.c_[xs[::-1], np.polyval(cr, np.abs(xs[::-1]))]]
 ztop = float(np.percentile(K[:, 2], 99.5)); zc0 = ztop - P("crest_height")
 cm = trimesh.creation.extrude_polygon(Polygon(crest_out).buffer(0), P("crest_height")); cm.vertices = cm.vertices + [0, 0, zc0]; meshes["CREST"] = cm
 report["crest"] = {"plan": "cloud (front/back extents per station, symmetric quadratic)", "thickness_centre_mm": float(np.polyval(cf, 0) - np.polyval(cr, 0)),
                    "thickness_end_mm": float(np.polyval(cf, 250) - np.polyval(cr, 250)), "bow_mm_over_half_span": float(np.polyval(cf, 0) - np.polyval(cf, 250)),
                    "top_z_mm": ztop, "note": "top edge arch and back-leg tilt of the rail NOT modelled (vertical extrusion)"}
 
-# ---------------------------------------------------------------- slats
-msl = (np.abs(C[:, 0]) < 160) & (C[:, 2] > 365) & (C[:, 2] < 1000) & (C[:, 1] < 70)
-Sl = C[msl]
-cs, n_s, _ = rpoly(Sl[:, 2], Sl[:, 1], 5, clip=14)
-Sl = Sl[np.abs(Sl[:, 1] - np.polyval(cs, Sl[:, 2])) < 14]
-cfront, n_front, _ = rpoly(Sl[:, 2], Sl[:, 1], 5, clip=3.0)                       # dominant layer = one face
-zs = np.linspace(372, 1004, 50); slat_info = {}
-def slat(xc_fn, w_fn, name):
-    cen = np.c_[xc_fn(zs), np.polyval(cfront, zs) - P("slat_thickness") / 2, zs]
-    tan = np.gradient(cen, axis=0); tan /= np.linalg.norm(tan, axis=1, keepdims=True)
-    e1 = np.tile([1.0, 0, 0], (len(zs), 1)); e1 = e1 - tan * np.sum(tan * e1, 1)[:, None]; e1 /= np.linalg.norm(e1, axis=1, keepdims=True)
-    return sweep(cen, e1, np.cross(tan, e1), w_fn(zs), np.full(len(zs), P("slat_thickness")))
-def extents(sel):
-    lo, hi, zc = [], [], []
-    for z0 in np.arange(400, 990, 50):
-        s = sel[np.abs(sel[:, 2] - z0) < 30]
-        if len(s) > 12: lo.append(np.percentile(s[:, 0], 3)); hi.append(np.percentile(s[:, 0], 97)); zc.append(z0)
-    return np.array(zc), np.array(lo), np.array(hi)
-zc, lo, hi = extents(Sl[np.abs(Sl[:, 0]) < 62]); cw = np.polyfit(zc, hi - lo, 1)
-meshes["SLAT_C"] = slat(lambda z: 0 * z, lambda z: np.polyval(cw, z), "C")
-So = Sl[np.abs(Sl[:, 0]) > 62].copy(); So[:, 0] = np.abs(So[:, 0]); zc2, lo2, hi2 = extents(So)
-cc = np.polyfit(zc2, (lo2 + hi2) / 2, 2); cw2 = np.polyfit(zc2, hi2 - lo2, 1)
-meshes["SLAT_R"] = slat(lambda z: np.polyval(cc, z), lambda z: np.polyval(cw2, z), "R"); meshes["SLAT_L"] = mirror(meshes["SLAT_R"])
-report["slats"] = {"side_profile": "cloud (5th-order curve through one face)", "face_scatter_mm": n_front,
-                   "centre_width_mm": {"z400": float(np.polyval(cw, 400)), "z950": float(np.polyval(cw, 950))},
-                   "outer_width_mm": {"z400": float(np.polyval(cw2, 400)), "z950": float(np.polyval(cw2, 950))},
-                   "outer_centre_x_mm": {"z400": float(np.polyval(cc, 400)), "z950": float(np.polyval(cc, 950))},
-                   "note": "widths are cloud extents (biased narrow by ~2-4 mm); tape close-ups read 2.89 in -> 3.87 in for the centre slat"}
+# ---------------------------------------------------------------- slats (traced in the unrolled back view)
+SLJ = json.load(open(ROOT / "parts/slats.json")); thick = float(SLJ["thickness_mm"]); ex60 = np.tile([1.0, 0, 0], (60, 1))
+def slat(sheet, lo_c, hi_c, sign=1.0):
+    """sheet = the slat's BACK face; the solid extends thick mm forward of it"""
+    zt_s, yt_s, st_s = sheet_tables(sheet); vs = np.linspace(8, min(st_s[-1] - 2, 742), 60); vcl = np.clip(vs, *SLJ["v_range"])
+    zs, ys = np.interp(vs, st_s, zt_s), np.interp(vs, st_s, yt_s); ds = np.interp(vs, st_s, np.gradient(yt_s, zt_s)); nr = np.hypot(1, ds)
+    nb = np.c_[np.zeros(len(vs)), -1 / nr, ds / nr]; lo, hi = np.polyval(lo_c, vcl) * sign, np.polyval(hi_c, vcl)
+    return sweep(np.c_[(lo + hi) / 2, ys, zs] - nb * thick / 2, ex60, nb, hi - lo, np.full(len(vs), thick)), (hi - lo)
+SY = SLJ["symmetric"]
+meshes["SLAT_C"], wc_ = slat(SLJ["sheet_centre"], SY["centre_half"], SY["centre_half"], -1.0)
+meshes["SLAT_R"], wo_ = slat(SLJ["sheet_outer"], SY["outer_in"], SY["outer_out"]); meshes["SLAT_L"] = mirror(meshes["SLAT_R"])
+report["slats"] = {"edges": "fitted (unrolled back view, by-eye seeded edges, L+R averaged)", "surface": "back face located by photo consistency in 7 height bands, separately for centre and outer slats",
+                   "thickness_mm": thick, "thickness_provenance": "front-face cloud layer vs photo-consistent back face (about 10 mm)",
+                   "centre_width_mm": {"near_seat": float(wc_[8]), "under_crest": float(wc_[-5])}, "outer_width_mm": {"near_seat": float(wo_[8]), "under_crest": float(wo_[-5])}}
 
 # ---------------------------------------------------------------- export
 scene = trimesh.Scene()

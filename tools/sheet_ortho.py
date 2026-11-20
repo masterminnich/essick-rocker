@@ -4,7 +4,7 @@
 extruded across the chair (x). Image axes: u = x (mm, chair's right positive), v = arc length up the profile (mm), so the
 picture is the part laid flat, i.e. its bending-form / flat template view. --offset moves the sheet along its normal
 (positive = towards the back of the chair); --sweep scores photo consistency per offset to find the real face.
-Profile JSON: {"<key>": {"coef": [...polynomial y(z), highest power first...], "z": [z0, z1]}}.
+Profile JSON: {"<key>": {"coef": [...polynomial y(z)...], "z": [z0, z1]}} or {"<key>": {"table": [[z, y], ...]}}.
 Writes PREFIX_median.png, PREFIX_spread.png, PREFIX_<photo>.png, PREFIX_plane.json (res/urange/vrange for the viewers
 and tracers; plus the profile so plane coordinates can be mapped back to 3D).
 Compute: <= 7 photos decoded (36 MB each), outputs ~1.5 MP; < 1 GB, seconds."""
@@ -20,18 +20,28 @@ ap.add_argument("--urange", nargs=2, type=float, required=True); ap.add_argument
 ap.add_argument("--sweep", nargs=3, type=float, default=None); ap.add_argument("--max-angle", type=float, default=30); ap.add_argument("--max-photos", type=int, default=7)
 ap.add_argument("--score-absu", nargs=2, type=float, default=None, help="score photo consistency only where A <= |u| <= B (mm)")
 ap.add_argument("--score-v", nargs=2, type=float, default=None, help="... and only for v in this range")
+ap.add_argument("--extend", nargs=2, type=float, default=None, help="LO HI: continue the profile straight by this many mm below / above")
 ap.add_argument("--photos", default="auto"); ap.add_argument("--out", required=True)
 a = ap.parse_args(); cams = Cameras.load()
-pr = json.load(open(a.profile))[a.key]; coef = np.array(pr["coef"]); z0, z1 = pr["z"]; dcoef = np.polyder(coef)
-zt = np.linspace(z0, z1, 2000); st = np.r_[0, np.cumsum(np.hypot(np.diff(zt), np.diff(np.polyval(coef, zt))))]; vrange = [0.0, float(st[-1])]
+pr = json.load(open(a.profile))[a.key]
+if "table" in pr:                                             # tabulated profile [[z, y], ...]
+    tb = np.array(pr["table"]); zt = np.linspace(tb[0, 0], tb[-1, 0], 2000); yt = np.interp(zt, tb[:, 0], tb[:, 1])
+else:                                                         # polynomial y(z)
+    zt = np.linspace(pr["z"][0], pr["z"][1], 2000); yt = np.polyval(np.array(pr["coef"]), zt)
+if a.extend:                                                  # straight-line continuation below / above the profile
+    lo, hi = a.extend; dz = zt[1] - zt[0]; n0, n1 = int(lo / dz), int(hi / dz); s0 = (yt[5] - yt[0]) / (zt[5] - zt[0]); s1 = (yt[-1] - yt[-6]) / (zt[-1] - zt[-6])
+    zt = np.r_[zt[0] - dz * np.arange(n0, 0, -1), zt, zt[-1] + dz * np.arange(1, n1 + 1)]
+    yt = np.r_[yt[0] - s0 * dz * np.arange(n0, 0, -1), yt, yt[-1] + s1 * dz * np.arange(1, n1 + 1)]
+z0, z1 = float(zt[0]), float(zt[-1]); dyt = np.gradient(yt, zt)
+st = np.r_[0, np.cumsum(np.hypot(np.diff(zt), np.diff(yt)))]; vrange = [0.0, float(st[-1])]
 
 class Sheet:
     def __init__(self, offset): self.offset = offset
     def to3d(self, uv):
-        uv = np.atleast_2d(uv); z = np.interp(uv[:, 1], st, zt); y = np.polyval(coef, z); d = np.polyval(dcoef, z); nrm = np.hypot(1, d)
+        uv = np.atleast_2d(uv); z = np.interp(uv[:, 1], st, zt); y = np.interp(uv[:, 1], st, yt); d = np.interp(uv[:, 1], st, dyt); nrm = np.hypot(1, d)
         return np.c_[uv[:, 0], y - self.offset / nrm, z + self.offset * d / nrm]          # n_back = (0, -1, f') / |.|
 
-zc = (z0 + z1) / 2; dc = np.polyval(dcoef, zc); nb = np.array([0, -1, dc]) / np.hypot(1, dc); cen = np.array([0, np.polyval(coef, zc), zc])
+zc = (z0 + z1) / 2; dc = float(np.interp(zc, zt, dyt)); nb = np.array([0, -1, dc]) / np.hypot(1, dc); cen = np.array([0, float(np.interp(zc, zt, yt)), zc])
 nview = nb if a.side == "back" else -nb
 if a.photos != "auto": photos = [f"IMG_{x}.JPG" for x in a.photos.split(",")]
 else:
@@ -65,6 +75,6 @@ ims = stack(a.offset)
 for nm, im in zip(photos, ims): cv2.imwrite(f"{a.out}_{nm[4:8]}.png", im)
 cv2.imwrite(f"{a.out}_median.png", np.median(np.stack(ims), 0).astype(np.uint8))
 s, sp = score(ims); cv2.imwrite(f"{a.out}_spread.png", np.clip(np.nan_to_num(sp, nan=2.0) * 160, 0, 255).astype(np.uint8))
-json.dump({"kind": "sheet", "profile_key": a.key, "coef": coef.tolist(), "z": [z0, z1], "offset": a.offset, "side": a.side, "urange": a.urange, "vrange": vrange,
+json.dump({"kind": "sheet", "profile_key": a.key, "table": np.c_[zt[::10], yt[::10]].tolist(), "z": [z0, z1], "offset": a.offset, "side": a.side, "urange": a.urange, "vrange": vrange,
            "res": a.res, "photos": photos, "score": s}, open(f"{a.out}_plane.json", "w"), indent=1)
 print("score", round(s, 4), "offset", a.offset)
