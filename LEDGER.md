@@ -53,3 +53,11 @@ Sessions on this machine get cut off without warning; this file says where thing
 ## Not done / open
 - Black ruler not used as an independent scale check (its units are inferred).
 - Repo still local; Joe to create private `masterminnich/essick-rocker`.
+
+## 13:30 note
+- tools/residual.py + tools/resid.sh exist but the metric does NOT discriminate yet: every part reads ~3 mm median, including
+  the rockers known to be ~1 mm. Background clutter and neighbouring arrises dominate. Needs: restrict to photos where the
+  part is seen against a plain background / use the multi-photo consistency (spread) image instead of single-photo edges.
+- Joe (13:30) was surprised model v1 looks rough and asked whether rectified images were the problem. Answer given: no; the
+  rough parts never came from rectified traces, they came from sparse cloud extents drawn as boxes. Plan: fit part
+  silhouettes directly in the photos (model-driven), keep rectified traces for flat faces only.
