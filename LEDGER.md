@@ -22,19 +22,29 @@ Sessions on this machine get cut off without warning; this file says where thing
       rigid alignment (tail tips differ up to 8 mm); face height L vs R within 0.4 mm (26.4-28.7 mm, ~21 at tail tip);
       rocking radius ~1066 mm; rockers straight in plan, toed out ~9 deg; right rocker pitched +0.85 deg vs left.
 
+- [x] Side frames: work/parts/sideL|R/ = whole side rectified on the rocker's outer plane (front leg, back leg lower part and
+      seat side edge share it). tools/trace_side.sh traces them; rocker/sideframe.py = symmetric side planes.
+- [x] FIRST MODEL: tools/model.sh --out parts/model_v1 -> parts/model_v1.glb, _params.json (provenance per number), _edges.json.
+      Check views: tools/overlay_sil.py (part outlines on photos) -> work/overlay_v1/sil_*.jpg.
+
 ## Now
-- [→] Remaining part faces, same recipe. Seed planes from the cloud (work/dense/chair_dense.npy, tools/cloud_slice.py to
-      look), then face_ortho --optimize, view, centreline, trace:
-      front legs (outer side face, front face), back legs (outer side, back face), arms (top face, outer edge),
-      crest (front face is curved: use top view + elevation), slats (curved in side view), seat (plan outline + cloud surface).
-      Rocker width (across) still needed: inner face plane or Joe's caliper R1-R5.
+- [→] Critique loop on model v1. Known faults seen in the overlays (1507 side, 1502 back, 1484 front-quarter):
+      * crest rail: too long (sticks out past the back legs), drawn as a straight vertical extrusion; needs its arch and tilt
+      * arms: cloud-extent plank, back end pinches to 10 mm wide, front too wide (88 mm); needs a traced top-view outline
+      * back legs upper: cloud centreline only; no traced edges above the arm joint
+      * slats: OK in back view to a few mm; widths biased narrow
+      * seat: outline has no front scallops / leg notches; scoop surface fit 1.8 mm rms
+      * rocker width across (31 mm), leg thicknesses across (33 / 38 mm), arm thickness (25 mm) are tape/assumed values
+      * no numeric model-vs-photo residual yet: build one (distance from projected outline to image edges per part)
+      Next traces to make: back view plane (crest front face, back legs, slats) from 1501/1502/1513; top view (arms, seat
+      outline, crest plan) from 1544/1545/1538/1539.
 
 ## Next
-- [ ] Assemble parametric model -> mesh (GLB/STEP), overlays on photos (tools/overlay.py), residual report.
 - [ ] Fold in Joe's caliper sheet (R/F/B/A/C/S/T codes), check dims K1-K6, seat depth grid, far photos, tape targets.
 - [ ] Templates (1:1 PDF/DXF). Rocker bending-form template comes from parts/rocker_profile.json (mean_bot / mean_top).
 - [ ] IMG_1592 (new in Drive at 12:00) not yet looked at or registered.
-- [ ] No way found yet to hand Joe files by link from this session (no upload helper on PATH); repo push needs his GitHub repo.
+- [ ] File delivery by link: no working uploader on this machine (the atrium repo's upload-r2.py depends on a path that is
+      not on CB). Repo push needs Joe's GitHub repo `masterminnich/essick-rocker`.
 
 ## Incidents
 - 12:13 machine restart during a capped (3-4 GB, 2 threads) matching job. Panic log: launchd (pid 1) died with SIGBUS;

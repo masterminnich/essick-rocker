@@ -50,33 +50,33 @@
   "front_leg": {
    "profile": "fitted (side face orthophoto, L+R pooled)",
    "edge_scatter_mm": [
-    0.731517586584611,
-    1.037346743553145
+    0.8222795840569783,
+    0.8862784204134428
    ],
    "inlier_share": [
-    0.7554621848739496,
-    0.5369747899159664
+    0.6092436974789915,
+    0.5764705882352941
    ],
    "width_side_view_mm": {
-    "v150": 53.703912797774855,
-    "v300": 57.77020421885584,
-    "v380": 53.032901902189884,
-    "v450": 45.97799295478544,
-    "v600": 37.547783556239864
+    "v150": 55.45271744313861,
+    "v300": 58.60889612372644,
+    "v380": 55.08853949122055,
+    "v450": 47.52034072916,
+    "v600": 33.29245442110061
    }
   },
   "back_leg": {
    "lower": "fitted (side face orthophoto; front edge good, rear edge rough)",
    "upper": "cloud (centreline + extents, mirrored L+R)",
-   "front_edge_scatter_mm": 1.014935891222621,
-   "rear_edge_scatter_mm": 1.9354648390382265,
+   "front_edge_scatter_mm": 0.8368287345986823,
+   "rear_edge_scatter_mm": 2.0013648674348743,
    "width_side_view_mm": {
-    "z100": 52.79023736002496,
-    "z300": 60.18224873995747,
-    "z450": 56.22260994566492,
-    "z600": 48.314199304960844,
-    "z800": 39.492190722669996,
-    "z1000": 39.42491408804165
+    "z100": 50.267481559223846,
+    "z300": 59.9951795710323,
+    "z450": 53.93986299844796,
+    "z600": 48.30582392521296,
+    "z800": 39.48156062678863,
+    "z1000": 39.425286958806566
    },
    "across_extent_cloud_mm": [
     48.12217594073374,
@@ -107,18 +107,24 @@
    "rim_tilt_deg": 8.81073298598491
   },
   "arm": {
-   "top_face": "cloud (plane fit, mirrored L+R)",
-   "plane_fit_rms_mm": 1.0203388593934402,
-   "n_points": 602,
-   "pitch_deg": 17.404849202179932,
-   "roll_deg": 0.1316869109937896,
-   "length_mm": 300.0,
-   "width_mm": {
-    "back": 46.055908275749196,
-    "mid": 58.99605897860283,
-    "front": 64.81263329737436
+   "top_surface": "cloud (93rd percentile height per station, mirrored L+R)",
+   "top_line_scatter_mm": 1.3435781771304787,
+   "n_points": 1410,
+   "length_mm": 480.0,
+   "y_range_mm": [
+    30.0,
+    510.0
+   ],
+   "top_height_mm": {
+    "back": 495.1447898465667,
+    "front": 667.321599467735
    },
-   "outline": "cloud extents (3-97 percentile), NOT a traced edge"
+   "width_mm": {
+    "back": 9.968916591623127,
+    "mid": 60.61436967911206,
+    "front": 88.20076495991759
+   },
+   "outline": "cloud extents (3-97 percentile), NOT a traced edge; arm edges are sculpted"
   },
   "crest": {
    "plan": "cloud (front/back extents per station, symmetric quadratic)",
@@ -147,18 +153,18 @@
   },
   "overall": {
    "bbox_min_mm": [
-    -304.9,
-    -475.5,
-    -0.2
+    -321.3,
+    -476.7,
+    0.3
    ],
    "bbox_max_mm": [
-    304.9,
-    617.3,
+    321.3,
+    615.6,
     1090.1
    ],
-   "height_in": 42.916648255284265,
-   "width_in": 24.01178097973606,
-   "length_in": 43.02480378697123
+   "height_in": 42.91665591384452,
+   "width_in": 25.295907647539625,
+   "length_in": 43.00605255455938
   }
  }
 }

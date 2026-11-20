@@ -69,18 +69,29 @@ def mirror(m):
 
 # ---------------------------------------------------------------- rocker
 rp = json.load(open(ROOT / "parts/rocker_profile.json")); U = np.array(rp["u"]); rtop = np.array(rp["mean_top"]); rbot = np.array(rp["mean_bot"])
-rock_poly = np.r_[np.c_[U, rtop], np.c_[U[::-1], rbot[::-1]]]
+RVL = rp["right_vs_left"]
+def rigid(q, th_deg, su, sv, inverse=False):
+    th = np.radians(th_deg); c, s_ = np.cos(th), np.sin(th); q = np.asarray(q, float)
+    if inverse:
+        d = q - [su, sv]; return np.c_[c * d[:, 0] + s_ * d[:, 1], -s_ * d[:, 0] + c * d[:, 1]]
+    return np.c_[c * q[:, 0] - s_ * q[:, 1] + su, s_ * q[:, 0] + c * q[:, 1] + sv]
+def to_mean(q):   # left-frame side-plane coordinates -> the half-way frame between the left and right frames (design intent)
+    return rigid(q, RVL["rotation_deg"] / 2, RVL["shift_u_mm"] / 2, RVL["shift_v_mm"] / 2, inverse=True)
+def pooled_edges(name):
+    """both sides' traced edges in the LEFT side-plane frame (right side moved by the rigid fit found on the rockers)"""
+    A, B = [], []
+    for S in "LR":
+        d = json.load(open(ROOT / f"work/parts/side{S}/{name}.json")); ea, eb = np.array(d[name + "_a"]), np.array(d[name + "_b"])
+        if S == "R": ea, eb = (rigid(e, RVL["rotation_deg"], RVL["shift_u_mm"], RVL["shift_v_mm"]) for e in (ea, eb))
+        A.append(ea); B.append(eb)
+    return np.vstack(A), np.vstack(B)
+rock_poly = to_mean(np.r_[np.c_[U, rtop], np.c_[U[::-1], rbot[::-1]]])
 meshes["ROCKER_R"] = extrude_side(rock_poly, 0, P("rocker_width_across"), +1); meshes["ROCKER_L"] = mirror(meshes["ROCKER_R"])
 report["rocker"] = {"profile": "fitted (face orthophoto, both sides averaged)", "length_traced_mm": float(U[-1] - U[0]),
                     "face_height_mm": [float(np.min(rtop - rbot)), float(np.max(rtop - rbot))], "rocking_radius_mm": rp["rocking_radius_mm"],
                     "left_right_shape_rms_mm": rp["right_vs_left"]["residual_rms_mm"]}
 
 # ---------------------------------------------------------------- legs in the side plane
-def pooled_edges(name):
-    A, B = [], []
-    for S in "LR":
-        d = json.load(open(ROOT / f"work/parts/side{S}/{name}.json")); A.append(np.array(d[name + "_a"])); B.append(np.array(d[name + "_b"]))
-    return np.vstack(A), np.vstack(B)
 fa, fb = pooled_edges("fleg")                     # a = rear edge, b = front edge (travel is upward)
 vv = np.linspace(95, 628, 120)
 c_fr, n_fr, k_fr = rpoly(fa[:, 1], fa[:, 0], 4); c_ff, n_ff, k_ff = rpoly(fb[:, 1], fb[:, 0], 4)
@@ -91,7 +102,7 @@ def foot_cut(vv, uu):
     for v_, u_ in zip(vv, uu):
         out.append([u_, max(v_, np.interp(u_, U, rtop))])
     return np.array(out)
-fl_poly = np.r_[foot_cut(vv, fl_rear), foot_cut(vv, fl_front)[::-1]]
+fl_poly = to_mean(np.r_[foot_cut(vv, fl_rear), foot_cut(vv, fl_front)[::-1]])
 meshes["FLEG_R"] = extrude_side(fl_poly, 0, P("fleg_thickness_across"), +1); meshes["FLEG_L"] = mirror(meshes["FLEG_R"])
 report["front_leg"] = {"profile": "fitted (side face orthophoto, L+R pooled)", "edge_scatter_mm": [n_fr, n_ff], "inlier_share": [k_fr, k_ff],
                        "width_side_view_mm": {f"v{int(v)}": float(np.interp(v, vv, fl_front - fl_rear)) for v in (150, 300, 380, 450, 600)}}
@@ -101,7 +112,7 @@ vb = np.linspace(40, 470, 80)
 c_bf, n_bf, k_bf = rpoly(bb[(bb[:, 1] < 480), 1], bb[(bb[:, 1] < 480), 0], 4)
 c_br, n_br, k_br = rpoly(ba[(ba[:, 1] < 480), 1], ba[(ba[:, 1] < 480), 0], 4, clip=4.0)
 bl_front = np.polyval(c_bf, vb); bl_rear = np.polyval(c_br, vb); bl_w = bl_front - bl_rear
-low_center_uvd = np.c_[(bl_front + bl_rear) / 2, vb, np.full(len(vb), P("bleg_thickness_across") / 2)]
+low_center_uvd = np.c_[to_mean(np.c_[(bl_front + bl_rear) / 2, vb]), np.full(len(vb), P("bleg_thickness_across") / 2)]
 low_center = from_plane(low_center_uvd, +1)
 # upper part from the cloud (mirrored): points of the back legs above the arm joint
 m = (Cm[:, 0] > 165) & (Cm[:, 2] > 520) & (Cm[:, 2] < 1075) & (Cm[:, 1] < 60)
@@ -181,27 +192,27 @@ report["seat"] = {"outline": "cloud (98th percentile half-width per station; fro
                   "max_scoop_below_rim_mm": dish, "rim_tilt_deg": float(np.degrees(np.arctan(0.155)))}
 
 # ---------------------------------------------------------------- arms (plank from the cloud)
-ma = (Cm[:, 0] > 228) & (Cm[:, 0] < 345) & (Cm[:, 1] > 30) & (Cm[:, 1] < 530) & (Cm[:, 2] > 470 + 0.33 * Cm[:, 1]) & (Cm[:, 2] < 545 + 0.33 * Cm[:, 1])
+ma = (Cm[:, 0] > 226) & (Cm[:, 0] < 345) & (Cm[:, 1] > 25) & (Cm[:, 1] < 545) & (Cm[:, 2] > 465 + 0.36 * Cm[:, 1]) & (Cm[:, 2] < 540 + 0.36 * Cm[:, 1])
 A = Cm[ma]
-from rocker.planes import ransac_plane
-ca, na, inl = ransac_plane(A, thr=2.0, iters=3000, normal_hint=np.array([0, -0.31, 0.95]), max_angle_deg=20)
-if na[2] < 0: na = -na
-ua = np.array([0, 1.0, 0]) - na * na[1]; ua /= np.linalg.norm(ua); va = np.cross(na, ua)       # ua forward along the arm, va across (towards -x?)
-if va[0] < 0: va = -va
-At = A[inl]; q = np.c_[(At - ca) @ ua, (At - ca) @ va]
-sb = np.arange(q[:, 0].min(), q[:, 0].max(), 20); lo, hi = [], []
-for s0 in sb:
-    s = q[np.abs(q[:, 0] - s0) < 14]; lo.append(np.percentile(s[:, 1], 3) if len(s) > 8 else np.nan); hi.append(np.percentile(s[:, 1], 97) if len(s) > 8 else np.nan)
-lo, hi = np.array(lo), np.array(hi); g = np.isfinite(lo)
-clo, _, _ = rpoly(sb[g], lo[g], 3, clip=6); chi, _, _ = rpoly(sb[g], hi[g], 3, clip=6)
-ss = np.linspace(sb[g][0], sb[g][-1], 40); arm_out = np.r_[np.c_[ss, np.polyval(clo, ss)], np.c_[ss[::-1], np.polyval(chi, ss[::-1])]]
-am = trimesh.creation.extrude_polygon(Polygon(arm_out).buffer(0), P("arm_thickness"))
-Vv = am.vertices; am.vertices = ca + Vv[:, :1] * ua + Vv[:, 1:2] * va + (Vv[:, 2:3] - P("arm_thickness")) * na
-am.fix_normals(); meshes["ARM_R"] = am; meshes["ARM_L"] = mirror(am)
-report["arm"] = {"top_face": "cloud (plane fit, mirrored L+R)", "plane_fit_rms_mm": float(np.std((At - ca) @ na)), "n_points": int(inl.sum()),
-                 "pitch_deg": float(np.degrees(np.arcsin(ua[2]))), "roll_deg": float(np.degrees(np.arcsin(va[2]))), "length_mm": float(ss[-1] - ss[0]),
-                 "width_mm": {"back": float(np.polyval(chi, ss[2]) - np.polyval(clo, ss[2])), "mid": float(np.polyval(chi, ss[20]) - np.polyval(clo, ss[20])), "front": float(np.polyval(chi, ss[-3]) - np.polyval(clo, ss[-3]))},
-                 "outline": "cloud extents (3-97 percentile), NOT a traced edge"}
+ybins = np.arange(40, 540, 20); zt_, xi_, xo_, yb_ = [], [], [], []
+for y0 in ybins:
+    s_ = A[np.abs(A[:, 1] - y0) < 14]
+    if len(s_) < 15: continue
+    zt_.append(np.percentile(s_[:, 2], 93)); xi_.append(np.percentile(s_[:, 0], 3)); xo_.append(np.percentile(s_[:, 0], 97)); yb_.append(y0)
+yb_ = np.array(yb_); c_zt, n_zt, _ = rpoly(yb_, np.array(zt_), 3, clip=5); c_xi, _, _ = rpoly(yb_, np.array(xi_), 3, clip=6); c_xo, _, _ = rpoly(yb_, np.array(xo_), 3, clip=6)
+ya = np.linspace(yb_[0] - 10, yb_[-1] + 10, 40)
+cen = np.c_[(np.polyval(c_xi, ya) + np.polyval(c_xo, ya)) / 2, ya, np.polyval(c_zt, ya)]
+tan = np.gradient(cen, axis=0); tan /= np.linalg.norm(tan, axis=1, keepdims=True)
+e1 = np.tile([1.0, 0, 0], (len(ya), 1)); e1 = e1 - tan * np.sum(tan * e1, 1)[:, None]; e1 /= np.linalg.norm(e1, axis=1, keepdims=True); e2 = np.cross(tan, e1)
+e2 = e2 * np.sign(e2[:, 2:3])
+cen_mid = cen - e2 * P("arm_thickness") / 2
+am = sweep(cen_mid, e1, e2, np.polyval(c_xo, ya) - np.polyval(c_xi, ya), np.full(len(ya), P("arm_thickness")))
+meshes["ARM_R"] = am; meshes["ARM_L"] = mirror(am)
+report["arm"] = {"top_surface": "cloud (93rd percentile height per station, mirrored L+R)", "top_line_scatter_mm": n_zt, "n_points": int(len(A)),
+                 "length_mm": float(ya[-1] - ya[0]), "y_range_mm": [float(ya[0]), float(ya[-1])],
+                 "top_height_mm": {"back": float(np.polyval(c_zt, ya[0])), "front": float(np.polyval(c_zt, ya[-1]))},
+                 "width_mm": {"back": float(np.polyval(c_xo, ya[2]) - np.polyval(c_xi, ya[2])), "mid": float(np.polyval(c_xo, ya[20]) - np.polyval(c_xi, ya[20])), "front": float(np.polyval(c_xo, ya[-3]) - np.polyval(c_xi, ya[-3]))},
+                 "outline": "cloud extents (3-97 percentile), NOT a traced edge; arm edges are sculpted"}
 
 # ---------------------------------------------------------------- crest rail
 mc = (C[:, 2] > 1003) & (C[:, 2] < 1095) & (np.abs(C[:, 0]) < 290) & (C[:, 1] < -120)
