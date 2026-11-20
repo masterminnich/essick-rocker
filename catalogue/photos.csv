@@ -1,0 +1,95 @@
+file,time,exif_orientation,class,view,sharpness,scale_objects_visible,parts_clearly_visible,best_for,problems,notes
+IMG_1469.JPG,2026-11-20 08:11:51,6,orbit,"right-rear 3/4, elevated (~1.6 m)",5,square full; ruler partial,all parts; ROCKER_R; BLEG_R; back,overall rear-right geometry; square heel,none,square heel and both legs clear
+IMG_1470.JPG,2026-11-20 08:11:54,6,orbit,"right side profile, camera ~arm height",5,square full; ruler partial,"ROCKER_R, FLEG_R, BLEG_R, ARM_R, SEAT side, back profile",right profile,slight 3/4 toward rear,
+IMG_1471.JPG,2026-11-20 08:11:56,6,orbit,"right side profile, purest",5,square full; ruler partial,"ROCKER_R, FLEG_R, BLEG_R, ARM_R, SEAT side, back profile",ROCKER_R curve; back rake; arm height,none,best right profile
+IMG_1472.JPG,2026-11-20 08:11:59,6,orbit,"right side profile, slightly toward rear",5,square full; ruler partial,"ROCKER_R, FLEG_R, BLEG_R, ARM_R, SEAT side",right profile cross-check,none,
+IMG_1473.JPG,2026-11-20 08:12:03,6,orbit,right-front 3/4,5,square full; ruler full,all parts; FLEG_R front; seat front edge,front-right orbit; ruler+square together,none,
+IMG_1474.JPG,2026-11-20 08:12:05,6,orbit,right-front 3/4,5,square full; ruler full,all parts,front-right orbit,none,
+IMG_1475.JPG,2026-11-20 08:12:08,6,orbit,right-front 3/4,3,square partial (hazed); ruler partial,"upper chair, back, arms",orbit coverage only,pink haze across lower third (finger/lens flare); rockers hazed,
+IMG_1476.JPG,2026-11-20 08:12:10,6,orbit,right side,3,square partial (hazed),"back, ARM_R, FLEG_R upper",orbit coverage only,pink haze lower part,
+IMG_1477.JPG,2026-11-20 08:12:13,6,elevation,"rear-right 3/4, high",5,square partial (cropped at bottom); ruler partial,"back, slats, crest, seat top, arms",back from above-right,square cut by frame,
+IMG_1478.JPG,2026-11-20 08:12:15,6,elevation,"rear-right 3/4, high",5,square partial; ruler partial,"back, slats, crest, seat top, arms",back from above-right,square cut by frame,
+IMG_1479.JPG,2026-11-20 08:12:19,6,elevation,"rear-right, close and high",4,none,"seat top, slats, ARM_R, CREST",seat top shape,rockers cropped,
+IMG_1480.JPG,2026-11-20 08:12:21,6,elevation,"rear-right, close and high",4,none,"seat top, slats, ARM_R",seat top shape,rockers cropped,
+IMG_1481.JPG,2026-11-20 08:12:23,6,detail,"right-rear high, close",4,none,"SEAT top right half, ARM_R, BLEG_R/arm joint",arm-to-back-leg joint,cropped; no full chair,
+IMG_1484.JPG,2026-11-20 08:12:36,6,elevation,"front-right 3/4, high",5,square full; ruler full,all parts; seat top; arm tops,seat top outline + both scale objects,none,one of best overall elevation views
+IMG_1485.JPG,2026-11-20 08:12:38,6,elevation,"front-right 3/4, high",5,square full; ruler full,all parts; seat top; arm tops,seat top outline,none,
+IMG_1486.JPG,2026-11-20 08:12:40,6,low_angle,"right side low, looking up at seat underside",4,none,"SEAT underside, FLEG_R, BLEG_R",seat underside/leg joints,partial chair,
+IMG_1487.JPG,2026-11-20 08:12:45,6,low_angle,"front-right, low, close",4,none,"FLEG_R, SEAT front-right corner, ROCKER_R front",front leg/seat corner,partial chair,
+IMG_1488.JPG,2026-11-20 08:12:55,6,low_angle,right side at table level,5,square partial,"SEAT side edge, FLEG_R, BLEG_R, plugs",seat side-edge profile; PLUG_FLEG_R_SEAT_OUT; PLUG_BLEG_R_SEAT_OUT,none,good plug landmarks
+IMG_1489.JPG,2026-11-20 08:12:57,6,low_angle,right side at table level,5,square partial,"SEAT side edge, FLEG_R, BLEG_R, plugs",seat side-edge profile; plugs,none,
+IMG_1490.JPG,2026-11-20 08:13:01,6,low_angle,"very low rear-right, close",3,none,ROCKER_R rear/BLEG_R lower only,little,frame is mostly ceiling/window; low value,near-junk
+IMG_1491.JPG,2026-11-20 08:13:05,6,orbit,"rear-right 3/4, lowish",5,square partial,"back, 3 slats, CREST, BLEG_L/R, ROCKER_R",slat count/shape; back,none,confirms 3 slats
+IMG_1492.JPG,2026-11-20 08:13:11,6,low_angle,"rear-right, low",4,square partial,"BLEG_R, ROCKER_R rear, seat back edge",rear rocker sweep,partial,
+IMG_1493.JPG,2026-11-20 08:13:28,3,tape_reading,"ROCKER_R rear tip, top face, tape across",4,tape,ROCKER_R,rocker width,EXIF orientation 3; tape upside down,see tape_readings.csv
+IMG_1494.JPG,2026-11-20 08:13:41,6,tape_reading,"rear leg bottom, back face, tape across",4,tape,BLEG (prob. R),leg width at rocker,side not identifiable from frame,see tape_readings.csv
+IMG_1495.JPG,2026-11-20 08:13:56,6,tape_reading,FLEG_R front face just above rocker,4,tape,"FLEG_R, ROCKER_R front",leg width at rocker,light band beyond edge (roundover or side face),see tape_readings.csv
+IMG_1496.JPG,2026-11-20 08:14:45,1,elevation,"front, from above, landscape",5,ruler full (best); square partial,"SEAT front edge, FLEG_L/R, ROCKER_L/R front",ruler scale; seat front-edge scallop; rocker spacing,none,best ruler frame
+IMG_1497.JPG,2026-11-20 08:14:55,6,tape_reading,FLEG_L outer face ~1-2 in below seat,4,tape,FLEG_L,leg depth,tape upside down,see tape_readings.csv
+IMG_1498.JPG,2026-11-20 08:15:02,6,tape_reading,FLEG_L outer face between seat and arm,4,tape,FLEG_L,leg depth,tape upside down,see tape_readings.csv
+IMG_1499.JPG,2026-11-20 08:15:20,6,elevation,"rear-left, high",5,square full,"back, seat top, BLEG_L, ROCKER_L",rear-left geometry,none,
+IMG_1500.JPG,2026-11-20 08:15:24,6,elevation,"rear-right, close and high, looking down",5,"square full (best, large, sharp)","ROCKER_R rear tip, BLEG_R, seat back, slat bases, ROCKER_L",square scale; rear rocker tip vs square,top of back cropped,best square frame
+IMG_1501.JPG,2026-11-20 08:15:26,6,orbit,"rear, centred, eye near crest",5,square full,"CREST, 3 slats, BLEG_L/R, rockers",back elevation; slat spacing,none,
+IMG_1502.JPG,2026-11-20 08:15:28,6,orbit,"rear, centred, lower",5,square full,"CREST, slats, BLEG_L/R, rockers rear",back elevation,none,
+IMG_1503.JPG,2026-11-20 08:15:30,6,orbit,rear-left 3/4,5,square partial (far),all parts,rear-left orbit,none,
+IMG_1504.JPG,2026-11-20 08:15:32,6,orbit,left-rear,5,square partial (far),all parts,left-rear orbit,none,
+IMG_1505.JPG,2026-11-20 08:15:33,6,orbit,"left side, low eye level",5,square partial (far); ruler edge-on,"ROCKER_L, FLEG_L, BLEG_L, ARM_L, SEAT side",left profile,none,
+IMG_1506.JPG,2026-11-20 08:15:35,6,orbit,"left side, low eye level",5,square partial (far); ruler edge-on,"ROCKER_L, FLEG_L, BLEG_L, ARM_L",left profile,none,
+IMG_1507.JPG,2026-11-20 08:15:37,6,orbit,"left side profile, purest",5,square partial (behind chair),"ROCKER_L, FLEG_L, BLEG_L, ARM_L, back profile",ROCKER_L curve; back rake; arm,none,best left profile; shop templates hang above
+IMG_1508.JPG,2026-11-20 08:15:38,6,orbit,"left side, slightly front",5,square partial,left side parts,left profile cross-check,none,
+IMG_1509.JPG,2026-11-20 08:15:40,6,orbit,left-front 3/4,5,square partial; ruler partial,all parts,left-front orbit,none,
+IMG_1510.JPG,2026-11-20 08:15:41,6,orbit,left-front 3/4,5,square partial; ruler partial,all parts,left-front orbit,none,
+IMG_1511.JPG,2026-11-20 08:15:44,6,elevation,"rear-left 3/4, high",5,square full,"back, seat top, arms",rear-left elevation,none,
+IMG_1512.JPG,2026-11-20 08:15:46,6,elevation,"rear-left 3/4, high",5,square full,"back, seat top, arms",rear-left elevation,none,
+IMG_1513.JPG,2026-11-20 08:15:48,6,elevation,"rear, slightly left, high",5,square full,"back, seat top, both rockers rear",square + rear rockers,none,
+IMG_1514.JPG,2026-11-20 08:15:50,6,elevation,"rear, slightly right, high",5,square full,"back, seat top, both rockers rear",square + rear rockers,none,
+IMG_1515.JPG,2026-11-20 08:15:51,6,elevation,"rear-left, close",4,square partial,"back, BLEG_L, seat",back-leg detail,rocker tips cropped,
+IMG_1516.JPG,2026-11-20 08:15:53,6,elevation,"rear-left, close",4,square partial,"back, BLEG_L, seat",back-leg detail,rocker tips cropped,
+IMG_1517.JPG,2026-11-20 08:15:54,6,orbit,"left side, close",4,none,"ARM_L, FLEG_L, BLEG_L, seat side",arm/leg joints left,rockers cropped,
+IMG_1518.JPG,2026-11-20 08:15:56,6,orbit,"left side, close",4,none,"ARM_L, FLEG_L, BLEG_L, seat side",arm/leg joints left,rockers cropped,
+IMG_1519.JPG,2026-11-20 08:16:02,6,low_angle,"left-front, low, close",5,none,"FLEG_L, SEAT left edge, BLEG_L, plugs",PLUG_FLEG_L_SEAT_OUT; PLUG_BLEG_L_SEAT_OUT,partial chair,good plug landmarks
+IMG_1520.JPG,2026-11-20 08:16:04,6,orbit,left-front 3/4,5,square partial; ruler partial,all parts,left-front orbit,none,
+IMG_1521.JPG,2026-11-20 08:16:06,6,orbit,"front-left 3/4, arm level",5,ruler partial (left edge),"all parts, arm tops",arm shape,none,
+IMG_1522.JPG,2026-11-20 08:16:08,6,orbit,"front-left 3/4, arm level",5,ruler partial,all parts,arm shape,none,
+IMG_1523.JPG,2026-11-20 08:16:12,6,low_angle,"front-left, low",5,ruler partial,"SEAT front edge, FLEG_L/R, rockers front",seat front-edge profile,none,
+IMG_1524.JPG,2026-11-20 08:16:13,6,low_angle,"front-left, low",5,ruler partial,"SEAT front edge, legs",seat front-edge profile,none,
+IMG_1525.JPG,2026-11-20 08:16:15,6,low_angle,"front-left, low",5,ruler full,"SEAT front edge, legs, rockers",seat front edge + ruler,none,
+IMG_1526.JPG,2026-11-20 08:16:16,6,low_angle,"front-left, low",5,ruler full,"SEAT front edge, legs, rockers",seat front edge + ruler,none,
+IMG_1527.JPG,2026-11-20 08:16:17,6,elevation,"front-left 3/4, high",5,ruler full; square partial,"all parts, arm tops, seat top",arm plan shape; seat top,none,
+IMG_1528.JPG,2026-11-20 08:16:19,6,elevation,"front-left 3/4, high",5,ruler full; square partial,"all parts, arm tops",arm tops; leg end on arm,none,
+IMG_1529.JPG,2026-11-20 08:16:21,6,elevation,"front-left 3/4, high",5,ruler full; square partial,"all parts, arm tops",arm tops,none,
+IMG_1530.JPG,2026-11-20 08:16:23,6,low_angle,"front-left, low, backlit",3,none,"SEAT underside, FLEG_L",underside,"backlit, dark",
+IMG_1531.JPG,2026-11-20 08:16:25,6,orbit,"front-left 3/4, slightly low",5,ruler full; square partial,all parts,front-left orbit; ruler foreground,none,
+IMG_1533.JPG,2026-11-20 08:16:26,6,orbit,"front-left, slightly low",5,ruler full; square partial,all parts,front-left orbit,none,
+IMG_1534.JPG,2026-11-20 08:16:28,6,orbit,"front, slightly left, slightly low",5,ruler full; square partial,all parts; seat front scallop,front elevation-ish,none,
+IMG_1535.JPG,2026-11-20 08:16:29,6,orbit,"front, slightly left, slightly low",5,ruler full; square partial,all parts,front view,none,
+IMG_1536.JPG,2026-11-20 08:16:30,6,elevation,"front-left 3/4, elevated",5,ruler full; square partial,all parts,front-left elevation,none,
+IMG_1537.JPG,2026-11-20 08:16:45,6,top,"high over right side, looking down",5,square full; ruler partial,"seat top, arms plan, back, rockers",plan view of seat/arms; square in plane,none,
+IMG_1538.JPG,2026-11-20 08:16:49,6,top,"high over right side, looking down",5,square full; ruler full,"seat top, arms, back, rockers",plan view; both scale objects,none,
+IMG_1539.JPG,2026-11-20 08:16:51,6,top,"high over right side, looking down",5,square full; ruler full,"seat top, arms, back, rockers",plan view; both scale objects,none,
+IMG_1540.JPG,2026-11-20 08:17:06,6,top,"high, from behind",5,square full,"back, seat, rockers rear, BLEG_L/R",rocker plan spacing; back from above,none,
+IMG_1542.JPG,2026-11-20 08:17:20,6,top,"high, from behind",5,square full,"back, seat, rockers rear",rocker plan spacing,person in background,
+IMG_1544.JPG,2026-11-20 08:23:34,6,top,top-down from above-behind,5,square full,"crest plan, seat top, rockers plan","plan view: seat outline, crest curve, rocker spacing",none,best plan view
+IMG_1545.JPG,2026-11-20 08:23:36,6,top,top-down from above-behind,5,square full,"crest plan, slats from above, seat, rockers",plan view,none,
+IMG_1547.JPG,2026-11-20 08:23:50,6,top,"high over left side, slightly front",5,square partial (beyond chair); ruler partial,"seat top, ARM_L/R plan, back, rockers",plan of arms/seat from left,none,
+IMG_1548.JPG,2026-11-20 08:23:51,6,top,high over left side,5,square partial; ruler partial,"seat top, arms, back, rockers",plan from left,none,
+IMG_1549.JPG,2026-11-20 08:23:53,6,top,high over left side,5,square partial; ruler partial,"seat top, arms, back",plan from left,none,
+IMG_1551.JPG,2026-11-20 08:24:26,6,tape_reading,"behind chair, tape on seat ledge at slat bases",4,tape,"SLAT_R, SLAT_C, SLAT_L, SEAT ledge",slat widths and gaps at seat,parallax: slats behind tape plane,see tape_readings.csv
+IMG_1552.JPG,2026-11-20 08:24:58,6,tape_reading,"behind chair, tape across SLAT_C ~1 in above seat",4,tape,SLAT_C,slat width,hook not on edge,see tape_readings.csv
+IMG_1553.JPG,2026-11-20 08:25:10,6,tape_reading,"behind chair, tape across SLAT_C just below crest",4,tape,"SLAT_C, SLAT_L, CREST",slat width at top,none,see tape_readings.csv
+IMG_1555.JPG,2026-11-20 08:25:20,6,tape_reading,"behind chair, tape down crest between SLAT_L and SLAT_C",4,tape,CREST,crest height,rounded top edge,see tape_readings.csv
+IMG_1556.JPG,2026-11-20 08:25:26,6,tape_reading,"behind chair, tape across BLEG_L below crest",4,tape,"BLEG_L, CREST",back-leg width at top,none,see tape_readings.csv
+IMG_1558.JPG,2026-11-20 08:25:41,1,low_angle,"front, eye at seat front edge, landscape",5,square partial,"SEAT front-edge scallop, FLEG_L/R, rockers front",seat front-edge outline (true front elevation),none,
+IMG_1559.JPG,2026-11-20 08:25:42,1,low_angle,"front, just above seat, landscape",5,square partial,"SEAT front edge and top, legs, slats",seat front edge,none,
+IMG_1562.JPG,2026-11-20 08:25:48,1,low_angle,"front, eye at seat front edge, landscape",5,square partial,"SEAT front edge, legs, back, CREST, slats",front elevation of seat edge and back,none,
+IMG_1570.JPG,2026-11-20 08:26:59,1,detail,"left side under seat, looking up",4,none,"SEAT side edge underside, FLEG_L plug, BLEG_L",seat side-edge underside; PLUG_FLEG_L_SEAT_OUT,background blurred; side inferred (left),
+IMG_1572.JPG,2026-11-20 08:27:10,1,detail,"left side under seat, looking up",4,none,"SEAT side edge, FLEG_L, BLEG_L, plugs",plugs; seat edge thickness,side inferred (left),
+IMG_1573.JPG,2026-11-20 08:27:13,1,detail,"left side under seat, looking up",4,none,"SEAT side edge, FLEG_L, BLEG_L, plugs",plugs; seat edge,side inferred (left),
+IMG_1574.JPG,2026-11-20 08:27:35,1,detail,"front, below crest, looking up",5,none,"CREST front, slat tops, BLEG tops",crest arch and slat/crest junction,none,
+IMG_1575.JPG,2026-11-20 08:27:47,1,detail,"seat side edge from below, prob. left",4,none,"SEAT side edge, plug, slats",seat edge underside,flare; side uncertain,
+IMG_1576.JPG,2026-11-20 08:27:51,1,detail,"seat side edge close, from below, prob. left",4,none,"SEAT side edge, plug, FLEG",seat edge underside,side uncertain,
+IMG_1578.JPG,2026-11-20 08:28:10,1,detail,"front rocker tip, low, close",4,none,"ROCKER front tip, FLEG bottom",front tip shape,side uncertain,
+IMG_1579.JPG,2026-11-20 08:28:13,1,detail,"both front rocker tips, low",4,square partial,"ROCKER_L/R front tips, FLEG_L/R bottoms",front tip shape; tip spacing,none,
+IMG_1581.JPG,2026-11-20 08:29:00,1,detail,"seat top close, from above",5,none,SEAT top dish,seat dish shape,no scale,
+IMG_1582.JPG,2026-11-20 08:29:02,1,detail,"seat top close, from above",5,none,"SEAT top dish, ARM",seat dish shape,no scale,
+IMG_1583.JPG,2026-11-20 08:29:14,1,detail,seat from front-side corner,3,ruler partial,"SEAT top, front corner, plug",seat corner,hazy/soft (lens smear),
