@@ -254,19 +254,44 @@ ins = np.array([pg.contains(Point(p)) for p in np.c_[gx.ravel(), gy.ravel()]])
 pts2 = np.r_[np.c_[gx.ravel(), gy.ravel()][ins], outline]
 tri = Delaunay(pts2); cent = pts2[tri.simplices].mean(1); keep = np.array([pg.buffer(0.5).contains(Point(c)) for c in cent]); T = tri.simplices[keep]
 zt = spl.ev(pts2[:, 0], pts2[:, 1]); zedge = seat_z(pts2[:, 1]) + 4
-# rim: blend the spline to the flat rim line near the outline so the edge is clean
-dist = np.array([pg.exterior.distance(Point(p)) for p in pts2]); wgt = np.clip(dist / 25, 0, 1); zt = wgt * zt + (1 - wgt) * np.maximum(zt, zedge - 2)
-zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")
+dist = np.array([pg.exterior.distance(Point(p)) for p in pts2]); wgt = np.clip(dist / 25, 0, 1)
+seat_src = None; _sp = ROOT / "seat" / "surface.json"
+if _sp.exists():
+    # measured top surface (seat session: blue-tape dots, thin-plate spline, right half mirrored). Inside the dotted region the
+    # spline is used as it is; outside, the cloud polynomial is kept but shifted so that it meets the spline at the region's edge
+    SS = json.load(open(_sp)); _c = np.array(SS["tps"]["centres"]); _w = np.array(SS["tps"]["w"]); _a = SS["tps"]["a"]
+    def tps(x, y):
+        r2 = (np.asarray(x, float)[:, None] - _c[None, :, 0]) ** 2 + (np.asarray(y, float)[:, None] - _c[None, :, 1]) ** 2
+        return (_w[None, :] * 0.5 * r2 * np.log(np.maximum(r2, 1e-12))).sum(1) + _a[0] + _a[1] * x + _a[2] * y
+    (mx0, mx1), (my0, my1) = SS["measured_region"]["x"], SS["measured_region"]["y"]
+    xc, yc = np.clip(pts2[:, 0], mx0, mx1), np.clip(pts2[:, 1], my0, my1); inside = (xc == pts2[:, 0]) & (yc == pts2[:, 1])
+    z_cloud = zt.copy(); zt = z_cloud + tps(xc, yc) - spl.ev(xc, yc)
+    ry, rz = np.array(SS["rim"]["y"]), np.array(SS["rim"]["z"]); s0, s1 = np.polyfit(ry[:15], rz[:15], 1)[0], np.polyfit(ry[-15:], rz[-15:], 1)[0]
+    def rim_z(y): return np.where(y < ry[0], rz[0] + s0 * (y - ry[0]), np.where(y > ry[-1], rz[-1] + s1 * (y - ry[-1]), np.interp(y, ry, rz)))
+    zrim = rim_z(pts2[:, 1]); wgt = np.ones(len(pts2))       # no rim lift: the edge strip beyond the dots is the shifted cloud surface
+    dz_in = (tps(pts2[inside, 0], pts2[inside, 1]) - z_cloud[inside])
+    seat_src = {"surface": f"measured inside |x| <= {mx1:.0f}, y {my0:.0f}-{my1:.0f} (seat/surface.json: {SS['dots']['top']} tape dots on the right half, mirrored; thin-plate spline, "
+                           f"leave-one-out {SS['loo_interior']['rms']:.2f} mm rms interior, {SS['loo_interior']['max']:.1f} max); outside that the cloud polynomial shifted to meet it",
+                "measured_minus_cloud_polynomial_mm": {"median": float(np.median(dz_in)), "rms": float(np.sqrt(np.mean(dz_in ** 2))), "min": float(dz_in.min()), "max": float(dz_in.max())},
+                "rim_z_mm": {f"y{int(y)}": float(rim_z(np.array([float(y)]))[0]) for y in (100, 200, 300, 400, 500)}}
+# rim: blend the surface to the rim line near the outline so the edge is clean (not inside the measured region)
+zt = wgt * zt + (1 - wgt) * np.maximum(zt, zedge - 2)
+zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")     # underside: NOT measured; this plane matched the lower edge in side photo 1507 by eye
 nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[pts2, zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
 nb = len(outline); base = nP - nb
 for i in range(nb):
     p, q = base + i, base + (i + 1) % nb; F += [[p, q, q + nP], [p, q + nP, p + nP]]
 seat = trimesh.Trimesh(V, np.array(F), process=True); seat.fix_normals(); meshes["SEAT"] = seat
-dish = float((seat_z(pts2[:, 1]) + 4 - zt).max())
+dish = float(((zrim if seat_src else zedge) - zt).max())
 report["seat"] = {"outline": "cloud (98th percentile half-width per station; front-edge scallops NOT modelled)", "surface": "cloud (polynomial surface even in x, mirrored L+R)",
                   "surface_fit_rms_mm": float(np.sqrt(np.mean(rs ** 2))), "n_surface_points": int(len(St)), "depth_y_mm": [y_back, y_front],
                   "half_width_mm": {"back": float(half[0]), "mid": float(half[len(half) // 2]), "front": float(half[-1])},
                   "max_scoop_below_rim_mm": dish, "rim_tilt_deg": float(np.degrees(np.arctan(0.155)))}
+if seat_src:
+    report["seat"].update(seat_src); report["seat"]["rim_tilt_deg"] = float(np.degrees(np.arctan(np.polyfit(ry, rz, 1)[0])))
+    report["seat"]["underside"] = "assumed plane (z = 342 + 0.155 y - edge thickness); checked by eye against the lower edge in IMG_1507 only"
+    _e = np.abs(np.abs(pts2[:, 0]) - 240) < 12
+    report["seat"]["thickness_near_edge_mm"] = {f"y{int(y)}": float(np.median((zt - zbm)[_e & (np.abs(pts2[:, 1] - y) < 25)])) for y in (100, 300, 500)}
 
 # ---------------------------------------------------------------- arms (plank from the cloud)
 ma = (Cm[:, 0] > 226) & (Cm[:, 0] < 345) & (Cm[:, 1] > 25) & (Cm[:, 1] < 545) & (Cm[:, 2] > 465 + 0.36 * Cm[:, 1]) & (Cm[:, 2] < 540 + 0.36 * Cm[:, 1])
