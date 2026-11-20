@@ -304,3 +304,41 @@ Sessions on this machine get cut off without warning; this file says where thing
 - NEXT: (a) upper back-leg front outline (right-side photos 1471/1470, or fore-aft depth from a front-quarter photo); (b) seat edge:
   trace the side edge face on the side sheets with edge_tri (top and bottom lines), front edge from IMG_1599; (c) merge crest-arms
   when it reports; (d) K1-K6 check dimensions and Joe's caliper sheet when they arrive.
+
+## 15:35 PST upper back leg traced in side view on its own face sheets; model v6 (branch back-leg-upper, PR #3)
+- WHY IT FAILED BEFORE: (1) tools/zoom_panels.sh wrote its panels to /tmp/_zp_N.jpg, shared with the seat and crest sessions, so the
+  panels I read were sometimes another session's (fixed: own mktemp folder). (2) The upper back leg splays outward: its outer face is
+  8 mm outside the side sheet at v 450 and 43 mm at v 1000, so every photo showed it displaced by a different parallax.
+- SHEETS on the leg's own outer face (plane through the back outer arris from the back views, rms 1.2 mm): work/parts/sideL/ub and
+  work/parts/sideR/ub (u -230..130, v 420..1080, 0.5 mm/px):
+    tools/py.sh tools/face_ortho.py --point -250.972 -6.651 698.892 --normal -0.986062 -0.139517 -0.090645 --urange -230 130 --vrange 420 1080 --res 0.5 --photos 1510,1506,1507,1508,1509,1505,1504,1511 --max-angle 75 --out work/parts/sideL/ub
+    tools/py.sh tools/face_ortho.py --point 253.65 -8.096 698.702 --normal 0.983159 -0.155652 -0.095768 --urange -230 130 --vrange 420 1080 --res 0.5 --photos 1470,1477,1469,1478,1471,1472,1473,1555 --max-angle 75 --out work/parts/sideR/ub
+  then tools/tri_lines.py SHEET parts/side_seeds_ub_?.json work/parts/side?/tub and tools/side_fit.py (--sheet ..._plane.json). On these sheets the FAR leg appears displaced (it is ~483 mm behind the sheet): behind the near leg's rear edge for a
+  camera near u 0 (IMG_1507), in front of its front edge for a camera well forward (1508). So each edge needs its own cameras.
+- FRONT OUTLINE (bleg?_front_hi, v 610-1040): cameras standing BEHIND the leg see the front edge against the shop. Left 1510, 1506,
+  1505, 1511: residual 0.61 mm rms, arris 3.7-6.1 mm inside the sheet (rounded corner). Right 1470, 1477, 1478, 1469: 0.46 mm rms.
+  First try with two cameras and depth fixed at 0 gave 1.18 mm with the two photos pulling opposite ways: depth has to be solved.
+- REAR EDGE (bleg?_rear_hi, v 600-940): cameras standing IN FRONT of the leg; depth held at 0 (sheet is on that arris; 1 mm of depth
+  moves the line 0.2 mm). Left 1508, 1509: 0.45 mm rms. Right 1472, 1473: 0.70 mm rms. IMG_1471 was dropped: the far leg and the
+  slats are behind the edge there and the trace locked onto a highlight (residual 1.9 mm with it).
+- All eight photos checked by eye on single rectified photos (figures/back_leg_upper/trace_*.jpg): traces on the wood's edge.
+- LEFT vs RIGHT (tools/side_mirror.py): rear edge R minus mirrored L +0.31 mm mean, 0.36 rms, 0.73 max. Front outline +0.83 mean,
+  1.17 rms, 3.2 max: the difference is 3.0 mm at z 620 just above the arm joint and falls to 0 by z 900 (hand-blended joint, or a
+  trace effect: not settled; the design line is the mean, so +-1.5 mm there, inside the 1.6 mm curve tolerance but only just).
+  The rear arris from the BACK views disagrees L/R in fore-aft (their weak direction) by 2.8 mm at z 700, 2.2 at z 925, 4.7 at
+  z 1000; the side traces settle it inside their range (z 925: side L -150.8, R -151.3; back views L -149.2, R -151.4).
+- parts/side_frame_ub_L.json, _R.json (per side, on the ub sheets), merged into parts/side_frame.json as bleg_front_hi, bleg_rear_hi
+  (tools/side_mirror.py --out parts/side_frame.json --update). Seeds: parts/side_seeds_ub_L.json, _R.json.
+- MODEL v6 (parts/model_v6.*): tools/build_model.py takes the upper back leg's fore-aft outline from these lines (z 608-1028 front,
+  608-928 rear; above 928 the rear follows the back-view arris shifted to meet the side trace; z 450-608, the arm joint, is a linear
+  ramp from the lower leg). v5's front outline was 10-21 mm too far forward and the rear 0.4-3.6 mm; width square to the leg is now
+  34.9 (z620), 31.9 (z700), 30.0 (z800), 27.8 (z900), 23.7 (z1000) against v5's 48 (z600), 39.5 (z800), 39.4 (z1000).
+  Across-width unchanged (back view). Overlays v5 vs v6 in figures/back_leg_upper/ (1508, 1473, 1510 zooms; 1507, 1472 full).
+- STILL OPEN on the back leg: z 928-1085 rear and the leg top (crest joint; wait for the crest merge); the arm-joint ramp z 450-608
+  is not traced (only ~70 mm of front edge is exposed between seat and arm); depth of the front arris is weak (L/R differ 5.9 mm in x)
+  and is not used: across-width comes from the back view.
+- crest-arms worktree now has parts/crest.json AND parts/arms.json committed (7d2edbd, based on old main 89564b3; it also edits
+  tools/build_model.py, so the merge will conflict there).
+- NEXT: (a) merge crest-arms (rebase or merge onto main, keep both sets of build_model changes, rebuild the model, PR);
+  (b) seat edge: top and bottom lines of the side edge face on the side sheets with edge_tri, front edge from IMG_1599;
+  (c) K1-K6 and Joe's caliper sheet when they arrive; (d) register IMG_1588-1593 at half resolution only.
