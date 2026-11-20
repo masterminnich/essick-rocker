@@ -419,3 +419,23 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   face on the side sheets with edge_tri, front edge from IMG_1599; (c) arm underside/thickness from the side sheets (the arm's side
   face is seen square-on in 1507/1472); (d) K1-K6 and Joe's caliper sheet when they arrive; (e) register IMG_1588-1593 at half
   resolution only.
+
+## 15:47 PST back-leg rear pinned to the crest's edge at the leg top; model v8 (branch leg-crest-joint, PR #5)
+- Problem (found by the crest merge): above z 928 the leg's rear line only had the back-view arris (weak fore-aft). At z 1060 the
+  leg's rear was at y -173.9; the crest's top-rear arris, which runs on over the leg top and was solved in y and z, puts the leg's
+  top rear corner at y -176.7, z 1064.5 at the leg centre x 237.6 (raw points: L -177.3, R -176.0).
+- Fix in tools/build_model.py (needs parts/crest.json; skipped with --legacy): the rear line is ramped from the end of the side
+  trace (z 927.5, no change) onto that point (-1.95 mm at z 1064.5). No new tracing; crest.json only read.
+- Result, v8 vs the crest's back face at the leg centre x 237.6 (crest value = line between its bottom-rear and top-rear arrises):
+  z 1000: leg -164.7, crest -164.8; z 1020: -168.5 / -168.5; z 1040: -172.0 / -172.2; z 1060: -175.8 / -175.9. v7 was 1.2-2.0 mm
+  in front. The agreement at z 1000-1040 is an independent check: the crest's bottom-rear depth was ASSUMED (carried down a
+  9.9 deg lean), and the leg line gets there from the side trace and the top pin alone.
+- Leg fore-aft width at z 1000: 25.2 mm (v7 24.1); at z 1060: 26.4 (v7 24.5). Everything below z 928 unchanged.
+- By eye, v7 vs v8 (figures/leg_crest_joint/): IMG_1508 the leg outline's rear edge now runs on the boundary between the leg and
+  the lit crest back face behind it, and reaches the top rear corner (v7 ran inside the wood); IMG_1473 small move, on the edge.
+- STILL OPEN at this joint: the crest's back face is bowed, so at the leg's INNER face (x 220) it is 2.5-2.8 mm behind the leg's
+  rear face in the model (z 1000-1060), and at the outer face (x 252, top) 0.4 mm in front. On the chair the leg's rear face is
+  blended into the bow by hand; the model's leg has a constant section. Front faces: leg -149.4 vs crest -150.8 at x 220, z 1060
+  (leg 1.4 mm proud). A side template of the leg is not affected (it is the outer-face profile); the blend is shaping after glue-up.
+- NEXT: (b) seat edge lines on the side sheets; (c) arm underside/thickness from the side sheets; (d) K1-K6 and the caliper
+  sheet when they arrive; (e) register IMG_1588-1593 at half resolution only.

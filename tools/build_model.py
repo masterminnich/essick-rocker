@@ -229,15 +229,25 @@ if SFL and "bleg_front_hi" in SFL and "bleg_rear_hi" in SFL:
         d = np.interp(z_, zL, yL) - old; d0 = np.interp(z0, zL, yL) - np.interp(z0, z_, old); d1 = np.interp(zL[-1], zL, yL) - np.interp(zL[-1], z_, old)
         return np.where(z_ < z0, d0 * np.clip((z_ - zj) / (z0 - zj), 0, 1), np.where(z_ > zL[-1], d1, d))   # ramp in below the trace, hold the last correction above it
     dF, dR = _corr(zF, yF, f_old), _corr(zR, yR, r_old); f_new, r_new = f_old + dF, r_old + dR
+    pin_rep = {}; _cf = ROOT / "parts/crest.json"
+    if _cf.exists() and not a.legacy:
+        # the crest's top-rear arris was solved in y and z and runs on over the leg top, so at the leg it is a measured point on the leg's rear face;
+        # above the side trace the rear only had the back-view arris (weak fore-aft). Ramp the rear line from the end of the side trace onto that point.
+        _C = json.load(open(_cf)); _ev = lambda c_, x_: sum(ck * abs(x_) ** (2 * k) for k, ck in enumerate(c_)); _d = _C["edges"]["top_rear"]["design"]
+        _xl = float(np.mean([abs(_C["joints"][s_][f_]["mm"]) for s_ in ("left", "right") for f_ in ("leg_inner_face_x", "leg_outer_face_x")]))
+        y_tr, z_tr = float(_ev(_d["y_even_poly"], _xl)), float(_ev(_d["z_even_poly"], _xl)); gap = y_tr - float(np.interp(z_tr, z_, r_new))
+        r_new = r_new + gap * np.clip((z_ - zR[-1]) / (z_tr - zR[-1]), 0, 1.2)
+        pin_rep = {"point_xyz": [round(_xl, 1), round(y_tr, 1), round(z_tr, 1)], "rear_moved_at_top_mm": gap, "ramp_from_z": float(zR[-1]),
+                   "note": "rear line pinned to the crest's top-rear arris at the leg centre (parts/crest.json); the arris slants across the leg top (about -179.0 at the inner face, -176.2 at the outer), the model's leg section does not"}
     allc = np.c_[allc[:, 0], (f_new + r_new) / 2, allc[:, 2]]; tan, e_acr, e_side = _frame(allc); w_side = (f_new - r_new) * np.abs(e_side[:, 1])
     inr = (z_ >= z0) & (z_ <= zR[-1])
     bl_up_src = (f"z {z0:.0f}-{zF[-1]:.0f}: front outline triangulated in side view from 4 cameras standing behind the leg on each side (solve residual 0.6 / 0.5 mm L / R); z {z0:.0f}-{zR[-1]:.0f}: rear edge traced in side view "
                  f"in 2 cameras standing in front of the leg on each side, depth held on the back outer arris (residual 0.45 / 0.7 mm); L and R averaged. Above z {zR[-1]:.0f} the rear follows the back-view arris, "
-                 f"shifted to meet the side trace; z {zj:.0f}-{z0:.0f} (arm joint) is a linear ramp from the lower leg. Across-width still from the back view.")
+                 f"shifted to meet the side trace" + (f" and ramped onto the crest's top-rear arris at the leg top (moved {pin_rep['rear_moved_at_top_mm']:+.1f} mm there)" if pin_rep else "") + f"; z {zj:.0f}-{z0:.0f} (arm joint) is a linear ramp from the lower leg. Across-width still from the back view.")
     up_rep = {"front_moved_mm": [float(dF[inr].min()), float(dF[inr].max())], "rear_moved_mm": [float(dR[inr].min()), float(dR[inr].max())],
               "left_right_fore_aft_mm": {k: {"mean": SFL[k]["lr_diff_y_mean_mm"], "rms_about_mean": SFL[k]["lr_diff_y_rms_about_mean_mm"]} for k in ("bleg_front_hi", "bleg_rear_hi")},
               "width_fore_aft_mm": {f"z{int(z)}": float(np.interp(z, z_, f_new - r_new)) for z in (620, 700, 800, 900, 1000)},
-              "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}}
+              "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}, "crest_pin": pin_rep}
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
 report["back_leg"] = {"lower": bl_low_src, "upper": bl_up_src, "upper_side_view": up_rep,
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
