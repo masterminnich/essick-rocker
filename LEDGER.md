@@ -134,3 +134,13 @@ Sessions on this machine get cut off without warning; this file says where thing
 - NEXT: (1) re-render sc/so with --max-angle 25 (3 frontal photos) and re-snap, esp. slatR_out; (2) same banded-offset fix for
   the back legs sheet (tabulated, replaces the 5th-order refit); (3) side-frame retraces with edge_snap; (4) crest + arms from
   a top view / own surface; (5) overlays of v2 on side and front-quarter photos.
+
+## 14:35 pushed to GitHub; seat split out
+- GitHub: https://github.com/masterminnich/essick-rocker (private). `tools/push.sh` pushes main + seat (fast-forward) through the
+  sandbox clone at ~/.cc-sessions/sandboxes/essick-rocker-joe/repo, which holds Joe's own GitHub sign-in. Push after commits.
+  The sandbox's PREVIEW setup failed (hub tried to write a service file into a folder that does not exist); not needed here.
+- Seat work is split to another session: worktree ../rocking-chair-seat, branch `seat`, brief in SEAT_HANDOFF.md. The coordinator
+  (this ledger) does NOT touch the seat any more; merge `seat` into main when that session reports.
+- Drive had 100 photos at 14:25. New since the first 94: IMG_1588-1592 (far views, square stood upright, digitally zoomed,
+  chair possibly moved) and IMG_1593 (tape across the seat front). No blue-dot photos uploaded yet. None of the six are
+  registered in the camera model.
