@@ -61,3 +61,15 @@ Sessions on this machine get cut off without warning; this file says where thing
 - Joe (13:30) was surprised model v1 looks rough and asked whether rectified images were the problem. Answer given: no; the
   rough parts never came from rectified traces, they came from sparse cloud extents drawn as boxes. Plan: fit part
   silhouettes directly in the photos (model-driven), keep rectified traces for flat faces only.
+
+## 13:50 carved hull (new shape source for the sculpted parts)
+- tools/chair_mask.py: chair masks for 70 photos (work/masks/, GrabCut seeded by projected cloud points + model v1 band).
+  Masks leak onto similar-coloured background in places (back views, under the seat).
+- tools/carve.py -> parts/hull_v1.npz (vote grid, 2.5 mm voxels); tools/hull_mesh.py --keep 0.97 -> parts/hull_v1.glb.
+  keep 0.88 fills the gaps between slats; 0.97 opens them. Run carve and mesh as SEPARATE steps (a combined run was cut off).
+- tools/hull_views.py (ortho thickness views), tools/shade.py (shaded render from a photo's camera beside the photo).
+- Result: recognisable chair with real part shapes. Faults: lump behind the centre slat / seat back, seat scoop filled
+  (a hull cannot see hollows), stepped surface, accuracy not yet measured against anything.
+- NEXT: (1) measure hull vs the traced rocker profile (known good) to get a real accuracy number for the hull;
+  (2) tighten masks using the hull itself as the prior and re-carve; (3) take part cross-sections from the hull to give
+  model parts real section shapes instead of boxes; (4) seat scoop from the cloud surface, cut into the hull.
