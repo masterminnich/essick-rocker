@@ -277,3 +277,30 @@ Sessions on this machine get cut off without warning; this file says where thing
   back-leg front outline (try right-side photos 1471/1470 where the background differs, or the leg's fore-aft depth from a
   front-quarter photo); (c) seat-joint region of both legs; (d) merge crest-arms when ready; (e) overlays on the 5 spread views
   1485,1472,1527,1502,1545 as before/after for Joe.
+
+## 15:10 PST seat merged and fed into the model (v5); pull-request workflow from now on
+- WORKFLOW (Joe, 15:08): big changes go through a pull request that is SQUASH-merged, so each PR is a readable record of the
+  progress (figures, plots, roadblocks) for a later write-up. Small ledger fixes may still go straight to main.
+  How: branch off main; commit figures under figures/<topic>/; `tools/push.sh BRANCH`; `gh pr create` with Joe's sign-in
+  (GH_CONFIG_DIR=/Users/sean/.cc-sessions/code2-fresh-home/.cc-sessions/users/726d315d-a06f-409b-b996-e0d36778bd9c/gh, absolute path:
+  HOME here is already .../code2-fresh-home, so `~/.cc-sessions/code2-fresh-home/...` points nowhere); images in the PR body as
+  https://github.com/masterminnich/essick-rocker/blob/<commit>/<path>?raw=true; `gh pr merge --squash --delete-branch`;
+  `tools/push.sh --pull-main`. The seat PR (#1) is the pattern.
+- Seat branch merged into main (b2ca0c2): seat/REPORT.md, seat/surface.json (thin-plate spline through 103 mirrored tape dots,
+  leave-one-out 1.18 mm rms interior), figures in seat/figures.
+- tools/build_model.py now uses seat/surface.json for the seat top inside the dotted region (|x| <= 251, y 64-530); outside it the
+  old cloud polynomial is kept but shifted to meet the spline at the region's edge. Measured minus old polynomial inside the
+  region: median -1.8, rms 4.5, range -16.7..+6.1 mm (the old polynomial was fitted to cloud points above a guide plane that sat
+  ~13 mm too high at the back, so it probably never saw the back hollow: inferred, not checked).
+- ROADBLOCK: first try also took the seat's edge height and underside from the measured rim line (extended behind the dots).
+  In IMG_1507 the underside then sat ~35 px (about 40 mm at the rear) too low. The rim line is the highest point INSIDE the dotted
+  region, not the seat's edge, and it is extrapolated behind y 64. Reverted: underside = the old assumed plane, which matches the
+  seat's lower edge in 1507 by eye. Resulting edge thickness 30 mm (y100), 36 (y300), 43 (y500): NOT measured.
+- parts/model_v5.* ; overlays v3 vs v5 on 1507,1484,1472,1485,1527,1502,1545 in figures/side_frames/ (tools/before_after.py pairs two
+  overlay_sil outputs); figures/side_frames/side_lines.png (tools/side_plot.py: elevation of the triangulated lines and widths against
+  height with the tape readings); traces_L_1507.jpg / traces_R_1472.jpg (tools/tri_show.py panels).
+- STILL OPEN: upper back-leg front outline in side view; seat plan outline, edge thickness and underside (no data: needs an edge
+  trace or two tape readings); seat-joint regions of the legs; arm/crest come from the crest-arms session.
+- NEXT: (a) upper back-leg front outline (right-side photos 1471/1470, or fore-aft depth from a front-quarter photo); (b) seat edge:
+  trace the side edge face on the side sheets with edge_tri (top and bottom lines), front edge from IMG_1599; (c) merge crest-arms
+  when it reports; (d) K1-K6 check dimensions and Joe's caliper sheet when they arrive.
