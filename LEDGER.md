@@ -388,7 +388,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   (b) seat edge: top and bottom lines of the side edge face on the side sheets with edge_tri, front edge from IMG_1599;
   (c) K1-K6 and Joe's caliper sheet when they arrive; (d) register IMG_1588-1593 at half resolution only.
 
-## 15:40 PST crest-arms merged; model v7 = v6 legs + measured crest and arms (branch crest-arms-merge, PR #4)
+## 15:39 PST crest-arms merged; model v7 = v6 legs + measured crest and arms (branch crest-arms-merge, PR #4)
 - Merged branch crest-arms (7d2edbd: parts/crest.json, parts/arms.json, tools/curve_tri.py, crest_fit.py, arm_fit.py, cam_table.py,
   figures/crest-arms/) into main's line. tools/build_model.py merged without conflict (my upper-back-leg block sits before the leg
   sweep, the crest/arm block after it); only this ledger conflicted (both entries kept, in time order). crest.json and arms.json are
@@ -401,10 +401,10 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   - upper back-leg widths unchanged from v6. Overall box 42.62 in high, 24.86 in wide, 43.01 in long.
 - CHECKED BY EYE, v6 vs v7 on single photos (figures/crest_arms_merge/):
   - IMG_1545 from above, both crest ends zoomed: the crest outline now stops on the visible joint line with the leg and the leg
-    outline sits on the leg's end grain; v6's crest was a straight box 15-25 mm off the bowed rail.
+    outline sits on the leg's end grain; v6's crest was a straight box that missed the bowed rail and overshot both ends.
   - IMG_1508 leg top zoomed: leg outline ends on the top of the wood; v6's leg and crest stood about 20 mm above it.
   - IMG_1502 from behind: crest outline follows the arch. IMG_1485 and IMG_1527 arm zooms: arm outlines follow both arms' top and
-    outer edges; v6's arms were up to ~15 mm off at the front and the front legs poked through.
+    outer edges; v6's arm outlines (from the point cloud) missed the front ends and undersides, and the front legs ran up into the arms.
   - Arm underside in 1485: the model's flat 25 mm plank is thicker than the wood at mid length (the real underside is hollowed
     between leg and back): thickness and underside shape are still assumed.
 - NEW OPEN ITEM found by the merge: the crest and the back leg do not meet flush in the model. At the leg's inner face (x 220) the
