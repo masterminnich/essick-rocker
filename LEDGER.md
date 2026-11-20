@@ -83,3 +83,15 @@ Sessions on this machine get cut off without warning; this file says where thing
   back-view plane (crest front face, upper back legs, slats) from 1501/1502/1513; top view (arm outlines, seat outline,
   crest plan) from 1544/1545/1538/1539; then rebuild model v2 with those. Hull only as a visual reference.
   A tighter segmenter (a learned model such as SAM) would be the way to make carving accurate; needs Joe's OK (compute).
+
+## 14:10 unrolled back view + tracing method changed (Joe: "tracing could be better from the jump")
+- tools/sheet_ortho.py: "unrolled" orthophoto along a side profile y(z) (parts/back_profile.json from the cloud). Slats from the
+  back: work/parts/back/s_* ; photo-consistency minimum at offset +10 mm = slat back face -> slat thickness ~10 mm.
+  Image is sharp for slats; crest and back legs visible but slightly off-sheet (do their own sheets: key "blegs").
+- WIDE-BAND AUTO TRACING IS WRONG HERE: ribbon_trace on the median image jumped to background (centre slat 98 mm at the
+  bottom); on a likelihood image it ran inside the wood (58 mm). By eye on a zoomed 10 mm grid: 76-82 mm.
+- NEW TRACING RULE: seed every edge BY EYE on zoomed gridded views (ortho_view.py --scale 2.6 --grid 10, read u,v off the
+  grid), then tools/edge_snap.py refines within +-3 mm only. Centre slat: 81.8 mm (v60) -> 100.0 mm (v665); tape close-up
+  IMG_1553 read 98.3 mm just under the crest. Remaining ambiguity 2-3 mm low on the slat (light strip = side face showing).
+- NEXT: redo with this rule: outer slats; back legs + crest (own sheets); then REDO front legs / back legs lower / seat edge
+  in work/parts/sideL|R (old traces only 54-61 % clean) and re-check the rockers; then model v2.
