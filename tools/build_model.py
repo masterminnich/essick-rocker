@@ -17,6 +17,7 @@ from scipy.spatial import Delaunay
 from rocker.sideframe import side_plane, to_plane, from_plane
 
 ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); ap.add_argument("--params", default=None)
+ap.add_argument("--legacy", action="store_true", help="v3 crest and arms from the cloud instead of parts/crest.json + parts/arms.json")
 a = ap.parse_args()
 PRM = {  # sizes not (yet) measured from photos
     "rocker_width_across": (31.0, "tape", "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"),
@@ -264,6 +265,76 @@ meshes["SLAT_R"], wo_ = slat(SLJ["sheet_outer"], SY["outer_in"], SY["outer_out"]
 report["slats"] = {"edges": "fitted (unrolled back view, by-eye seeded edges, L+R averaged)", "surface": "back face located by photo consistency in 7 height bands, separately for centre and outer slats",
                    "thickness_mm": thick, "thickness_provenance": "front-face cloud layer vs photo-consistent back face (about 10 mm)",
                    "centre_width_mm": {"near_seat": float(wc_[8]), "under_crest": float(wc_[-5])}, "outer_width_mm": {"near_seat": float(wo_[8]), "under_crest": float(wo_[-5])}}
+
+# ---------------------------------------------------------------- crest rail and arms from the overhead photos (parts/crest.json, parts/arms.json)
+def grid_solid(top, bot, ns, nt):
+    """closed solid from two (ns x nt x 3) grids of matching topology: top surface, bottom surface, four side strips"""
+    T, B = np.asarray(top).reshape(-1, 3), np.asarray(bot).reshape(-1, 3); V = np.r_[T, B]; o = ns * nt; F = []
+    idx = lambda i, j: i * nt + j
+    for i in range(ns - 1):
+        for j in range(nt - 1):
+            a_, b_, c_, d_ = idx(i, j), idx(i + 1, j), idx(i + 1, j + 1), idx(i, j + 1)
+            F += [[a_, b_, c_], [a_, c_, d_], [a_ + o, c_ + o, b_ + o], [a_ + o, d_ + o, c_ + o]]
+    ring = [idx(i, 0) for i in range(ns)] + [idx(ns - 1, j) for j in range(1, nt)] + [idx(i, nt - 1) for i in range(ns - 2, -1, -1)] + [idx(0, j) for j in range(nt - 2, 0, -1)]
+    for k in range(len(ring)):
+        p, q = ring[k], ring[(k + 1) % len(ring)]; F += [[p, q + o, q], [p, p + o, q + o]]
+    m = trimesh.Trimesh(V, np.array(F), process=True); m.fix_normals(); return m
+
+
+TOPF = ROOT / "parts/crest.json", ROOT / "parts/arms.json"
+if a.legacy or not all(f.exists() for f in TOPF):
+    report["crest_arms_source"] = "legacy cloud crest and arms (v3)"
+else:
+    CJ = json.load(open(TOPF[0])); ev = lambda c, x: sum(ck * np.abs(x) ** (2 * k) for k, ck in enumerate(c))
+    E = {k: CJ["edges"][k]["design"] for k in ("top_rear", "top_front", "bottom_front", "bottom_rear")}
+    jx = (abs(CJ["joints"]["left"]["leg_inner_face_x"]["mm"]) + abs(CJ["joints"]["right"]["leg_inner_face_x"]["mm"])) / 2
+    xo_ = (abs(CJ["joints"]["left"]["leg_outer_face_x"]["mm"]) + abs(CJ["joints"]["right"]["leg_outer_face_x"]["mm"])) / 2
+    xs_ = np.linspace(-jx - 2, jx + 2, 89)       # 2 mm into each leg so the parts meet
+    corner = lambda k: np.c_[xs_, ev(E[k]["y_even_poly"], xs_), ev(E[k]["z_even_poly"], xs_)]
+    TR, TF, BF, BR = (corner(k) for k in ("top_rear", "top_front", "bottom_front", "bottom_rear"))
+    tt = np.linspace(0, 1, 5)[None, :, None]
+    top = TR[:, None] * (1 - tt) + TF[:, None] * tt; bot = BR[:, None] * (1 - tt) + BF[:, None] * tt
+    meshes["CREST"] = grid_solid(top, bot, len(xs_), 5)
+    # back-leg tops end flush with the crest's top arch (crest.json joints: "leg tops flush, arch carried over them")
+    xl = (jx + xo_) / 2; sx = (ev(E["top_rear"]["z_even_poly"], xl + 1) - ev(E["top_rear"]["z_even_poly"], xl - 1)) / 2
+    yr_, yf_ = ev(E["top_rear"]["y_even_poly"], xl), ev(E["top_front"]["y_even_poly"], xl); zr_, zf_ = ev(E["top_rear"]["z_even_poly"], xl), ev(E["top_front"]["z_even_poly"], xl)
+    sy = (zf_ - zr_) / (yf_ - yr_); p0 = np.array([xl, yr_, zr_]); nrm = np.array([-sx, -sy, 1.0]); nrm /= np.linalg.norm(nrm)
+    bl_top_before = float(meshes["BLEG_R"].vertices[:, 2].max())
+    for k_, sg in (("BLEG_R", 1), ("BLEG_L", -1)):
+        p_, n_ = p0 * [sg, 1, 1], nrm * [sg, 1, 1]
+        try: meshes[k_] = meshes[k_].slice_plane(p_, -n_, cap=True)
+        except Exception: meshes[k_] = meshes[k_].slice_plane(p_, -n_, cap=False)
+    report["crest"] = {"source": "parts/crest.json (four arrises triangulated from overhead + rear photos; design = even polynomials)",
+                       "span_between_legs_mm": float(2 * jx), "top_centre_z": float(ev(E["top_rear"]["z_even_poly"], 0)), "top_at_leg_centre_z": float(zr_),
+                       "back_leg_top_cut": {"before_z_max": bl_top_before, "plane_point": p0.round(1).tolist(), "slope_dzdx": float(sx), "slope_dzdy": float(sy)}}
+    # arms: design version (right arm; left = mirror)
+    AJ = json.load(open(TOPF[1])); D_ = AJ["design"]; th = AJ["thickness"]["value_mm"]
+    pin, pout = np.array(D_["inner_x_of_y"]["poly_in_(y-300)"]), np.array(D_["outer_x_of_y"]["poly_in_(y-300)"])
+    pz, pzx, pf = np.array(D_["top_z_of_y"]["poly_in_(y-300)"]), np.array(D_["top_z_of_y"]["cross_slope_outer_minus_inner_poly"]), np.array(D_["front_y_of_x"]["poly"])
+    y_back = min(D_["y_back"], 40.0)              # carried on into the back leg (the joint itself is not seen from above)
+    ci_, co_ = D_["corners"]["front_inner"], D_["corners"]["front_outer"]; ns, nt = 70, 7
+    S_, T_ = np.meshgrid(np.linspace(0, 1, ns), np.linspace(0, 1, nt), indexing="ij")
+    yend = ci_[1] + T_ * (co_[1] - ci_[1]); Y = y_back + S_ * (yend - y_back)
+    X = np.polyval(pin, Y - 300) + T_ * (np.polyval(pout, Y - 300) - np.polyval(pin, Y - 300))
+    Y = np.where(S_ == 1, np.polyval(pf, X), Y)   # front row exactly on the design front line
+    Z = np.polyval(pz, Y - 300) + (T_ - 0.5) * np.polyval(pzx, Y - 300)
+    slope = np.arctan(np.polyval(np.polyder(pz), Y - 300)); Zb = Z - th / np.cos(slope)
+    am = grid_solid(np.dstack([X, Y, Z]), np.dstack([X, Y, Zb]), ns, nt); meshes["ARM_R"] = am; meshes["ARM_L"] = mirror(am)
+    # front-leg tops vs the arm underside
+    fv = meshes["FLEG_R"].vertices; tp = fv[fv[:, 2] > fv[:, 2].max() - 15]; yc, xc = float(tp[:, 1].mean()), float(tp[:, 0].mean())
+    zu = float(np.polyval(pz, yc - 300) - th / np.cos(np.arctan(np.polyval(np.polyder(pz), yc - 300))))
+    fl = {"leg_top_z": float(fv[:, 2].max()), "arm_underside_z_at_leg": zu, "leg_top_xy": [round(xc, 1), round(yc, 1)],
+          "arm_x_range_at_leg": [float(np.polyval(pin, yc - 300)), float(np.polyval(pout, yc - 300))]}
+    if fl["leg_top_z"] > zu:
+        su = np.polyval(np.polyder(pz), yc - 300); n_ = np.array([0, -su, 1.0]); n_ /= np.linalg.norm(n_); p_ = np.array([xc, yc, zu])
+        for k_, sg in (("FLEG_R", 1), ("FLEG_L", -1)):
+            try: meshes[k_] = meshes[k_].slice_plane(p_ * [sg, 1, 1], -n_, cap=True)
+            except Exception: meshes[k_] = meshes[k_].slice_plane(p_ * [sg, 1, 1], -n_, cap=False)
+        fl["action"] = "cut at the arm underside (it ran through the arm)"
+    else: fl["action"] = f"left as traced: it stops {zu - fl['leg_top_z']:.1f} mm below the arm underside (assumed arm thickness {th} mm)"
+    report["arm"] = {"source": "parts/arms.json design (triangulated top arrises of both arms, mirrored mean)", "y_range": [float(y_back), float(max(ci_[1], co_[1]))],
+                     "back_extension": f"carried from y {D_['y_back']} back to {y_back} into the back leg (not seen)", "thickness_mm": th, "front_leg_top": fl}
+    report["crest_arms_source"] = "parts/crest.json + parts/arms.json"
 
 # ---------------------------------------------------------------- export
 scene = trimesh.Scene()

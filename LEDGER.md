@@ -239,3 +239,48 @@ Sessions on this machine get cut off without warning; this file says where thing
   --depth-guess; write parts/side_seeds_R.json); mirror-compare with parts/side_frame_L.json; upper back-leg front outline;
   seat side edge is the seat session's. Then feed side_frame_L/R into build_model (front legs and lower back legs are still the
   old ribbon traces there). (4) crest + arms. (5) overlays on side (1507) and front-quarter (1484) photos.
+
+## 15:27 PST crest rail and arms from the photos taken from above (step 4, branch crest-arms; Joe's section)
+Method: each arris (edge) traced only in photos that cannot see that part's side face, and solved on its own. No photo
+blending across a thick part. No COLMAP re-solve; every job ran through tools/py.sh / safe_run, one at a time, peak < 0.5 GB.
+- New tools: tools/curve_tri.py (one arris as a 3D curve from traces on DIFFERENT sheets: overhead z = const + rear
+  y = const, so both y and z are solved), tools/crest_fit.py, tools/arm_fit.py, tools/cam_table.py.
+- **Crest (parts/crest.json)**: four arrises.
+  - Top-rear (the back face's top edge): triangulated from 1545/1547/1548/1549 overhead + 1502/1501/1503 rear.
+    Residuals 0.4-1.7 mm; sigma < 0.9 mm.
+  - Top-front and bottom-front: triangulated in plan; z assumed square to the lean (+4.4 mm).
+  - Bottom-rear: z triangulated from the rear photos; y carried down the back legs' lean (9.9 deg, assumed; flush backs per IMG_1540).
+  - Shape: the back face bows 18.0 mm in plan (arc R 1231). The top arches in elevation: 1078.5 at the centre,
+    1063.8 at the leg outer face, so the rise is 14.7 mm.
+  - The rail tapers: 28.4 thick at the top, 40.6 at the bottom (the front face leans 18.8 deg at the centre).
+  - Leg tops end flush with the crest top, so the arch runs over them. Visible span between the legs' inner faces: 436.7 mm (+-0.8).
+  - Left/right mirror rms 0.6-1.8 mm.
+  - OPEN: the tape height check is off by 2.8 mm (74.7 here vs IMG_1555's 77.5).
+- **Arms (parts/arms.json)**: left and right solved separately, then a symmetric design version.
+  - Outer top arris: depth solved (1544/1545/1547-1549 for the right arm; 1544/1545/1537-1539 for the left). Residual 0.36 / 0.56 mm.
+  - Inner top arris: its clean photos all stand on one side (1537-1539 R, 1547-1549 L). So its depth is taken from the
+    outer arris at the same station, which assumes the top is flat across the width. Sensitivity is 0.4-0.6 mm per mm of depth.
+  - Front ends: a second sheet with its axes swapped, since edge_tri only follows edges running along v. All photos
+    stand behind the front edge, so all are clean. The free depth solve put the arris 7-13 mm deeper than the side
+    arrises do. The point cloud sides with the side arrises, so their depth is used. Front position along the arm: +-2.5 mm.
+  - Heights checked independently against the dense cloud at every 30 mm station: within 1-3 mm.
+  - Design: a tapered plank. Width 41 / 53 / 63 / 72 / 76 mm at y = 100 / 200 / 300 / 400 / 480. Top z 531 -> 659.
+    Slope 23 deg at the back easing to 14 deg at the front. The inner edge curves; the outer is nearly straight.
+    Front corners (design, right arm) (239.0, 490.1) and (315.6, 503.8): the front end is cut on a slant.
+  - Left vs right: forward of y 340, both arms sit ~3.6 mm toward +x and the left is ~5 mm higher. That is a real
+    asymmetry or a slight roll of the frame; the design averages it out.
+  - The left inner trace behind y 180 follows a shading line ~4-5 mm inside the edge, so the design uses the right arm there.
+  - Lesson: on long tapered parts, the outer trace jumped onto background where the arm narrows (behind y ~ 230).
+    Re-seeding by eye on 10 mm grids fixed it. Always overlay the per-photo traces before trusting a solve.
+- **build_model.py**: reads both files (`--legacy` gives back v3's cloud crest and arms).
+  - The crest is lofted between its four design arrises, 2 mm into each leg.
+  - The back-leg tops are cut to the arch: they were 1088.5 high, now flush with the crest top at the leg (1064.5).
+  - The arms are a grid solid from the design curves, carried back to y 40 into the back leg.
+  - The front-leg tops ran 10.7 mm up through the arm; now cut at the arm underside.
+  - Output: parts/model_v3_crest.glb.
+- Overlays (v3 left, new right): figures/crest-arms/sbs_{1545,1485,1472,1527,1502}.jpg.
+- OPEN:
+  - Arm thickness is still assumed (25 mm).
+  - Where each arm meets its back leg isn't seen from above.
+  - Neither the arms' inner edges nor their front ends meet 1/32"; both are within 1/16".
+  - R2 delivery: no uploader on CB. The figures are on GitHub (private repo).
