@@ -1,0 +1,164 @@
+{
+ "assumed_or_tape": {
+  "rocker_width_across": {
+   "value_mm": 31.0,
+   "provenance": "tape",
+   "note": "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"
+  },
+  "fleg_thickness_across": {
+   "value_mm": 33.0,
+   "provenance": "cloud+tape",
+   "note": "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"
+  },
+  "bleg_thickness_across": {
+   "value_mm": 38.0,
+   "provenance": "cloud+tape",
+   "note": "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"
+  },
+  "arm_thickness": {
+   "value_mm": 25.0,
+   "provenance": "assumed",
+   "note": "not measurable yet; caliper A1-A3 will replace"
+  },
+  "slat_thickness": {
+   "value_mm": 9.5,
+   "provenance": "cloud",
+   "note": "front/back face point layers about 8-10 mm apart"
+  },
+  "seat_edge_thickness": {
+   "value_mm": 40.0,
+   "provenance": "fitted",
+   "note": "side-edge face traced 39-45 mm at the back, thinner to the front; constant here"
+  },
+  "crest_height": {
+   "value_mm": 77.5,
+   "provenance": "tape",
+   "note": "IMG_1555 read 3.05 in"
+  }
+ },
+ "parts": {
+  "rocker": {
+   "profile": "fitted (face orthophoto, both sides averaged)",
+   "length_traced_mm": 1100.0,
+   "face_height_mm": [
+    19.939143415025,
+    30.62023870776993
+   ],
+   "rocking_radius_mm": 1066.0481101767214,
+   "left_right_shape_rms_mm": 1.0227473114484877
+  },
+  "front_leg": {
+   "profile": "fitted (side face orthophoto, L+R pooled)",
+   "edge_scatter_mm": [
+    0.731517586584611,
+    1.037346743553145
+   ],
+   "inlier_share": [
+    0.7554621848739496,
+    0.5369747899159664
+   ],
+   "width_side_view_mm": {
+    "v150": 53.703912797774855,
+    "v300": 57.77020421885584,
+    "v380": 53.032901902189884,
+    "v450": 45.97799295478544,
+    "v600": 37.547783556239864
+   }
+  },
+  "back_leg": {
+   "lower": "fitted (side face orthophoto; front edge good, rear edge rough)",
+   "upper": "cloud (centreline + extents, mirrored L+R)",
+   "front_edge_scatter_mm": 1.014935891222621,
+   "rear_edge_scatter_mm": 1.9354648390382265,
+   "width_side_view_mm": {
+    "z100": 52.79023736002496,
+    "z300": 60.18224873995747,
+    "z450": 56.22260994566492,
+    "z600": 48.314199304960844,
+    "z800": 39.492190722669996,
+    "z1000": 39.42491408804165
+   },
+   "across_extent_cloud_mm": [
+    48.12217594073374,
+    96.13713718145434
+   ],
+   "top_centre": [
+    218.2,
+    -166.5,
+    1085.0
+   ],
+   "splay_top_x_mm": 218.23499177564526
+  },
+  "seat": {
+   "outline": "cloud (98th percentile half-width per station; front-edge scallops NOT modelled)",
+   "surface": "cloud (polynomial surface even in x, mirrored L+R)",
+   "surface_fit_rms_mm": 1.8292898999892055,
+   "n_surface_points": 3467,
+   "depth_y_mm": [
+    10.807830588623009,
+    513.6011155464511
+   ],
+   "half_width_mm": {
+    "back": 202.3133640904399,
+    "mid": 257.0455232051427,
+    "front": 267.6544775564857
+   },
+   "max_scoop_below_rim_mm": 21.05890891853886,
+   "rim_tilt_deg": 8.81073298598491
+  },
+  "arm": {
+   "top_face": "cloud (plane fit, mirrored L+R)",
+   "plane_fit_rms_mm": 1.0203388593934402,
+   "n_points": 602,
+   "pitch_deg": 17.404849202179932,
+   "roll_deg": 0.1316869109937896,
+   "length_mm": 300.0,
+   "width_mm": {
+    "back": 46.055908275749196,
+    "mid": 58.99605897860283,
+    "front": 64.81263329737436
+   },
+   "outline": "cloud extents (3-97 percentile), NOT a traced edge"
+  },
+  "crest": {
+   "plan": "cloud (front/back extents per station, symmetric quadratic)",
+   "thickness_centre_mm": 39.52695373377864,
+   "thickness_end_mm": 35.917372431013746,
+   "bow_mm_over_half_span": -14.191906994826638,
+   "top_z_mm": 1082.4709139226143,
+   "note": "top edge arch and back-leg tilt of the rail NOT modelled (vertical extrusion)"
+  },
+  "slats": {
+   "side_profile": "cloud (5th-order curve through one face)",
+   "face_scatter_mm": 1.4974602790979064,
+   "centre_width_mm": {
+    "z400": 56.47859746533996,
+    "z950": 80.98382659927049
+   },
+   "outer_width_mm": {
+    "z400": 31.291201655740984,
+    "z950": 42.06572814268563
+   },
+   "outer_centre_x_mm": {
+    "z400": 85.17392548106596,
+    "z950": 109.11083208154821
+   },
+   "note": "widths are cloud extents (biased narrow by ~2-4 mm); tape close-ups read 2.89 in -> 3.87 in for the centre slat"
+  },
+  "overall": {
+   "bbox_min_mm": [
+    -304.9,
+    -475.5,
+    -0.2
+   ],
+   "bbox_max_mm": [
+    304.9,
+    617.3,
+    1090.1
+   ],
+   "height_in": 42.916648255284265,
+   "width_in": 24.01178097973606,
+   "length_in": 43.02480378697123
+  }
+ }
+}
