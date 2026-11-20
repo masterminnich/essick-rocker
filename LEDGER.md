@@ -310,8 +310,10 @@ Sessions on this machine get cut off without warning; this file says where thing
   panels I read were sometimes another session's (fixed: own mktemp folder). (2) The upper back leg splays outward: its outer face is
   8 mm outside the side sheet at v 450 and 43 mm at v 1000, so every photo showed it displaced by a different parallax.
 - SHEETS on the leg's own outer face (plane through the back outer arris from the back views, rms 1.2 mm): work/parts/sideL/ub and
-  work/parts/sideR/ub (tools/face_ortho.py --point/--normal, u -230..130, v 420..1080, 0.5 mm/px, --max-angle 75). Commands are in
-  the PR body. On these sheets the FAR leg appears displaced (it is ~483 mm behind the sheet): behind the near leg's rear edge for a
+  work/parts/sideR/ub (u -230..130, v 420..1080, 0.5 mm/px):
+    tools/py.sh tools/face_ortho.py --point -250.972 -6.651 698.892 --normal -0.986062 -0.139517 -0.090645 --urange -230 130 --vrange 420 1080 --res 0.5 --photos 1510,1506,1507,1508,1509,1505,1504,1511 --max-angle 75 --out work/parts/sideL/ub
+    tools/py.sh tools/face_ortho.py --point 253.65 -8.096 698.702 --normal 0.983159 -0.155652 -0.095768 --urange -230 130 --vrange 420 1080 --res 0.5 --photos 1470,1477,1469,1478,1471,1472,1473,1555 --max-angle 75 --out work/parts/sideR/ub
+  then tools/tri_lines.py SHEET parts/side_seeds_ub_?.json work/parts/side?/tub and tools/side_fit.py (--sheet ..._plane.json). On these sheets the FAR leg appears displaced (it is ~483 mm behind the sheet): behind the near leg's rear edge for a
   camera near u 0 (IMG_1507), in front of its front edge for a camera well forward (1508). So each edge needs its own cameras.
 - FRONT OUTLINE (bleg?_front_hi, v 610-1040): cameras standing BEHIND the leg see the front edge against the shop. Left 1510, 1506,
   1505, 1511: residual 0.61 mm rms, arris 3.7-6.1 mm inside the sheet (rounded corner). Right 1470, 1477, 1478, 1469: 0.46 mm rms.
@@ -323,8 +325,8 @@ Sessions on this machine get cut off without warning; this file says where thing
 - LEFT vs RIGHT (tools/side_mirror.py): rear edge R minus mirrored L +0.31 mm mean, 0.36 rms, 0.73 max. Front outline +0.83 mean,
   1.17 rms, 3.2 max: the difference is 3.0 mm at z 620 just above the arm joint and falls to 0 by z 900 (hand-blended joint, or a
   trace effect: not settled; the design line is the mean, so +-1.5 mm there, inside the 1.6 mm curve tolerance but only just).
-  The rear arris from the BACK views disagreed L/R by 2.7-4.7 mm in fore-aft at z 940-1000 (their weak direction); the side traces
-  settle it (L -152.7, R -153.2 at z 940).
+  The rear arris from the BACK views disagrees L/R in fore-aft (their weak direction) by 2.8 mm at z 700, 2.2 at z 925, 4.7 at
+  z 1000; the side traces settle it inside their range (z 925: side L -150.8, R -151.3; back views L -149.2, R -151.4).
 - parts/side_frame_ub_L.json, _R.json (per side, on the ub sheets), merged into parts/side_frame.json as bleg_front_hi, bleg_rear_hi
   (tools/side_mirror.py --out parts/side_frame.json --update). Seeds: parts/side_seeds_ub_L.json, _R.json.
 - MODEL v6 (parts/model_v6.*): tools/build_model.py takes the upper back leg's fore-aft outline from these lines (z 608-1028 front,
