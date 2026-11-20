@@ -239,3 +239,41 @@ Sessions on this machine get cut off without warning; this file says where thing
   --depth-guess; write parts/side_seeds_R.json); mirror-compare with parts/side_frame_L.json; upper back-leg front outline;
   seat side edge is the seat session's. Then feed side_frame_L/R into build_model (front legs and lower back legs are still the
   old ribbon traces there). (4) crest + arms. (5) overlays on side (1507) and front-quarter (1484) photos.
+
+## 15:05 PST right side frame, mirror comparison, model v4 (front legs lofted from triangulated lines)
+- Right sheet: work/parts/sideR/p (NOT the old .../o), plane point [202.513,0,0], normal [0.98719,-0.15629,-0.03196], u -260..660,
+  v -10..1150, photos 1472,1471,1470,1473,1469 (the near-frontal ones on this side). Render command is in tools/face_ortho.py usage
+  form: --point ... --normal ... --urange -260 660 --vrange -10 1150 --res 0.5 --photos 1472,1471,1470,1473,1469 (946 MB, 4 s).
+- Seeds: parts/side_seeds_R.json = the solved LEFT lines mirrored onto the right sheet (drawn on 1472 first and checked by eye:
+  they sit on the right leg edges; my own reading of the small full view was 40 mm off, so mirrored solved lines are the better seed).
+  Run: work/toolkit/rk.sh tools/tri_lines.py work/parts/sideR/p parts/side_seeds_R.json work/parts/sideR/t2 ; side_fit.py --side R
+  -> parts/side_frame_R.json. Outline residuals 0.23-0.52 mm; far-arris depths 30-36 mm.
+- Widths agree left/right within ~1 mm: front leg outer face R 30.4/32.6/35.7/38.6/40.4 vs L 31.0/32.8/35.0/37.5/40.3 (rocker ->
+  under the seat); overall side-view width R 38.7/41.9/45.0/46.5 vs L 38.7/41.2/44.0/45.9; lower back leg outer face
+  R 37.4/38.9/40.7 vs L 36.4/38.3/40.3.
+- tools/side_mirror.py (left reflected, compared with right at the same height, averaged) -> parts/side_frame.json (symmetric lines:
+  z, y, x_abs per line). Right minus mirrored left, fore-aft mean: front leg below the seat -0.1 (front), -0.4 (ridge), +0.2 (inner
+  rear); front leg above the seat +4.8 / +2.3 / +4.1; lower back leg +2.7 / +1.9 / +1.4 mm. So the chair as built is a few mm
+  out of mirror above the seat (the right front leg top sits ~4-5 mm forward of the left); the symmetric model takes the mean.
+- FINDING: the old model legs were 13-27 mm too wide in side view (old ribbon traces on the multi-photo median included the side
+  face; the old upper front-leg front edge followed an interior ridge 16-20 mm back). Old trace width 55.5 at v150, 58.6 at v300;
+  triangulated overall width 37.9 and 44.6.
+- tools/build_model.py: if parts/side_frame.json exists, the FRONT LEG is a loft through 4-cornered sections (front arris, rear
+  outer-face ridge, inner rear arris, front at inner depth) from the three lines; foot cut on the rocker top; the seat joint
+  (v 370-470, hidden by the seat) is bridged linearly. LOWER BACK LEG: front and inner-rear lines replace the old trace; the rear
+  edge through the seat joint is a cubic between the lower inner-rear line (last 90 mm) and the frontal back outer arris
+  (parts/back_legs.json, traced range only), fit 0.6 mm rms. Report keys: front_leg.*, back_leg.lower.
+- parts/model_v4.* (tools/model.sh --out parts/model_v4). Front leg outer-face width 31.9 (v150), 38.1 (v300), 40.1 (v360),
+  39.5 (v500), 30.3 (v600); overall 37.9/44.6/45.8/40.7/33.6; thickness across 28-31. Back leg side-view width 41.4 (z100),
+  48.7 (z300), 47.6 (z450), 48.3 (z600), 39.5 (z800-1000); across 37-40.
+- Overlays (tools/overlay_sil.py --glb parts/model_v4.glb --images 1507,1484,1472 --max-side 3000 --out-dir work/overlay_v4): front
+  legs sit on the wood in 1507 and 1484. Back leg: rear outline on the wood; a 20-30 mm kink remains where the upper (cloud
+  extents) and lower (triangulated) parts meet at the seat joint, and the lower leg's rear outline is ~5 mm outside the wood in 1484.
+- STILL OPEN: front outline of the upper back leg in side view (v 530-940; model uses cloud extents there). Second attempt on 1510
+  with the frontal arris projected (tools/xyz_on_sheet.py) located the leg but not a clean front edge. Front-leg seat joint bridge.
+- Crest rail + arms: now a separate session (worktree ../rocking-chair-crest, branch crest-arms). Do not edit those parts here;
+  merge parts/crest.json and parts/arms.json when it reports. Seat session reported (seat/REPORT.md, PR #1): merged below.
+- NEXT: (a) feed the measured seat (seat/surface.json thin-plate spline, valid |x|<=251, y 64-530) into build_model; (b) upper
+  back-leg front outline (try right-side photos 1471/1470 where the background differs, or the leg's fore-aft depth from a
+  front-quarter photo); (c) seat-joint region of both legs; (d) merge crest-arms when ready; (e) overlays on the 5 spread views
+  1485,1472,1527,1502,1545 as before/after for Joe.

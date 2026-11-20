@@ -63,6 +63,13 @@ def sweep(centers, e1s, e2s, w1, w2):
     m = trimesh.Trimesh(np.array(V), np.array(F), process=False); m.fix_normals(); return m
 
 
+def sheet_tables(sheet):
+    """(z, y, arc length v) tables of a sheet written by tools/sheet_ortho.py (tabulated or polynomial profile)"""
+    if "table" in sheet: tb = np.array(sheet["table"]); zt_ = np.linspace(tb[0, 0], tb[-1, 0], 2000); yt_ = np.interp(zt_, tb[:, 0], tb[:, 1])
+    else: zt_ = np.linspace(sheet["z"][0], sheet["z"][1], 2000); yt_ = np.polyval(np.array(sheet["coef"]), zt_)
+    return zt_, yt_, np.r_[0, np.cumsum(np.hypot(np.diff(zt_), np.diff(yt_)))]
+
+
 def mirror(m):
     m2 = m.copy(); m2.vertices = m2.vertices * [-1, 1, 1]; m2.invert(); return m2
 
@@ -102,15 +109,69 @@ def foot_cut(vv, uu):
         out.append([u_, max(v_, np.interp(u_, U, rtop))])
     return np.array(out)
 fl_poly = to_mean(np.r_[foot_cut(vv, fl_rear), foot_cut(vv, fl_front)[::-1]])
-meshes["FLEG_R"] = extrude_side(fl_poly, 0, P("fleg_thickness_across"), +1); meshes["FLEG_L"] = mirror(meshes["FLEG_R"])
-report["front_leg"] = {"profile": "fitted (side face orthophoto, L+R pooled)", "edge_scatter_mm": [n_fr, n_ff], "inlier_share": [k_fr, k_ff],
-                       "width_side_view_mm": {f"v{int(v)}": float(np.interp(v, vv, fl_front - fl_rear)) for v in (150, 300, 380, 450, 600)}}
+SFL = json.load(open(ROOT / "parts/side_frame.json"))["lines"] if (ROOT / "parts/side_frame.json").exists() else None
+def sf_line(*keys):
+    """triangulated side-frame line(s) (tools/edge_tri.py -> side_fit.py -> side_mirror.py, L+R averaged) in model side-plane coords (u, v, depth inward)"""
+    Q = np.vstack([to_plane(np.c_[SFL[k]["x_abs"], SFL[k]["y"], SFL[k]["z"]], +1) for k in keys]); return Q[np.argsort(Q[:, 1])]
+def sf_at(Q, v, col):
+    """value of a line at heights v: linear between samples (bridges the seat joint), straight-line extension beyond the ends"""
+    out = np.interp(v, Q[:, 1], Q[:, col]); lo, hi = v < Q[0, 1], v > Q[-1, 1]
+    if lo.any(): c = np.polyfit(Q[:6, 1], Q[:6, col], 1); out[lo] = np.polyval(c, v[lo])
+    if hi.any(): c = np.polyfit(Q[-6:, 1], Q[-6:, col], 1); out[hi] = np.polyval(c, v[hi])
+    return out
+def loft4(sec):
+    """solid through 4-cornered sections: sec (n, 4, 3)"""
+    n = len(sec); V = sec.reshape(-1, 3); F = []
+    for i in range(n - 1):
+        b = 4 * i
+        for k in range(4):
+            p_, q_ = b + k, b + (k + 1) % 4; F += [[p_, q_, q_ + 4], [p_, q_ + 4, p_ + 4]]
+    F += [[0, 2, 1], [0, 3, 2]]; e = 4 * (n - 1); F += [[e, e + 1, e + 2], [e, e + 2, e + 3]]
+    m = trimesh.Trimesh(V, np.array(F), process=False); m.fix_normals(); return m
+if SFL:
+    # three triangulated lines per leg: front outline and rear ridge on the outer face, rear arris on the inner face (the rear face is bevelled / rounded)
+    QF, QR, QI = sf_line("fleg_front_lo", "fleg_front_hi"), sf_line("fleg_rear_lo", "fleg_rear_hi"), sf_line("fleg_rearfar_lo", "fleg_rearfar_hi")
+    uF, dF, uR, uI, dI = sf_at(QF, vv, 0), sf_at(QF, vv, 2), sf_at(QR, vv, 0), sf_at(QI, vv, 0), sf_at(QI, vv, 2); uI = np.minimum(uI, uR)
+    rt_m = to_mean(np.c_[U, rtop]); cut = lambda u_: np.maximum(vv, np.interp(u_, rt_m[:, 0], rt_m[:, 1]))
+    sec = np.stack([np.c_[uF, cut(uF), dF], np.c_[uR, cut(uR), dF], np.c_[uI, cut(uI), dI], np.c_[uF, cut(uF), dI]], 1)
+    meshes["FLEG_R"] = loft4(from_plane(sec.reshape(-1, 3), +1).reshape(-1, 4, 3)); meshes["FLEG_L"] = mirror(meshes["FLEG_R"])
+    old_w = fl_front - fl_rear
+    report["front_leg"] = {"profile": "triangulated per line from near-frontal side photos (tools/edge_tri.py), L and R averaged; outlines +-1 mm, rear outer-face ridge is a soft line +-2 mm",
+                           "outer_face_width_mm": {f"v{int(v)}": float(np.interp(v, vv, uF - uR)) for v in (150, 300, 360, 500, 600)},
+                           "overall_side_view_width_mm": {f"v{int(v)}": float(np.interp(v, vv, uF - uI)) for v in (150, 300, 360, 500, 600)},
+                           "thickness_across_mm": {f"v{int(v)}": float(np.interp(v, vv, dI - dF)) for v in (150, 300, 500, 600)},
+                           "left_right_fore_aft_mm": {k: SFL[k]["lr_diff_y_mean_mm"] for k in SFL if k.startswith("fleg")},
+                           "previous_trace_width_mm": {f"v{int(v)}": float(np.interp(v, vv, old_w)) for v in (150, 300, 500, 600)},
+                           "note": "seat joint (v 370-470) is bridged linearly; the earlier 8-photo median trace was 13-27 mm too wide (thickness parallax)"}
+else:
+    meshes["FLEG_R"] = extrude_side(fl_poly, 0, P("fleg_thickness_across"), +1); meshes["FLEG_L"] = mirror(meshes["FLEG_R"])
+    report["front_leg"] = {"profile": "fitted (side face orthophoto, L+R pooled)", "edge_scatter_mm": [n_fr, n_ff], "inlier_share": [k_fr, k_ff],
+                           "width_side_view_mm": {f"v{int(v)}": float(np.interp(v, vv, fl_front - fl_rear)) for v in (150, 300, 380, 450, 600)}}
 
 ba, bb = pooled_edges("bleg")                     # a = rear edge (rough), b = front edge (good)
 vb = np.linspace(40, 470, 80)
 c_bf, n_bf, k_bf = rpoly(bb[(bb[:, 1] < 480), 1], bb[(bb[:, 1] < 480), 0], 4)
 c_br, n_br, k_br = rpoly(ba[(ba[:, 1] < 480), 1], ba[(ba[:, 1] < 480), 0], 4, clip=4.0)
-bl_front = np.polyval(c_bf, vb); bl_rear = np.polyval(c_br, vb); bl_w = bl_front - bl_rear
+bl_front = np.polyval(c_bf, vb); bl_rear = np.polyval(c_br, vb); bl_low_src = "fitted (side face orthophoto; front edge good, rear edge rough)"
+if SFL:        # below the seat: triangulated front outline and inner rear arris replace the old traces; their correction at the top of that range is carried up to the arm
+    for key, cf, tgt in (("bleg_front_lo", c_bf, "f"), ("bleg_rearfar_lo", c_br, "r")):
+        Q = sf_line(key); corr = np.interp(vb, Q[:, 1], Q[:, 0] - np.polyval(cf, Q[:, 1]))
+        if tgt == "f": bl_front = bl_front + corr; corr_f = corr
+        else: bl_rear = bl_rear + corr; corr_r = corr
+    bl_low_src = (f"below the seat (v 65-270): triangulated front outline and inner rear arris (tools/edge_tri.py, L+R averaged, +-1 mm); the old rear trace was {corr_r.min():+.0f}..{corr_r.max():+.0f} mm off "
+                  f"(front {corr_f.min():+.1f}..{corr_f.max():+.1f}); above v 270 the old trace with the correction at v 270 held")
+    if (ROOT / "parts/back_legs.json").exists() and "table" in json.load(open(ROOT / "parts/back_legs.json"))["sheet"]:
+        # through the seat joint (v 270-440) nothing is traced: bridge the rear edge with a cubic from the triangulated inner rear arris below the seat
+        # to the back outer arris triangulated from the front photos above it (parts/back_legs.json), instead of the old side trace
+        _B = json.load(open(ROOT / "parts/back_legs.json")); _z, _y, _s = sheet_tables(_B["sheet"]); z0_ = float(np.interp(_B["v_range"][0] + 10, _s, _z)); zk = np.arange(z0_, z0_ + 90, 6.0)      # only where the back view was actually traced
+        _v = np.clip(np.interp(zk, _z, _s), _B["v_range"][0] + 10, _B["v_range"][1] - 10); Qu = to_plane(np.c_[np.polyval(_B["symmetric"]["outer"], _v), np.interp(zk, _z, _y), zk], +1)
+        Ql = sf_line("bleg_rearfar_lo"); Ql = Ql[Ql[:, 1] > Ql[-1, 1] - 90]; cb = np.polyfit(np.r_[Ql[:, 1], Qu[:, 1]], np.r_[Ql[:, 0], Qu[:, 0]], 3)
+        mid = (vb > Ql[-1, 1]) & (vb < Qu[0, 1]); up = vb >= Qu[0, 1]; old_mid = bl_rear[mid | up].copy()
+        bl_rear[mid] = np.polyval(cb, vb[mid]); bl_rear[up] = np.interp(vb[up], Qu[:, 1], Qu[:, 0])
+        fitres = np.r_[Ql[:, 0], Qu[:, 0]] - np.polyval(cb, np.r_[Ql[:, 1], Qu[:, 1]])
+        bl_low_src += (f"; rear edge v {Ql[-1, 1]:.0f}-{Qu[0, 1]:.0f} (seat joint, not traced) bridged by a cubic between the triangulated lines either side (fit {np.sqrt(np.mean(fitres ** 2)):.1f} mm rms); "
+                       f"it moved the rear edge there by {np.min(bl_rear[mid | up] - old_mid):+.0f}..{np.max(bl_rear[mid | up] - old_mid):+.0f} mm")
+bl_w = bl_front - bl_rear
 low_center_uvd = np.c_[to_mean(np.c_[(bl_front + bl_rear) / 2, vb]), np.full(len(vb), P("bleg_thickness_across") / 2)]
 low_center = from_plane(low_center_uvd, +1)
 # upper part from the cloud (mirrored): points of the back legs above the arm joint
@@ -139,11 +200,6 @@ w_side_up = np.interp(zu, zz[ok], np.array(wside)[ok] * np.cos(np.arctan(np.abs(
 _t2 = np.gradient(low_center_uvd[:, :2], axis=0); _t2 /= np.linalg.norm(_t2, axis=1, keepdims=True)
 w_side = np.r_[bl_w * np.abs(_t2[:, 1]), w_side_up]        # horizontal width -> width perpendicular to the leg
 w_side = np.convolve(np.r_[w_side[:1].repeat(3), w_side, w_side[-1:].repeat(3)], np.ones(7) / 7, "valid")
-def sheet_tables(sheet):
-    """(z, y, arc length v) tables of a sheet written by tools/sheet_ortho.py (tabulated or polynomial profile)"""
-    if "table" in sheet: tb = np.array(sheet["table"]); zt_ = np.linspace(tb[0, 0], tb[-1, 0], 2000); yt_ = np.interp(zt_, tb[:, 0], tb[:, 1])
-    else: zt_ = np.linspace(sheet["z"][0], sheet["z"][1], 2000); yt_ = np.polyval(np.array(sheet["coef"]), zt_)
-    return zt_, yt_, np.r_[0, np.cumsum(np.hypot(np.diff(zt_), np.diff(yt_)))]
 w_acr = np.full(len(allc), P("bleg_thickness_across")); bl_src = "v1 (side plane + assumed thickness)"
 if (ROOT / "parts/back_legs.json").exists():
     BL = json.load(open(ROOT / "parts/back_legs.json")); zt_b, yt_b, st_b = sheet_tables(BL["sheet"])
@@ -158,11 +214,11 @@ if (ROOT / "parts/back_legs.json").exists():
     tan, e_acr, e_side = _frame(allc)
     if "table" in BL["sheet"]:            # the sheet is the triangulated back OUTER arris: put the leg's rear face on it (mid-face is toe/2 forward of the outer arris)
         es = e_side * np.sign(-e_side[:, 1:2]); rear = allc + es * (w_side / 2)[:, None]; toe = float(BL.get("inner_arris_forward_mm", 0.0)) / 2
-        dy = np.interp(rear[:, 2], zt_b, yt_b) + toe - rear[:, 1]; rear_gap = dy[(vleg > v_lo) & (vleg < v_hi)]
+        dy = np.where(rear[:, 2] >= zt_b[0], np.interp(rear[:, 2], zt_b, yt_b) + toe - rear[:, 1], 0.0); rear_gap = dy[(vleg > v_lo) & (vleg < v_hi)]
         allc = np.c_[allc[:, 0], allc[:, 1] + t * dy, allc[:, 2]]; tan, e_acr, e_side = _frame(allc)
         bl_src += f"; rear face moved onto the triangulated back arris (was off by {np.median(rear_gap):+.1f} mm median, {np.abs(rear_gap).max():.1f} max)"
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
-report["back_leg"] = {"lower": "fitted (side face orthophoto; front edge good, rear edge rough)", "upper": "cloud (centreline + extents, mirrored L+R)",
+report["back_leg"] = {"lower": bl_low_src, "upper": "cloud (centreline + extents, mirrored L+R)",
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
                       "across": bl_src, "width_across_mm": {f"z{int(z)}": float(np.interp(z, allc[:, 2], w_acr)) for z in (100, 300, 450, 600, 800, 1000)}, "top_centre": up_center[-1].round(1).tolist(), "splay_top_x_mm": float(up_center[-1, 0])}
 

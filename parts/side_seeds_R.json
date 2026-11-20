@@ -1,0 +1,89 @@
+[
+ {
+  "name": "blegR_front_lo",
+  "seed": "68.4,60 74.7,110 79.3,160 82.0,210 82.6,260 81.9,290",
+  "inside": "50,150",
+  "mode": "clean",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line blegL_front_lo"
+ },
+ {
+  "name": "blegR_rear_lo",
+  "seed": "35.0,70 39.3,120 41.8,170 42.4,220 40.8,270 40.2,280",
+  "inside": "50,150",
+  "mode": "all",
+  "band": 4,
+  "seeded_from": "mirror of the solved left line blegL_rear_lo",
+  "depth_fixed": -3.3,
+  "photos": "1472,1471,1470,1473,1469"
+ },
+ {
+  "name": "blegR_rearfar_lo",
+  "seed": "31.3,60 33.9,110 36.0,160 36.7,210 35.2,260 33.8,280",
+  "inside": "50,150",
+  "mode": "far",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line blegL_rearfar_lo",
+  "depth_guess": -32.0
+ },
+ {
+  "name": "flegR_front_hi",
+  "seed": "481.0,460 472.5,510 465.0,560 458.5,610",
+  "inside": "440,550",
+  "mode": "clean",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line flegL_front_hi"
+ },
+ {
+  "name": "flegR_front_lo",
+  "seed": "564.1,110 549.1,160 535.3,210 522.6,260 511.0,310 500.4,360",
+  "inside": "500,200",
+  "mode": "clean",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line flegL_front_lo"
+ },
+ {
+  "name": "flegR_rear_hi",
+  "seed": "438.7,470 434.5,520 431.8,570 430.9,600",
+  "inside": "450,550",
+  "mode": "all",
+  "band": 4,
+  "seeded_from": "mirror of the solved left line flegL_rear_hi",
+  "depth_fixed": -7.0,
+  "photos": "1472,1471,1470,1473,1469"
+ },
+ {
+  "name": "flegR_rear_lo",
+  "seed": "533.1,110 516.6,160 501.1,210 486.6,260 473.0,310 460.1,360",
+  "inside": "530,200",
+  "mode": "all",
+  "band": 4,
+  "seeded_from": "mirror of the solved left line flegL_rear_lo",
+  "depth_fixed": -2.0,
+  "photos": "1472,1471,1470,1473,1469"
+ },
+ {
+  "name": "flegR_rearfar_hi",
+  "seed": "437.8,470 432.0,520 427.6,570 425.0,610",
+  "inside": "450,550",
+  "mode": "far",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line flegL_rearfar_hi",
+  "depth_guess": -34.0
+ },
+ {
+  "name": "flegR_rearfar_lo",
+  "seed": "523.1,120 507.6,170 492.1,220 477.4,270 463.9,320 452.3,370",
+  "inside": "530,200",
+  "mode": "far",
+  "pool": "1472,1471,1470,1473,1469",
+  "band": 6,
+  "seeded_from": "mirror of the solved left line flegL_rearfar_lo",
+  "depth_guess": -25.0
+ }
+]
