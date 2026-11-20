@@ -19,7 +19,7 @@ import numpy as np
 from . import ROOT
 from .orientation import RAW_W, RAW_H, raw_to_disp, disp_to_raw, exif_orientation, disp_size
 
-DEFAULT_MODEL = ROOT / "work/sfm_full/sparse/0"
+DEFAULT_MODEL = ROOT / "work/solve/model"
 DEFAULT_METRIC = ROOT / "solve/metric_frame.json"
 DEFAULT_DRIVE = ROOT / "drive"
 

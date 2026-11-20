@@ -7,7 +7,7 @@ if str(ROOT) not in sys.path:
 
 
 def add_camera_args(ap):
-    ap.add_argument("--model", default=str(ROOT / "work/sfm_full/sparse/0"), help="COLMAP model dir (half-res probe: work/sfm/sparse/0; final: work/solve/model)")
+    ap.add_argument("--model", default=str(ROOT / "work/solve/model"), help="COLMAP model dir (half-res probe: work/sfm/sparse/0; final: work/solve/model)")
     ap.add_argument("--metric", default=str(ROOT / "solve/metric_frame.json"), help="metric frame json; missing = COLMAP units")
     ap.add_argument("--image-scale", type=float, default=None, help="raw px per model px (default: 4032/camera.width)")
 
