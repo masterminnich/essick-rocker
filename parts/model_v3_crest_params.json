@@ -1,0 +1,178 @@
+{
+ "assumed_or_tape": {
+  "rocker_width_across": {
+   "value_mm": 31.0,
+   "provenance": "tape",
+   "note": "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"
+  },
+  "fleg_thickness_across": {
+   "value_mm": 33.0,
+   "provenance": "cloud+tape",
+   "note": "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"
+  },
+  "bleg_thickness_across": {
+   "value_mm": 38.0,
+   "provenance": "cloud+tape",
+   "note": "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"
+  },
+  "arm_thickness": {
+   "value_mm": 25.0,
+   "provenance": "assumed",
+   "note": "not measurable yet; caliper A1-A3 will replace"
+  },
+  "seat_edge_thickness": {
+   "value_mm": 40.0,
+   "provenance": "fitted",
+   "note": "side-edge face traced 39-45 mm at the back, thinner to the front; constant here"
+  },
+  "crest_height": {
+   "value_mm": 77.5,
+   "provenance": "tape",
+   "note": "IMG_1555 read 3.05 in"
+  }
+ },
+ "parts": {
+  "rocker": {
+   "profile": "fitted (face orthophoto, both sides averaged)",
+   "length_traced_mm": 1100.0,
+   "face_height_mm": [
+    19.939143415025,
+    30.62023870776993
+   ],
+   "rocking_radius_mm": 1066.0481101767214,
+   "left_right_shape_rms_mm": 1.0227473114484877
+  },
+  "front_leg": {
+   "profile": "fitted (side face orthophoto, L+R pooled)",
+   "edge_scatter_mm": [
+    0.8222795840569783,
+    0.8862784204134428
+   ],
+   "inlier_share": [
+    0.6092436974789915,
+    0.5764705882352941
+   ],
+   "width_side_view_mm": {
+    "v150": 55.45271744313861,
+    "v300": 58.60889612372644,
+    "v380": 55.08853949122055,
+    "v450": 47.52034072916,
+    "v600": 33.29245442110061
+   }
+  },
+  "back_leg": {
+   "lower": "fitted (side face orthophoto; front edge good, rear edge rough)",
+   "upper": "cloud (centreline + extents, mirrored L+R)",
+   "front_edge_scatter_mm": 0.8368287345986823,
+   "rear_edge_scatter_mm": 2.0013648674348743,
+   "width_side_view_mm": {
+    "z100": 50.267481559223846,
+    "z300": 59.9951795710323,
+    "z450": 53.93986299844796,
+    "z600": 48.30582392521296,
+    "z800": 39.48156062678863,
+    "z1000": 39.425286958806566
+   },
+   "across": "fitted (unrolled back view, by-eye seeded edges, L+R averaged) above the seat; blended to the side plane at the rocker; rear face moved onto the triangulated back arris (was off by +5.7 mm median, 13.3 max)",
+   "width_across_mm": {
+    "z100": 37.85450894839762,
+    "z300": 37.351251109381565,
+    "z450": 37.21833017570094,
+    "z600": 39.66111105129758,
+    "z800": 38.150031458882964,
+    "z1000": 38.78114627870195
+   },
+   "top_centre": [
+    218.2,
+    -166.5,
+    1085.0
+   ],
+   "splay_top_x_mm": 218.23499177564526
+  },
+  "seat": {
+   "outline": "cloud (98th percentile half-width per station; front-edge scallops NOT modelled)",
+   "surface": "cloud (polynomial surface even in x, mirrored L+R)",
+   "surface_fit_rms_mm": 1.8292898999892055,
+   "n_surface_points": 3467,
+   "depth_y_mm": [
+    10.807830588623009,
+    513.6011155464511
+   ],
+   "half_width_mm": {
+    "back": 202.3133640904399,
+    "mid": 257.0455232051427,
+    "front": 267.6544775564857
+   },
+   "max_scoop_below_rim_mm": 21.05890891853886,
+   "rim_tilt_deg": 8.81073298598491
+  },
+  "arm": {
+   "source": "parts/arms.json design (triangulated top arrises of both arms, mirrored mean)",
+   "y_range": [
+    40.0,
+    503.8
+   ],
+   "back_extension": "carried from y 68.2 back to 40.0 into the back leg (not seen)",
+   "thickness_mm": 25.0,
+   "front_leg_top": {
+    "leg_top_z": 627.6148221599799,
+    "arm_underside_z_at_leg": 616.9623962976448,
+    "leg_top_xy": [
+     269.0,
+     420.5
+    ],
+    "arm_x_range_at_leg": [
+     237.75720738607728,
+     310.5768143230006
+    ],
+    "action": "cut at the arm underside (it ran through the arm)"
+   }
+  },
+  "crest": {
+   "source": "parts/crest.json (four arrises triangulated from overhead + rear photos; design = even polynomials)",
+   "span_between_legs_mm": 436.7,
+   "top_centre_z": 1078.4944162938061,
+   "top_at_leg_centre_z": 1064.5400744929786,
+   "back_leg_top_cut": {
+    "before_z_max": 1088.5379148342731,
+    "plane_point": [
+     237.6,
+     -176.7,
+     1064.5
+    ],
+    "slope_dzdx": -0.06766087250457531,
+    "slope_dzdy": 0.09581568541065134
+   }
+  },
+  "slats": {
+   "edges": "fitted (unrolled back view, by-eye seeded edges, L+R averaged)",
+   "surface": "back face located by photo consistency in 7 height bands, separately for centre and outer slats",
+   "thickness_mm": 10.0,
+   "thickness_provenance": "front-face cloud layer vs photo-consistent back face (about 10 mm)",
+   "centre_width_mm": {
+    "near_seat": 77.26433077773679,
+    "under_crest": 99.2698671014883
+   },
+   "outer_width_mm": {
+    "near_seat": 40.45951772369547,
+    "under_crest": 52.28631902914272
+   }
+  },
+  "crest_arms_source": "parts/crest.json + parts/arms.json",
+  "overall": {
+   "bbox_min_mm": [
+    -315.7,
+    -476.7,
+    0.3
+   ],
+   "bbox_max_mm": [
+    315.7,
+    615.6,
+    1082.7
+   ],
+   "height_in": 42.62465652075348,
+   "width_in": 24.85536053943937,
+   "length_in": 43.00605255455938
+  }
+ }
+}

@@ -305,6 +305,51 @@ Sessions on this machine get cut off without warning; this file says where thing
   trace the side edge face on the side sheets with edge_tri (top and bottom lines), front edge from IMG_1599; (c) merge crest-arms
   when it reports; (d) K1-K6 check dimensions and Joe's caliper sheet when they arrive.
 
+## 15:27 PST crest rail and arms from the photos taken from above (step 4, branch crest-arms; Joe's section)
+Method: each arris (edge) traced only in photos that cannot see that part's side face, and solved on its own. No photo
+blending across a thick part. No COLMAP re-solve; every job ran through tools/py.sh / safe_run, one at a time, peak < 0.5 GB.
+- New tools: tools/curve_tri.py (one arris as a 3D curve from traces on DIFFERENT sheets: overhead z = const + rear
+  y = const, so both y and z are solved), tools/crest_fit.py, tools/arm_fit.py, tools/cam_table.py.
+- **Crest (parts/crest.json)**: four arrises.
+  - Top-rear (the back face's top edge): triangulated from 1545/1547/1548/1549 overhead + 1502/1501/1503 rear.
+    Residuals 0.4-1.7 mm; sigma < 0.9 mm.
+  - Top-front and bottom-front: triangulated in plan; z assumed square to the lean (+4.4 mm).
+  - Bottom-rear: z triangulated from the rear photos; y carried down the back legs' lean (9.9 deg, assumed; flush backs per IMG_1540).
+  - Shape: the back face bows 18.0 mm in plan (arc R 1231). The top arches in elevation: 1078.5 at the centre,
+    1063.8 at the leg outer face, so the rise is 14.7 mm.
+  - The rail tapers: 28.4 thick at the top, 40.6 at the bottom (the front face leans 18.8 deg at the centre).
+  - Leg tops end flush with the crest top, so the arch runs over them. Visible span between the legs' inner faces: 436.7 mm (+-0.8).
+  - Left/right mirror rms 0.6-1.8 mm.
+  - OPEN: the tape height check is off by 2.8 mm (74.7 here vs IMG_1555's 77.5).
+- **Arms (parts/arms.json)**: left and right solved separately, then a symmetric design version.
+  - Outer top arris: depth solved (1544/1545/1547-1549 for the right arm; 1544/1545/1537-1539 for the left). Residual 0.36 / 0.56 mm.
+  - Inner top arris: its clean photos all stand on one side (1537-1539 R, 1547-1549 L). So its depth is taken from the
+    outer arris at the same station, which assumes the top is flat across the width. Sensitivity is 0.4-0.6 mm per mm of depth.
+  - Front ends: a second sheet with its axes swapped, since edge_tri only follows edges running along v. All photos
+    stand behind the front edge, so all are clean. The free depth solve put the arris 7-13 mm deeper than the side
+    arrises do. The point cloud sides with the side arrises, so their depth is used. Front position along the arm: +-2.5 mm.
+  - Heights checked independently against the dense cloud at every 30 mm station: within 1-3 mm.
+  - Design: a tapered plank. Width 41 / 53 / 63 / 72 / 76 mm at y = 100 / 200 / 300 / 400 / 480. Top z 531 -> 659.
+    Slope 23 deg at the back easing to 14 deg at the front. The inner edge curves; the outer is nearly straight.
+    Front corners (design, right arm) (239.0, 490.1) and (315.6, 503.8): the front end is cut on a slant.
+  - Left vs right: forward of y 340, both arms sit ~3.6 mm toward +x and the left is ~5 mm higher. That is a real
+    asymmetry or a slight roll of the frame; the design averages it out.
+  - The left inner trace behind y 180 follows a shading line ~4-5 mm inside the edge, so the design uses the right arm there.
+  - Lesson: on long tapered parts, the outer trace jumped onto background where the arm narrows (behind y ~ 230).
+    Re-seeding by eye on 10 mm grids fixed it. Always overlay the per-photo traces before trusting a solve.
+- **build_model.py**: reads both files (`--legacy` gives back v3's cloud crest and arms).
+  - The crest is lofted between its four design arrises, 2 mm into each leg.
+  - The back-leg tops are cut to the arch: they were 1088.5 high, now flush with the crest top at the leg (1064.5).
+  - The arms are a grid solid from the design curves, carried back to y 40 into the back leg.
+  - The front-leg tops ran 10.7 mm up through the arm; now cut at the arm underside.
+  - Output: parts/model_v3_crest.glb.
+- Overlays (v3 left, new right): figures/crest-arms/sbs_{1545,1485,1472,1527,1502}.jpg.
+- OPEN:
+  - Arm thickness is still assumed (25 mm).
+  - Where each arm meets its back leg isn't seen from above.
+  - Neither the arms' inner edges nor their front ends meet 1/32"; both are within 1/16".
+  - R2 delivery: no uploader on CB. The figures are on GitHub (private repo).
+
 ## 15:35 PST upper back leg traced in side view on its own face sheets; model v6 (branch back-leg-upper, PR #3)
 - WHY IT FAILED BEFORE: (1) tools/zoom_panels.sh wrote its panels to /tmp/_zp_N.jpg, shared with the seat and crest sessions, so the
   panels I read were sometimes another session's (fixed: own mktemp folder). (2) The upper back leg splays outward: its outer face is
@@ -342,3 +387,35 @@ Sessions on this machine get cut off without warning; this file says where thing
 - NEXT: (a) merge crest-arms (rebase or merge onto main, keep both sets of build_model changes, rebuild the model, PR);
   (b) seat edge: top and bottom lines of the side edge face on the side sheets with edge_tri, front edge from IMG_1599;
   (c) K1-K6 and Joe's caliper sheet when they arrive; (d) register IMG_1588-1593 at half resolution only.
+
+## 15:39 PST crest-arms merged; model v7 = v6 legs + measured crest and arms (branch crest-arms-merge, PR #4)
+- Merged branch crest-arms (7d2edbd: parts/crest.json, parts/arms.json, tools/curve_tri.py, crest_fit.py, arm_fit.py, cam_table.py,
+  figures/crest-arms/) into main's line. tools/build_model.py merged without conflict (my upper-back-leg block sits before the leg
+  sweep, the crest/arm block after it); only this ledger conflicted (both entries kept, in time order). crest.json and arms.json are
+  untouched: they belong to the crest session.
+- MODEL v7 (parts/model_v7.*, `tools/model.sh --out parts/model_v7`): crest lofted between its four measured arrises, arms from
+  the arms design, on top of v6's legs. Numbers from the build report:
+  - back-leg tops cut from z 1087.0 to the crest arch: top now 1064.5 at the leg centre (1068.3 at the highest corner);
+    crest top 1078.5 at the centre; visible crest span between the legs' inner faces 436.7 mm.
+  - arms y 40.0-503.8, 25 mm thick (assumed); front-leg top was 628.7, now cut at the arm underside 621.9 (it ran 6.8 mm into the arm).
+  - upper back-leg widths unchanged from v6. Overall box 42.62 in high, 24.86 in wide, 43.01 in long.
+- CHECKED BY EYE, v6 vs v7 on single photos (figures/crest_arms_merge/):
+  - IMG_1545 from above, both crest ends zoomed: the crest outline now stops on the visible joint line with the leg and the leg
+    outline sits on the leg's end grain; v6's crest was a straight box that missed the bowed rail and overshot both ends.
+  - IMG_1508 leg top zoomed: leg outline ends on the top of the wood; v6's leg and crest stood about 20 mm above it.
+  - IMG_1502 from behind: crest outline follows the arch. IMG_1485 and IMG_1527 arm zooms: arm outlines follow both arms' top and
+    outer edges; v6's arm outlines (from the point cloud) missed the front ends and undersides, and the front legs ran up into the arms.
+  - Arm underside in 1485: the model's flat 25 mm plank is thicker than the wood at mid length (the real underside is hollowed
+    between leg and back): thickness and underside shape are still assumed.
+- NEW OPEN ITEM found by the merge: the crest and the back leg do not meet flush in the model. At the leg's inner face (x 220) the
+  crest's back face is at y -179.3 (top) and -166.9 (bottom) while the leg's rear is at -175.1 and -164.5: a 4.2 / 2.4 mm step. At
+  the leg's outer face the crest's top-rear arris (y -176.2 at x 252) is only 1.1 mm behind the leg. The crest arris is the better
+  measurement there (solved in y, sigma < 0.5 mm); the leg's rear above z 928 is the back-view arris, weak fore-aft. So the leg's
+  rear face twists near the top to carry the crest's bow, and the model's constant section does not. Fix: pin the leg's rear line
+  above z 928 to the crest's top-rear and bottom-rear arrises at the joint (a build_model change, no new tracing).
+- Still open from the crest session: tape height check 2.8 mm off (74.7 vs 77.5 in IMG_1555, tape hooked over a rounded edge);
+  arm thickness assumed 25 mm; arm-to-back-leg joint not seen; arm inner edges and front ends within 1/16" but not 1/32".
+- NEXT: (a) pin the back-leg rear to the crest arrises at the joint (above); (b) seat edge: top and bottom lines of the side edge
+  face on the side sheets with edge_tri, front edge from IMG_1599; (c) arm underside/thickness from the side sheets (the arm's side
+  face is seen square-on in 1507/1472); (d) K1-K6 and Joe's caliper sheet when they arrive; (e) register IMG_1588-1593 at half
+  resolution only.
