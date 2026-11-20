@@ -1,5 +1,6 @@
 #!/bin/zsh
 # USAGE: tools/zoom_panels.sh PREFIX OUT.jpg SCALE GRID "U0 U1 V0 V1" ["U0 U1 V0 V1" ...] [-- CURVES.json]
+# env IMG="--img 1502" picks a single rectified photo instead of the median.
 # Close-up gridded panels of an orthophoto side by side (red separators), for placing edge seeds by eye.
 P=$1; O=$2; S=$3; G=$4; shift 4; i=0; L=(); C=()
 for w in "$@"; do
@@ -8,7 +9,7 @@ for w in "$@"; do
 done
 for w in "$@"; do
   if [[ "$w" == "--" || "$w" == *.json ]]; then continue; fi
-  i=$((i+1)); work/toolkit/rk.sh tools/ortho_view.py "$P" --scale $S --grid $G --window ${=w} $C --out /tmp/_zp_$i.jpg >/dev/null; L+=(/tmp/_zp_$i.jpg)
+  i=$((i+1)); work/toolkit/rk.sh tools/ortho_view.py "$P" --scale $S --grid $G --window ${=w} $C ${=IMG} --out /tmp/_zp_$i.jpg >/dev/null; L+=(/tmp/_zp_$i.jpg)
 done
 work/toolkit/rk.sh - "$O" $L <<'PY'
 import sys, cv2, numpy as np

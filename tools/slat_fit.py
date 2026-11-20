@@ -22,8 +22,11 @@ print("inner edge R / L mirrored:", ev("slatR_in").round(1).tolist(), (-ev("slat
 print("outer edge R / L mirrored:", ev("slatR_out").round(1).tolist(), (-ev("slatL_out")).round(1).tolist())
 d = np.r_[ev("slatR_in") + ev("slatL_in"), ev("slatR_out") + ev("slatL_out"), ev("slatC_right") + ev("slatC_left")]
 print(f"left/right mirror disagreement: rms {np.sqrt(np.mean(d ** 2)):.2f} mm, max {np.abs(d).max():.2f} mm")
+# a constant sideways shift of the whole slat set against the chair's centre plane is as-built placement (or centre-plane error), not shape
+u0 = float(np.median(d) / 2); d2 = d - 2 * u0
+print(f"slat set sits {u0:+.2f} mm to the chair's right of the centre plane; with that removed, mirror disagreement rms {np.sqrt(np.mean(d2 ** 2)):.2f} mm, max {np.abs(d2).max():.2f} mm")
 sym = {"centre_half": ((np.array(F["slatC_right"]["coef"]) - np.array(F["slatC_left"]["coef"])) / 2).tolist(),
        "outer_in": ((np.array(F["slatR_in"]["coef"]) - np.array(F["slatL_in"]["coef"])) / 2).tolist(),
        "outer_out": ((np.array(F["slatR_out"]["coef"]) - np.array(F["slatL_out"]["coef"])) / 2).tolist()}
-json.dump({"fits": F, "symmetric": sym, "v_range": [70, 715], "sheet_centre": json.load(open(a.sheet_c)), "sheet_outer": json.load(open(a.sheet_o)), "thickness_mm": 10.0,
+json.dump({"fits": F, "symmetric": sym, "v_range": [70, 715], "sheet_centre": json.load(open(a.sheet_c)), "sheet_outer": json.load(open(a.sheet_o)), "thickness_mm": 10.0, "set_offset_u_mm": u0, "mirror_rms_after_offset_mm": float(np.sqrt(np.mean(d2 ** 2))),
            "widths_mm": {"v": V.tolist(), "centre": cw.tolist(), "right": rw.tolist(), "left": lw.tolist()}}, open(a.out, "w"), indent=1)

@@ -144,3 +144,26 @@ Sessions on this machine get cut off without warning; this file says where thing
 - Drive had 100 photos at 14:25. New since the first 94: IMG_1588-1592 (far views, square stood upright, digitally zoomed,
   chair possibly moved) and IMG_1593 (tape across the seat front). No blue-dot photos uploaded yet. None of the six are
   registered in the camera model.
+
+## 16:00 slats re-traced from clean-silhouette photos (step 1 of the '15:10' NEXT) -- root cause of the L/R smear found
+- CAUSE of the smeared / fat slat edges: slat thickness parallax. A camera standing to one side of an edge sees the slat's
+  side face, so the outline on that side is the FRONT arris, landing t*(xc-u)/depth further out on the back-face sheet.
+  Measured: off-side photos read 1.3-3.8 mm outward, square-arris prediction 1.6-5.1 mm (ratio ~0.75: eased arrises).
+  Pooling photos from both sides (the old 5-photo median, and even 3 frontal ones) fattens every edge. "Frontal only" was
+  not the fix; "per edge, only photos that cannot see that edge's side face" is.
+- tools/slat_clean_snap.py --primary: each edge from the most on-axis clean photo (IMG_1502, camera x = -39; an on-axis
+  photo is also immune to sheet-depth error), other clean photos as checks (agree to 0.3-1.6 mm), small arris bias removed
+  (0.65 mm slatR_in, 0.19 slatL_in). tools/snap_multi.py = per-photo snap + median (general helper).
+  Sheets re-rendered to work/parts/back/f/sc|so (same geometry as sc/so: --extend 30 20, photos 1502,1501,1503,1499,1513).
+- parts/slats.json (tools/slat_fit.py): edge scatter 0.15-0.83 mm. Centre slat 77.0 mm (v80) -> 99.9 (v700);
+  outer slats R 39.5 -> 51.0, L 40.6 -> 53.5. The whole slat set sits +1.8 mm to the chair's right of the centre plane (constant
+  at every height: placement or centre-plane error, not shape); with that removed L/R mirror disagreement is 1.14 mm rms
+  (was 3.4), max 3.3 at the top of the right outer slat (as-built: right slat ~3-4 mm narrower than left at the top).
+- Tape cross-check (measurements/tape_readings.csv): IMG_1551 at the slat bases: outer 40.9, centre 77.7, gaps 27.7 / 25.7 mm
+  -> trace 39.5-40.6, 77.1, gaps 29.2 / 28.6 (old trace had outer 45-47, centre 80.7). IMG_1553 centre just under the crest
+  98.3 mm (rated high, +-1.2) -> trace 100.0-100.5: 1.7-2.2 mm FATTER than the tape. OPEN: over the 1/16" tolerance; a caliper
+  reading of the centre slat width under the crest would settle it.
+- By-eye check done on IMG_1502 zoom panels: traces sit on the wood/background boundary; bright strips at the slat tops are
+  highlights on the eased arris (trace runs outside them = max width). slatR_out raw trace wanders 3-4 mm onto a background
+  chair leg at v 110-170; the fair curve rejects it (92% clean) and passes through the mirrored left edge there.
+- zoom_panels.sh: env IMG="--img 1502" shows a single rectified photo (use it; the median hides which photo an edge is from).
