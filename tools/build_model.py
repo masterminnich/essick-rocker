@@ -217,8 +217,28 @@ if (ROOT / "parts/back_legs.json").exists():
         dy = np.where(rear[:, 2] >= zt_b[0], np.interp(rear[:, 2], zt_b, yt_b) + toe - rear[:, 1], 0.0); rear_gap = dy[(vleg > v_lo) & (vleg < v_hi)]
         allc = np.c_[allc[:, 0], allc[:, 1] + t * dy, allc[:, 2]]; tan, e_acr, e_side = _frame(allc)
         bl_src += f"; rear face moved onto the triangulated back arris (was off by {np.median(rear_gap):+.1f} mm median, {np.abs(rear_gap).max():.1f} max)"
+bl_up_src = "cloud (centreline + extents, mirrored L+R)"; up_rep = {}
+if SFL and "bleg_front_hi" in SFL and "bleg_rear_hi" in SFL:
+    # above the arm: the front outline and the rear edge traced in SIDE view, on a sheet fitted to the leg's own outer face (the leg splays 8 -> 43 mm
+    # outside the side plane, so the old side sheet could not be used), each side triangulated on its own and averaged (parts/side_frame.json)
+    zF, yF, zR, yR = (np.array(SFL[k][c]) for k in ("bleg_front_hi", "bleg_rear_hi") for c in ("z", "y")); z_ = allc[:, 2]
+    wy = w_side / np.abs(e_side[:, 1]); f_old = allc[:, 1] + wy / 2; r_old = allc[:, 1] - wy / 2            # front / rear outline of the leg so far, fore-aft at each height
+    z0 = max(zF[0], zR[0]); zj = 450.0                                                                     # zj: top of the seat joint, where the lower leg's lines stop
+    def _corr(zL, yL, old):
+        d = np.interp(z_, zL, yL) - old; d0 = np.interp(z0, zL, yL) - np.interp(z0, z_, old); d1 = np.interp(zL[-1], zL, yL) - np.interp(zL[-1], z_, old)
+        return np.where(z_ < z0, d0 * np.clip((z_ - zj) / (z0 - zj), 0, 1), np.where(z_ > zL[-1], d1, d))   # ramp in below the trace, hold the last correction above it
+    dF, dR = _corr(zF, yF, f_old), _corr(zR, yR, r_old); f_new, r_new = f_old + dF, r_old + dR
+    allc = np.c_[allc[:, 0], (f_new + r_new) / 2, allc[:, 2]]; tan, e_acr, e_side = _frame(allc); w_side = (f_new - r_new) * np.abs(e_side[:, 1])
+    inr = (z_ >= z0) & (z_ <= zR[-1])
+    bl_up_src = (f"z {z0:.0f}-{zF[-1]:.0f}: front outline triangulated in side view from 4 cameras standing behind the leg on each side (solve residual 0.6 / 0.5 mm L / R); z {z0:.0f}-{zR[-1]:.0f}: rear edge traced in side view "
+                 f"in 2 cameras standing in front of the leg on each side, depth held on the back outer arris (residual 0.45 / 0.7 mm); L and R averaged. Above z {zR[-1]:.0f} the rear follows the back-view arris, "
+                 f"shifted to meet the side trace; z {zj:.0f}-{z0:.0f} (arm joint) is a linear ramp from the lower leg. Across-width still from the back view.")
+    up_rep = {"front_moved_mm": [float(dF[inr].min()), float(dF[inr].max())], "rear_moved_mm": [float(dR[inr].min()), float(dR[inr].max())],
+              "left_right_fore_aft_mm": {k: {"mean": SFL[k]["lr_diff_y_mean_mm"], "rms_about_mean": SFL[k]["lr_diff_y_rms_about_mean_mm"]} for k in ("bleg_front_hi", "bleg_rear_hi")},
+              "width_fore_aft_mm": {f"z{int(z)}": float(np.interp(z, z_, f_new - r_new)) for z in (620, 700, 800, 900, 1000)},
+              "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}}
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
-report["back_leg"] = {"lower": bl_low_src, "upper": "cloud (centreline + extents, mirrored L+R)",
+report["back_leg"] = {"lower": bl_low_src, "upper": bl_up_src, "upper_side_view": up_rep,
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
                       "across": bl_src, "width_across_mm": {f"z{int(z)}": float(np.interp(z, allc[:, 2], w_acr)) for z in (100, 300, 450, 600, 800, 1000)}, "top_centre": up_center[-1].round(1).tolist(), "splay_top_x_mm": float(up_center[-1, 0])}
 
