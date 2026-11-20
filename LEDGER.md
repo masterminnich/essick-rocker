@@ -40,7 +40,8 @@ Sessions on this machine get cut off without warning; this file says where thing
       outline, crest plan) from 1544/1545/1538/1539.
 
 ## Next
-- [ ] Fold in Joe's caliper sheet (R/F/B/A/C/S/T codes), check dims K1-K6, seat depth grid, far photos, tape targets.
+- [ ] Fold in Joe's hand measurements M1-M8 (PLAN.md, 'Hand measurements') if/when he sends them; never block on them. The
+      caliper sheet and K1-K6 are retired (Joe, 2026-11-20); any later 'K1-K6 / caliper sheet' NEXT item means M1-M8.
 - [ ] Templates (1:1 PDF/DXF). Rocker bending-form template comes from parts/rocker_profile.json (mean_bot / mean_top).
 - [ ] IMG_1592 (new in Drive at 12:00) not yet looked at or registered.
 - [ ] File delivery by link: no working uploader on this machine (the atrium repo's upload-r2.py depends on a path that is

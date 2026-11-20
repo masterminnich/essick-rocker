@@ -23,8 +23,26 @@
 5. Parts: each part = planar template outline in its own plane + thickness + shaping, placed in 3D. Edge types tried in
    order: line, single-radius arc, fair spline; keep the simplest within tolerance. Model is generated from a parameters file.
 6. Critique loop: project the model into every photo through the solved cameras; measure edge gaps per part; fix the worst;
-   repeat. ~15% of photos and Joe's check dimensions (K1-K6) are held out for validation only.
+   repeat. ~15% of photos are held out for validation only; Joe's M7/M8 (below) are independent checks if he supplies them.
 7. Deliverables: CAD model, dimensioned drawing, accuracy report, then 1:1 tiled PDF/DXF templates with a print-scale check square.
+
+## Hand measurements (Joe, 2026-11-20: optional, small list; never block on them)
+The original 35-item caliper sheet (R/F/B/A/C/S/T codes, K1-K6, seat depth grid, far photos) is retired: photogrammetry now
+covers it. Only these remain, because no photo sees them or two sources disagree. Fold them in whenever Joe sends them.
+Required:
+- M1 seat edge thickness, front centre. M2 seat edge thickness, middle of one side. (Underside is an assumed plane; edge
+  thickness 30-43 mm is NOT measured; no photo sees the underside.)
+- M3 crest rail height at the centre. (Photos 74.7 mm vs tape IMG_1555 77.5: 2.8 mm conflict.)
+- M4 centre slat thickness. (~10 mm from photo consistency, weak; it is the lamination stock / bending-form thickness.)
+- M5 centre slat width just under the crest. (Trace 100.0-100.5 vs tape IMG_1553 98.3: 1.7-2.2 mm conflict.)
+Optional:
+- M6 arm thickness at the front end (assumed 25 mm; try the side photos first).
+- M7 table to top of crest at the centre; M8 rocker tip to tip, straight line. The only independent check on the single
+  framing-square scale; they make the accuracy report more than self-graded.
+- Leg stock thickness across (now +-3 mm), only if Joe wants rough stock sizes; side templates do not depend on it.
+Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
+(replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (in: IMG_1588-1592). Every dimension that stays
+photo-derived keeps its provenance tag and +- figure, so the accuracy report shows what was never hand-checked.
 
 ## Compute safety (Joe, 2026-11-20; this machine is a shared hub and was crashed twice)
 Full-resolution COLMAP solves run in parallel used about 40 GB each and exhausted the machine's 64 GB.
