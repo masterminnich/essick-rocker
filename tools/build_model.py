@@ -152,8 +152,15 @@ if (ROOT / "parts/back_legs.json").exists():
     t = np.clip((allc[:, 2] - allc[0, 2]) / (np.interp(v_lo + 10, st_b, zt_b) - allc[0, 2]), 0, 1)       # 0 at the rocker, 1 where the back-view trace starts
     xc_new = (1 - t) * allc[:, 0] + t * (xin + xout) / 2; w_acr = (1 - t) * w_acr + t * (xout - xin)
     allc = np.c_[xc_new, allc[:, 1:]]; bl_src = "fitted (unrolled back view, by-eye seeded edges, L+R averaged) above the seat; blended to the side plane at the rocker"
-    tan = np.gradient(allc, axis=0); tan /= np.linalg.norm(tan, axis=1, keepdims=True)
-    e_acr = np.tile([1.0, 0, 0], (len(allc), 1)); e_acr = e_acr - tan * np.sum(tan * e_acr, 1)[:, None]; e_acr /= np.linalg.norm(e_acr, axis=1, keepdims=True); e_side = np.cross(tan, e_acr)
+    def _frame(c):
+        tn = np.gradient(c, axis=0); tn /= np.linalg.norm(tn, axis=1, keepdims=True)
+        ea = np.tile([1.0, 0, 0], (len(c), 1)); ea = ea - tn * np.sum(tn * ea, 1)[:, None]; ea /= np.linalg.norm(ea, axis=1, keepdims=True); return tn, ea, np.cross(tn, ea)
+    tan, e_acr, e_side = _frame(allc)
+    if "table" in BL["sheet"]:            # the sheet is the triangulated back OUTER arris: put the leg's rear face on it (mid-face is toe/2 forward of the outer arris)
+        es = e_side * np.sign(-e_side[:, 1:2]); rear = allc + es * (w_side / 2)[:, None]; toe = float(BL.get("inner_arris_forward_mm", 0.0)) / 2
+        dy = np.interp(rear[:, 2], zt_b, yt_b) + toe - rear[:, 1]; rear_gap = dy[(vleg > v_lo) & (vleg < v_hi)]
+        allc = np.c_[allc[:, 0], allc[:, 1] + t * dy, allc[:, 2]]; tan, e_acr, e_side = _frame(allc)
+        bl_src += f"; rear face moved onto the triangulated back arris (was off by {np.median(rear_gap):+.1f} mm median, {np.abs(rear_gap).max():.1f} max)"
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
 report["back_leg"] = {"lower": "fitted (side face orthophoto; front edge good, rear edge rough)", "upper": "cloud (centreline + extents, mirrored L+R)",
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},

@@ -145,7 +145,7 @@ Sessions on this machine get cut off without warning; this file says where thing
   chair possibly moved) and IMG_1593 (tape across the seat front). No blue-dot photos uploaded yet. None of the six are
   registered in the camera model.
 
-## 16:00 slats re-traced from clean-silhouette photos (step 1 of the '15:10' NEXT) -- root cause of the L/R smear found
+## 14:35 PST (machine clock; some earlier headings ran ahead of it) slats re-traced from clean-silhouette photos (step 1 of the '15:10' NEXT) -- root cause of the L/R smear found
 - CAUSE of the smeared / fat slat edges: slat thickness parallax. A camera standing to one side of an edge sees the slat's
   side face, so the outline on that side is the FRONT arris, landing t*(xc-u)/depth further out on the back-face sheet.
   Measured: off-side photos read 1.3-3.8 mm outward, square-arris prediction 1.6-5.1 mm (ratio ~0.75: eased arrises).
@@ -167,3 +167,29 @@ Sessions on this machine get cut off without warning; this file says where thing
   highlights on the eased arris (trace runs outside them = max width). slatR_out raw trace wanders 3-4 mm onto a background
   chair leg at v 110-170; the fair curve rejects it (92% clean) and passes through the mirrored left edge there.
 - zoom_panels.sh: env IMG="--img 1502" shows a single rectified photo (use it; the median hides which photo an edge is from).
+
+## 15:05 PST back legs re-traced by EDGE TRIANGULATION (step 2 of the '15:10' NEXT); model v3
+- NEW TOOL tools/edge_tri.py (+ rocker/surface.py): trace one arris in each "clean" photo (camera inside the edge line, so the
+  part's side face is hidden) and solve BOTH the edge position and how far the arris sits off the sheet, from the parallax
+  between photos (u_obs = u + d*(u-xc)/(H-d)). The sheet no longer has to be exactly on the face. Give --inside U,V (a
+  point inside the part; with a negative u write --inside=-225,400). Validated on the slats: agrees with the 14:35 trace to
+  <= 0.7 mm, residual 0.3-0.5 mm rms between photos.
+- Back legs: the old "blegs_back" sheet was wrong by +30..43 mm at v100, ~0 at v400-550, +16..21 mm at v735 (all four edges
+  agreed), so the old 5-photo composite put every edge in the wrong place (old width 54.7 mm at v110 was an artefact).
+  Fixed in two passes (depth baked with tools/profile_offset.py): parts/back_profile.json keys blegs_back2 -> blegs_back3 =
+  the back OUTER arris of the legs (y(z) side profile, good to ~1-3 mm; L and R differ by that much as built).
+  Sheet: work/parts/back/t/b3 (photos 1502,1501,1503,1499,1513). Outer edges: 3 clean photos each, position + depth solved.
+  Inner edges: only 2 clean photos, both far to one side (weak baseline; free depth came out +-10 mm inconsistent), so depth is
+  FIXED: inner arris 5.7 mm forward of the outer one (leg faces toed out ~8.5 deg with the side frame; supported by the
+  2-3 mm side-face strips visible in IMG_1502). This is an assumption worth 0.6-0.8 mm of width.
+- parts/back_legs.json (tools/bleg_fit.py): edge scatter 0.2-0.4 mm; width across (x) 37.0 mm at v110, 39.8 at v250, 38.3-38.5
+  above (= 38.9 mm measured along the toed face = 1.53 in; tape IMG_1556 under the crest 1.55 in +-0.05: agrees).
+  Outside-to-outside 454 mm (v110) -> 514 mm (v725). L/R mirror 0.84 mm rms, 1.5 max after a +0.6 mm pair offset.
+- parts/model_v3.glb (tools/model.sh --out parts/model_v3): new slats + back legs; leg rear face moved onto the triangulated
+  arris (the cloud/side-trace rear face was off by +5.7 mm median, 13 max). Overlay work/overlay_v3/sil_1502.jpg: slats and
+  legs sit on the wood; crest still the old box (not arched), leg tops stick up past the crest.
+- LESSON: any composite of photos from both sides of a thick part is wrong at its edges. Use edge_tri per edge. The
+  side-frame traces (front legs, back-leg lower part, seat edge; ribbon_trace on an 8-photo median) have the same flaw.
+- NEXT: (3) side frames with edge_tri: work/parts/sideL|R have per-photo o_<photo>.png; outer-face arrises are on the plane,
+  so d should come out ~0 (check), front/rear edges of legs traced from clean photos; (4) crest: own surface + top view;
+  arms: top view; (5) overlays of v3 on side and front-quarter photos; then the leg top / crest joint.
