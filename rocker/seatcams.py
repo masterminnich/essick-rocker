@@ -18,7 +18,7 @@ def load(min_inliers=60):
     ref = cams[cams.names()[0]]
     if POSES.exists():
         for name, r in json.loads(POSES.read_text()).items():
-            if r.get("status") != "ok" or r["n_inliers"] < min_inliers: continue
+            if r.get("status") != "ok" or r["n_inliers"] < min_inliers or name in cams.views: continue
             p = cams.drive / name
             cams.views[name] = View(name, ref.model, ref.params, np.array(r["Rcw"]), np.array(r["tcw"]), ref.scale,
                                     cams.metric, exif_orientation(str(p)))
