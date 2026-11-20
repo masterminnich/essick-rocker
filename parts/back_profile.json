@@ -29,5 +29,20 @@
   ],
   "scatter_mm": 6.038339717098542,
   "n": 730
+ },
+ "blegs_back": {
+  "coef": [
+   2.2665811704320325e-12,
+   -1.3905776495952983e-08,
+   2.9024276130831507e-05,
+   -0.02685758872035523,
+   10.857248262942408,
+   -1529.1604097767176
+  ],
+  "z": [
+   318.92218137152196,
+   1088.663123933585
+  ],
+  "note": "back face of the back legs: cloud profile moved back by the photo-consistency offset per height band (24,22,10,4 mm; top band assumed 6)"
  }
 }

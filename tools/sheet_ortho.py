@@ -18,6 +18,8 @@ from rocker.ortho import ortho, load_raw
 ap = argparse.ArgumentParser(); ap.add_argument("--profile", required=True); ap.add_argument("--key", required=True); ap.add_argument("--side", default="back")
 ap.add_argument("--urange", nargs=2, type=float, required=True); ap.add_argument("--res", type=float, default=0.5); ap.add_argument("--offset", type=float, default=0)
 ap.add_argument("--sweep", nargs=3, type=float, default=None); ap.add_argument("--max-angle", type=float, default=30); ap.add_argument("--max-photos", type=int, default=7)
+ap.add_argument("--score-absu", nargs=2, type=float, default=None, help="score photo consistency only where A <= |u| <= B (mm)")
+ap.add_argument("--score-v", nargs=2, type=float, default=None, help="... and only for v in this range")
 ap.add_argument("--photos", default="auto"); ap.add_argument("--out", required=True)
 a = ap.parse_args(); cams = Cameras.load()
 pr = json.load(open(a.profile))[a.key]; coef = np.array(pr["coef"]); z0, z1 = pr["z"]; dcoef = np.polyder(coef)
@@ -48,6 +50,10 @@ def norm_gray(im):
     return hp / (np.sqrt(cv2.GaussianBlur(hp * hp, (0, 0), 6 / a.res)) + 2.0)
 def score(ims):
     G = np.stack([norm_gray(i) for i in ims]); valid = np.all(np.stack([i.sum(2) > 0 for i in ims]), 0); sp = G.std(0); sp[~valid] = np.nan
+    if a.score_absu or a.score_v:
+        uu = np.abs(a.urange[0] + np.arange(sp.shape[1]) * a.res)[None, :]; vv = (vrange[1] - np.arange(sp.shape[0]) * a.res)[:, None]
+        if a.score_absu: valid = valid & (uu >= a.score_absu[0]) & (uu <= a.score_absu[1])
+        if a.score_v: valid = valid & (vv >= a.score_v[0]) & (vv <= a.score_v[1])
     vals = np.sort(sp[valid]); return float(vals[:max(1, int(0.3 * len(vals)))].mean()), sp
 if a.sweep:
     best = None
