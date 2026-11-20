@@ -26,9 +26,12 @@ DET = ROOT / "work/seat/det"; DET.mkdir(parents=True, exist_ok=True)
 seat_z = lambda y: 338 + 0.155 * y      # rough seat rim plane (tools/build_model.py)
 
 
-def seat_cloud():
+def seat_cloud(front_face=False):
+    """seat points of the chair cloud; front_face=True also takes the front edge face down to 65 mm below the rim
+    (detection region only: Joe taped the front edge too)"""
     C = np.load(ROOT / "work/dense/chair_dense.npy")[:, :3]
-    m = (np.abs(C[:, 0]) < 290) & (C[:, 1] > -60) & (C[:, 1] < 580) & (C[:, 2] > seat_z(C[:, 1]) - 22) & (C[:, 2] < seat_z(C[:, 1]) + 45)
+    lo = seat_z(C[:, 1]) - (np.where(C[:, 1] > 420, 65, 22) if front_face else 22)
+    m = (np.abs(C[:, 0]) < 290) & (C[:, 1] > -60) & (C[:, 1] < 580) & (C[:, 2] > lo) & (C[:, 2] < seat_z(C[:, 1]) + 45)
     return C[m]
 
 
@@ -46,7 +49,7 @@ def prior_surface():
 def cmd_detect(names):
     cv2.setNumThreads(2); cams = load()
     names = names or sorted(n for n in json.loads((ROOT / "work/seat/poses.json").read_text()) if n in cams.views)
-    S = seat_cloud()
+    S = seat_cloud(front_face=True)
     for n in names:
         n = n if n.endswith(".JPG") else n + ".JPG"; v = cams[n]
         rgb = np.asarray(Image.open(cams.drive / n).convert("RGB"))          # raw sensor orientation
@@ -117,7 +120,7 @@ def refine(cams, X, obs, iters=10):
 def cmd_dots(merge=9.0, maxerr=3.0):
     cams = load(); surf = prior_surface()    # the prior is only used for surface normals and a z-difference column
     from scipy.spatial import cKDTree
-    BOX = np.array([[-330, -100, 280], [330, 620, 480]], float)      # seat region, chair frame mm
+    BOX = np.array([[-330, -100, 280], [330, 640, 480]], float)      # seat region, chair frame mm
     DUV = {}
     for p in sorted(DET.glob("*.npz")):
         n = p.stem + ".JPG"; z = np.load(p)

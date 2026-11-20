@@ -22,7 +22,13 @@ for n, rec in P.items():
     if not dp.exists(): continue
     D = np.load(dp)["uv"]; uv = v.project(X); ok = np.flatnonzero(v.in_image(uv, -5))
     if len(D) < 2 or len(ok) < 8: print(n, "skip: too few"); continue
-    d, j = cKDTree(D).query(uv[ok], k=2); m = (d[:, 0] < r) & (d[:, 1] > 2 * r)
+    # coarse 2D shift first (a pose can be off by tens of px): mode of nearest-detection vectors within 60 px
+    d1, j1 = cKDTree(D).query(uv[ok]); vec = (D[j1] - uv[ok])[d1 < 60]
+    shift = np.zeros(2)
+    if len(vec) >= 8:
+        best = max(vec, key=lambda c: (np.linalg.norm(vec - c, axis=1) < 6).sum())
+        shift = np.median(vec[np.linalg.norm(vec - best, axis=1) < 6], 0)
+    d, j = cKDTree(D).query(uv[ok] + shift, k=2); m = (d[:, 0] < r) & (d[:, 1] > 2 * r)
     Xw = X[ok[m]]
     if len(Xw) < 12: print(n, "skip:", len(Xw), "pairs"); continue
     und = v.undistort_pixels(D[j[m, 0]])
@@ -37,7 +43,7 @@ for n, rec in P.items():
     c_old, c_new = -Rch.T @ tch, -Rn.T @ tn
     rec.setdefault("Rcw_prev", rec["Rcw"]); rec.setdefault("tcw_prev", rec["tcw"])
     rec["Rcw"] = (Rn @ M.R).tolist(); rec["tcw"] = ((Rn @ M.t + tn) / M.s).tolist(); rec["center_mm"] = c_new.tolist()
-    log = dict(pairs=int(len(Xw)), kept=int(keep.sum()), rms_before=float(np.sqrt((e0 ** 2).mean())), rms_after=float(np.sqrt((e[keep] ** 2).mean())),
+    log = dict(shift_px=np.round(shift, 1).tolist(), pairs=int(len(Xw)), kept=int(keep.sum()), rms_before=float(np.sqrt((e0 ** 2).mean())), rms_after=float(np.sqrt((e[keep] ** 2).mean())),
                moved_mm=float(np.linalg.norm(c_new - c_old)))
     rec.setdefault("posefix", []).append(log)
     print(n, log)
