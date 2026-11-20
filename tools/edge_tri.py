@@ -6,7 +6,8 @@ Why: a point d mm off the sheet lands at  u_obs = u + d * (u - xc) / (H - d)  in
 and at lateral position xc, so photos disagree in proportion to d. Two or more photos give both u and d.
 Only "clean" photos are used: the camera must stand on the INSIDE of the edge (--inside = any point inside the part, on
 the sheet), so that it cannot see the part's side face there and the outline it sees is this arris, not the far one.
---margin lets a camera stand that many mm outside (use only for thin parts). d(v) is a polynomial of degree --ddeg along
+--margin lets a camera stand that many mm outside (use only for thin parts). --mode far does the opposite: only cameras
+standing OUTSIDE the edge line, which all see the far arris as the outline; its depth is then minus the part's thickness. d(v) is a polynomial of degree --ddeg along
 the edge; u is free per station. Each photo is refined separately around the seed (band, then band/2 around its own
 smoothed result). --depth-fixed D skips the depth solve (for an edge whose clean photos all stand on one side with a short baseline: put the
 sheet on the neighbouring, well-triangulated arris first, then fix d = 0). With a single clean photo d is taken as 0 and the edge is NOT parallax-corrected (it says so).
@@ -22,6 +23,8 @@ from rocker.surface import load_surface
 ap = argparse.ArgumentParser(); ap.add_argument("prefix"); ap.add_argument("--seed", default=None); ap.add_argument("--seed-poly", nargs="+", default=None, help='"coefs of u(v)" V0 V1')
 ap.add_argument("--inside", required=True); ap.add_argument("--photos", default="auto"); ap.add_argument("--margin", type=float, default=0.0)
 ap.add_argument("--band", type=float, default=6.0); ap.add_argument("--ddeg", type=int, default=2); ap.add_argument("--name", default="edge"); ap.add_argument("--out", required=True)
+ap.add_argument("--mode", default="clean", choices=["clean", "far", "all"], help="clean: cameras inside the edge line (outline = near arris). far: cameras outside it by > margin (outline = the FAR arris; "
+                "the depth then comes out as minus the part's thickness). all: every photo (only for a line drawn on the surface, e.g. a ridge)")
 ap.add_argument("--depth-fixed", type=float, default=None, help="do not solve d; take the arris this far off the sheet (e.g. 0 when the sheet was already put on the neighbouring arris) and weight photos by how little a depth error moves them")
 ap.add_argument("--lam", type=float, default=1.5); ap.add_argument("--max-photos", type=int, default=4); ap.add_argument("--clip", type=float, default=1.5)
 a = ap.parse_args()
@@ -65,10 +68,10 @@ names = [f"IMG_{x}.JPG" for x in a.photos.split(",")] if a.photos != "auto" else
 rows = []
 for nm in names:
     H, lat = geom(nm); rows.append((nm, float(np.median(lat)), H, lat))
-clean = [r for r in rows if r[1] <= a.margin] if a.photos == "auto" else rows
+clean = rows if (a.photos != "auto" or a.mode == "all") else [r for r in rows if (r[1] <= a.margin if a.mode == "clean" else r[1] > a.margin)]
 clean = sorted(clean, key=lambda r: abs(r[1]) / np.median(r[2]))[:a.max_photos]
 if not clean: sys.exit(f"{a.name}: no clean photo (camera positions along outward: " + ", ".join(f"{r[0][4:8]} {r[1]:+.0f}" for r in rows) + ")")
-M = []; G = []
+M = []; G = []; HH = np.array([r[2] for r in clean]); LL = np.array([r[3] for r in clean])
 for nm, latm, H, lat in clean:
     lab = cv2.GaussianBlur(cv2.cvtColor(cv2.imread(f"{a.prefix}_{nm[4:8]}.png"), cv2.COLOR_BGR2LAB).astype(np.float32), (0, 0), 0.8)
     m1 = snap(lab, np.zeros(n_st), a.band); m2 = snap(lab, smooth(m1), max(a.band / 2, 2.0))
@@ -78,9 +81,10 @@ if a.depth_fixed is not None:
     d = np.full(n_st, a.depth_fixed); w = 1.0 / (G ** 2 + 0.05 ** 2); x = np.sum((M - G * d) * w, 0) / w.sum(0); resid = (M - G * d - x).ravel(); solved = False
 elif len(clean) >= 2 and np.ptp(G.mean(1)) > 0.08:
     Mc = M - M.mean(0); Gc = G - G.mean(0); keep = np.ones(M.shape, bool)
-    for _ in range(6):
+    for it in range(8):
         A_ = (Gc[..., None] * B[None]) [keep]; cf = np.linalg.lstsq(A_, Mc[keep], rcond=None)[0]; d = B @ cf
         r = Mc - Gc * d; keep = np.abs(r - np.median(r, 0)) < a.clip
+        if it >= 3: G = -LL / (HH - d); Gc = G - G.mean(0)          # exact parallax factor once d is roughly known (matters for d of tens of mm)
     w = keep.astype(float) + 1e-6; x = np.sum((M - G * d) * w, 0) / w.sum(0); resid = (M - G * d - x)[keep]; solved = True
 else:
     d = np.zeros(n_st); x = M.mean(0); resid = (M - x).ravel(); solved = False

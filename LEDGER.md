@@ -193,3 +193,17 @@ Sessions on this machine get cut off without warning; this file says where thing
 - NEXT: (3) side frames with edge_tri: work/parts/sideL|R have per-photo o_<photo>.png; outer-face arrises are on the plane,
   so d should come out ~0 (check), front/rear edges of legs traced from clean photos; (4) crest: own surface + top view;
   arms: top view; (5) overlays of v3 on side and front-quarter photos; then the leg top / crest joint.
+
+## 15:20 PST side frames: pilot only, NOT valid yet (step 3 started)
+- Looked at work/parts/sideL in a single photo (IMG="--img 1507" zoom_panels): the old ribbon traces are wrong in places
+  (front-leg "front edge" follows an interior ridge above v350; back-leg rear edge runs inside the wood above the seat).
+  The legs are sculpted: in side view each shows two faces with a ridge between them, so "width in side view" needs the
+  outline AND the ridge, each as its own triangulated line.
+- edge_tri.py got --mode far (cameras outside the edge: outline = far arris, depth = minus thickness) and --mode all.
+- Pilot on the left front leg (by-eye seeds from the 1507 panels; work/parts/sideL/t/flegL_front|rear.json): residuals 0.6 mm
+  but edges moved up to 12 mm from the seeds and depths came out +5..+12 / -13 mm instead of ~0 / ~-33. NOT trustworthy:
+  8 photos up to 56 deg off the face normal were used, a +-6 mm band cannot follow that parallax, and the seeds were rough.
+- NEXT for step 3: per member and per line (front outline, rear outline, ridge): seeds by eye per photo region on 1507;
+  use only 1507,1508,1509,1510,1506 (within ~20 deg); first pass band 10; check each photo's trace by eye before trusting
+  the solve; right side has only 1470,1469,1474,1477,1478 on file (more oblique) - render more near-frontal right photos
+  if any exist. Then (4) crest/arms, (5) overlays on side and front-quarter photos.
