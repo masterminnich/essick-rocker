@@ -73,3 +73,13 @@ Sessions on this machine get cut off without warning; this file says where thing
 - NEXT: (1) measure hull vs the traced rocker profile (known good) to get a real accuracy number for the hull;
   (2) tighten masks using the hull itself as the prior and re-carve; (3) take part cross-sections from the hull to give
   model parts real section shapes instead of boxes; (4) seat scoop from the cloud surface, cut into the hull.
+
+## 13:55 hull accuracy measured: NOT usable for dimensions
+- tools/hull_vs_rocker.py: hull vs traced left rocker profile. keep 0.97: top edge +11.4 mm fat (8.5..16.5), bottom -3.0 mm,
+  face height +13.6 mm on a 27 mm part. keep 0.88: +26 mm. Cause: masks leak onto table/background consistently.
+- Joe (13:55) spotted the generous masks himself. Conclusion told to Joe: the hull improved looks, not accuracy; do not take
+  any dimension or cross-section from it. The NEXT list under '13:50' is superseded.
+- NEXT (replaces the above): keep to the method with proven numbers (face orthophotos + traces):
+  back-view plane (crest front face, upper back legs, slats) from 1501/1502/1513; top view (arm outlines, seat outline,
+  crest plan) from 1544/1545/1538/1539; then rebuild model v2 with those. Hull only as a visual reference.
+  A tighter segmenter (a learned model such as SAM) would be the way to make carving accurate; needs Joe's OK (compute).
