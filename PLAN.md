@@ -25,3 +25,14 @@
 6. Critique loop: project the model into every photo through the solved cameras; measure edge gaps per part; fix the worst;
    repeat. ~15% of photos and Joe's check dimensions (K1-K6) are held out for validation only.
 7. Deliverables: CAD model, dimensioned drawing, accuracy report, then 1:1 tiled PDF/DXF templates with a print-scale check square.
+
+## Compute safety (Joe, 2026-11-20; this machine is a shared hub and was crashed twice)
+Full-resolution COLMAP solves run in parallel used about 40 GB each and exhausted the machine's 64 GB.
+- **No full-resolution COLMAP feature extraction, matching or bundle adjustment on this machine.** The camera model in
+  `work/solve/model` is final; do not re-solve. New photos are added by registering them into that model at half
+  resolution, one job, thread-capped.
+- **One compute job at a time**, always through `tools/safe_run.sh` (low priority, 2 threads, killed above 6 GB or 20 min
+  unless a higher cap is justified in writing first). Never in the background, never from parallel agents.
+- **Audit before running** any script that loads the COLMAP model, many images or runs an optimiser: state expected peak
+  memory, threads and runtime; process photos one at a time (a decoded photo is ~36 MB); never hold all 94 in memory.
+- Agents may read, view images and write code in parallel, but only one of them (or the coordinator) runs compute.
