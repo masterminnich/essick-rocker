@@ -168,7 +168,7 @@ Sessions on this machine get cut off without warning; this file says where thing
   chair leg at v 110-170; the fair curve rejects it (92% clean) and passes through the mirrored left edge there.
 - zoom_panels.sh: env IMG="--img 1502" shows a single rectified photo (use it; the median hides which photo an edge is from).
 
-## 15:05 PST back legs re-traced by EDGE TRIANGULATION (step 2 of the '15:10' NEXT); model v3
+## 14:38 PST back legs re-traced by EDGE TRIANGULATION (step 2 of the '15:10' NEXT); model v3
 - NEW TOOL tools/edge_tri.py (+ rocker/surface.py): trace one arris in each "clean" photo (camera inside the edge line, so the
   part's side face is hidden) and solve BOTH the edge position and how far the arris sits off the sheet, from the parallax
   between photos (u_obs = u + d*(u-xc)/(H-d)). The sheet no longer has to be exactly on the face. Give --inside U,V (a
@@ -194,7 +194,7 @@ Sessions on this machine get cut off without warning; this file says where thing
   so d should come out ~0 (check), front/rear edges of legs traced from clean photos; (4) crest: own surface + top view;
   arms: top view; (5) overlays of v3 on side and front-quarter photos; then the leg top / crest joint.
 
-## 15:20 PST side frames: pilot only, NOT valid yet (step 3 started)
+## 14:41 PST side frames: pilot only, NOT valid yet (step 3 started)
 - Looked at work/parts/sideL in a single photo (IMG="--img 1507" zoom_panels): the old ribbon traces are wrong in places
   (front-leg "front edge" follows an interior ridge above v350; back-leg rear edge runs inside the wood above the seat).
   The legs are sculpted: in side view each shows two faces with a ridge between them, so "width in side view" needs the
