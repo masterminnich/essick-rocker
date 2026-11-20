@@ -1,5 +1,6 @@
 """USAGE: python -I tools/edge_tri.py PREFIX --seed "u,v u,v ..." | --seed-poly "c4 c3 .. c0" V0 V1   --inside U,V
-            [--photos 1502,1501 | auto] [--margin 0] [--band 6] [--ddeg 2] [--name NAME] --out FILE.json
+            [--photos 1502,1501 | auto] [--mode clean|far|all] [--margin 0] [--band 6] [--ddeg 2] [--depth-fixed D] [--depth-guess D]
+            [--dump PERPHOTO.json] [--name NAME] --out FILE.json
 Trace ONE edge (arris) of a part in several rectified photos and TRIANGULATE it: the result is the edge on the sheet with
 parallax removed, plus how far the arris really sits off the sheet (so the sheet no longer has to be exactly on the face).
 Why: a point d mm off the sheet lands at  u_obs = u + d * (u - xc) / (H - d)  in a photo whose camera is H above the sheet
@@ -26,6 +27,10 @@ ap.add_argument("--band", type=float, default=6.0); ap.add_argument("--ddeg", ty
 ap.add_argument("--mode", default="clean", choices=["clean", "far", "all"], help="clean: cameras inside the edge line (outline = near arris). far: cameras outside it by > margin (outline = the FAR arris; "
                 "the depth then comes out as minus the part's thickness). all: every photo (only for a line drawn on the surface, e.g. a ridge)")
 ap.add_argument("--depth-fixed", type=float, default=None, help="do not solve d; take the arris this far off the sheet (e.g. 0 when the sheet was already put on the neighbouring arris) and weight photos by how little a depth error moves them")
+ap.add_argument("--depth-guess", type=float, default=0.0, help="expected depth of the arris off the sheet: each photo's search is centred where an arris at that depth would land (g * D), so the band can stay small for a far arris")
+ap.add_argument("--pool", default=None, help="candidate photos (e.g. only the near-frontal ones); unlike --photos the --mode filter still picks among them")
+ap.add_argument("--seed-photo", default=None, help="the photo the seed was read on (e.g. 1507): with --depth-guess the search in every other photo is shifted by the parallax difference to that photo")
+ap.add_argument("--dump", default=None, help="also write every photo's own traced curve {photo: [[u, v]..]} to this JSON, to overlay on that single photo and check by eye")
 ap.add_argument("--lam", type=float, default=1.5); ap.add_argument("--max-photos", type=int, default=4); ap.add_argument("--clip", type=float, default=1.5)
 a = ap.parse_args()
 pj = json.load(open(a.prefix + "_plane.json")); res = pj["res"]; (u0, u1), (v0, v1) = pj["urange"], pj["vrange"]; S = load_surface(pj); cams = Cameras.load()
@@ -64,17 +69,21 @@ def snap(lab, centre, band):
     return centre + offs[path]
 
 
-names = [f"IMG_{x}.JPG" for x in a.photos.split(",")] if a.photos != "auto" else pj["photos"]
+names = [f"IMG_{x}.JPG" for x in a.photos.split(",")] if a.photos != "auto" else ([f"IMG_{x}.JPG" for x in a.pool.split(",")] if a.pool else pj["photos"])
 rows = []
 for nm in names:
     H, lat = geom(nm); rows.append((nm, float(np.median(lat)), H, lat))
 clean = rows if (a.photos != "auto" or a.mode == "all") else [r for r in rows if (r[1] <= a.margin if a.mode == "clean" else r[1] > a.margin)]
 clean = sorted(clean, key=lambda r: abs(r[1]) / np.median(r[2]))[:a.max_photos]
 if not clean: sys.exit(f"{a.name}: no clean photo (camera positions along outward: " + ", ".join(f"{r[0][4:8]} {r[1]:+.0f}" for r in rows) + ")")
+g_ref = 0.0
+if a.seed_photo:
+    Hr, lr = geom(f"IMG_{a.seed_photo}.JPG"); g_ref = -lr / (Hr - a.depth_guess)
 M = []; G = []; HH = np.array([r[2] for r in clean]); LL = np.array([r[3] for r in clean])
 for nm, latm, H, lat in clean:
     lab = cv2.GaussianBlur(cv2.cvtColor(cv2.imread(f"{a.prefix}_{nm[4:8]}.png"), cv2.COLOR_BGR2LAB).astype(np.float32), (0, 0), 0.8)
-    m1 = snap(lab, np.zeros(n_st), a.band); m2 = snap(lab, smooth(m1), max(a.band / 2, 2.0))
+    c0 = out_sign * (-lat / (H - a.depth_guess) - g_ref) * a.depth_guess
+    m1 = snap(lab, c0, a.band); m2 = snap(lab, smooth(m1), max(a.band / 2, 2.0))
     M.append(m2 * out_sign); G.append(-lat / H)          # outward offset from the seed; observed = x + g * d  (d>0: arris off the sheet towards the cameras)
 M = np.array(M); G = np.array(G); s_ = np.linspace(-1, 1, n_st); B = np.stack([s_ ** k for k in range(a.ddeg + 1)], 1)
 if a.depth_fixed is not None:
@@ -89,6 +98,10 @@ elif len(clean) >= 2 and np.ptp(G.mean(1)) > 0.08:
 else:
     d = np.zeros(n_st); x = M.mean(0); resid = (M - x).ravel(); solved = False
 E = P + (out_sign * x)[:, None] * N; XYZ = S.to3d(E, d)
+if a.dump:
+    dj = json.load(open(a.dump)) if Path(a.dump).exists() else {}
+    for i, r in enumerate(clean): dj[f"{a.name}@{r[0][4:8]}"] = (P + (out_sign * M[i])[:, None] * N).tolist()
+    json.dump(dj, open(a.dump, "w"))
 info = {"photos": [r[0][4:8] for r in clean], "camera_along_outward_mm": [round(r[1]) for r in clean], "triangulated": solved, "residual_rms_mm": float(np.sqrt(np.mean(resid ** 2))),
         "depth_mm": {"start": float(d[0]), "mid": float(d[n_st // 2]), "end": float(d[-1])}, "moved_outward_from_seed_mm": {"median": float(np.median(x)), "p5": float(np.percentile(x, 5)), "p95": float(np.percentile(x, 95))},
         "per_photo_outward_minus_edge_mm": {r[0][4:8]: float(np.median(M[i] - x)) for i, r in enumerate(clean)}, "not_used": {r[0][4:8]: round(r[1]) for r in rows if r[0] not in [c[0] for c in clean]}}

@@ -207,3 +207,35 @@ Sessions on this machine get cut off without warning; this file says where thing
   use only 1507,1508,1509,1510,1506 (within ~20 deg); first pass band 10; check each photo's trace by eye before trusting
   the solve; right side has only 1470,1469,1474,1477,1478 on file (more oblique) - render more near-frontal right photos
   if any exist. Then (4) crest/arms, (5) overlays on side and front-quarter photos.
+
+## 14:53 PST left side frame: front leg and lower back leg triangulated (step 3, left half done except upper back-leg front edge)
+- Tools: edge_tri.py got --pool (candidate photos, mode filter still applies), --depth-guess + --seed-photo (search centred where an
+  arris at that depth lands in each photo, so the band stays small for far arrises), --dump (each photo's own trace).
+  tools/tri_lines.py runs every line of a seeds file (parts/side_seeds_L.json = by-eye seeds read on IMG_1507 zooms);
+  tools/tri_show.py draws one photo's own traces on that photo (the by-eye check); tools/side_fit.py collects the lines into
+  parts/side_frame_L.json (fair curve, scatter, depth, xyz, photos, provenance); tools/xyz_on_sheet.py draws any 3D line onto a
+  rectified photo (cross-check of lines triangulated from other photos).
+- Run: work/toolkit/rk.sh tools/tri_lines.py work/parts/sideL/o parts/side_seeds_L.json work/parts/sideL/t2 ; then
+  work/toolkit/rk.sh tools/side_fit.py work/parts/sideL/t2 --sheet work/parts/sideL/o_plane.json --side L --out parts/side_frame_L.json
+- What the legs look like in side view (checked by eye on 1507, 1508, 1510, 1506 singly): the outer face is flat; the rear is a
+  rounded/bevelled face, so there are THREE lines per member: front outline (clean), rear outer-face ridge (a soft tone line;
+  depth fixed to the front arris, residual 1.3-2.3 mm, +-2 mm), rear inner arris (far mode, seen as the outline by cameras behind).
+  The inner rear arris sits 5-9 mm rearward of the outer ridge on both legs (about half of it is the 8 deg toe of the plane).
+- Left front leg (photos 1507,1508,1509,1510,1506; residuals 0.3-0.5 mm on outlines): outer-face width 31 mm at the rocker,
+  40 mm just under the seat (tape IMG_1497: 39.6 +-1.6, agrees), 38 mm above the seat tapering to 28-31 mm under the arm
+  (tape IMG_1498: 29.2); overall side-view width (front to inner rear arris) 38 -> 46 mm below the seat, 41 -> 34 above.
+  Thickness (depth of the inner arris) 27-30 mm below the seat, 32-36 above (ddeg 1 solve; +-3 mm).
+- Left back leg below the seat (v 60-290): front outline 4 photos, residual 0.31, on the plane (+0.5..-0.3); outer-face width
+  35 mm at the rocker -> 42 under the seat; overall 38 -> 48; inner arris 36 mm deep at the rocker (tape IMG_1494: 34-41) but
+  27 at v290 (suspect: frontal trace says 37-40 across; the frontal number is the better one).
+- CROSS-CHECK front vs side: the back OUTER arris of the left back leg triangulated from the FRONT photos (work/parts/back/t/
+  blegL_out) drawn into side photos 1508 and 1509 lies 0.7-2.4 mm (along u) behind the rear outline seen there over v 480-840
+  (by eye: trace on the wood edge, frontal line just outside it). Above v 940 the side outline is the crest, not the leg.
+  So the back-leg side profile from the front photos is good to about 1.5 mm; it could be moved forward ~1.5 mm at v 600-840.
+- NOT done: front outline of the upper back leg in side view (v 530-940). In 1510 the dust hose, far leg and slats sit behind it
+  and I could not read seeds reliably (two readings at v650 differed by 20 mm); the arm joins the leg at v 480-520. Try seeds on
+  1506/1505 (different background) or measure the leg's front-to-back depth from a front-quarter photo instead.
+- NEXT: (3b) right side frame the same way (work/parts/sideR/o, photos 1470,1469,1474,1477,1478 are more oblique: use
+  --depth-guess; write parts/side_seeds_R.json); mirror-compare with parts/side_frame_L.json; upper back-leg front outline;
+  seat side edge is the seat session's. Then feed side_frame_L/R into build_model (front legs and lower back legs are still the
+  old ribbon traces there). (4) crest + arms. (5) overlays on side (1507) and front-quarter (1484) photos.

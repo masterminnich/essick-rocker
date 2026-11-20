@@ -1,0 +1,84 @@
+[
+ {
+  "name": "flegL_front_lo",
+  "seed": "566,110 553.5,150 540,200 521,270 506.7,330 500.5,370",
+  "inside": "500,200",
+  "mode": "clean",
+  "band": 8,
+  "photos": "1507,1508,1509,1510,1506"
+ },
+ {
+  "name": "flegL_front_hi",
+  "seed": "484,460 474.7,500 468,550 462,600 461,612",
+  "inside": "440,550",
+  "mode": "clean",
+  "band": 8,
+  "photos": "1507,1508,1509,1510,1506"
+ },
+ {
+  "name": "flegL_rearfar_lo",
+  "seed": "524,110 507.5,150 491,200 474,270 463,300 446.7,370",
+  "inside": "530,200",
+  "mode": "far",
+  "band": 7,
+  "depth_guess": -32,
+  "seed_photo": "1507",
+  "photos": "1507,1508,1509,1510,1506"
+ },
+ {
+  "name": "flegL_rearfar_hi",
+  "seed": "426,460 423.5,500 421,550 419,600 418,612",
+  "inside": "450,550",
+  "mode": "far",
+  "band": 7,
+  "depth_guess": -32,
+  "seed_photo": "1507",
+  "photos": "1507,1508,1509,1510,1506"
+ },
+ {
+  "name": "flegL_rear_lo",
+  "seed": "535,110 518.5,150 502,200 485,270 474,300 457.7,370",
+  "inside": "530,200",
+  "mode": "all",
+  "band": 4,
+  "depth_fixed": 3.5,
+  "photos": "1507,1508,1509,1510,1506"
+ },
+ {
+  "name": "flegL_rear_hi",
+  "seed": "437,460 436,480 433,520 431,570 430,610",
+  "inside": "450,550",
+  "mode": "all",
+  "band": 3,
+  "photos": "1507,1509,1510,1506",
+  "depth_fixed": 0.0
+ },
+ {
+  "name": "blegL_front_lo",
+  "seed": "65,60 68,90 73,133 78,200 80,295",
+  "inside": "50,150",
+  "mode": "clean",
+  "pool": "1507,1508,1509,1510,1506",
+  "margin": 25,
+  "band": 6
+ },
+ {
+  "name": "blegL_rearfar_lo",
+  "seed": "33,60 31.5,120 30.5,200 30.5,290",
+  "inside": "50,150",
+  "mode": "far",
+  "photos": "1507,1510,1506",
+  "band": 4,
+  "depth_guess": -32,
+  "seed_photo": "1507"
+ },
+ {
+  "name": "blegL_rear_lo",
+  "seed": "38,60 39.5,120 40,200 40.5,290",
+  "inside": "50,150",
+  "mode": "all",
+  "photos": "1507,1508,1509,1510,1506",
+  "band": 3,
+  "depth_fixed": 0.0
+ }
+]
