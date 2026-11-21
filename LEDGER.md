@@ -917,3 +917,27 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - NEXT: Joe's item 3 (front-leg Domino centring on the leg face, `tools/domino_ortho.py`; `parts/dominos.json` is the
   joinery session's: small named edit), then the 3 mm question at the seat's right front corner, left-side scoop check, arm
   underside and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.
+
+## 21:52 PST front-leg Domino centred on the leg face (PR #24); MODEL v19 on main
+- FRONT-LEG DOMINO (Joe's item 3; PR #24, `tools/front_domino/`, figures `figures/front_domino/`). Run on Opus 5.5. Straightened
+  orthophotos of each front leg's outer face (0.1 mm/px, sheared by the leg's lean 0.185 so the edges stand vertical); Domino
+  end by a matched filter from eye seeds; arrises by the strongest tone step within 4 mm of a seed, in a band below and one
+  above the Domino; each reading checked on single photos at 10 px/mm. Used if view <= 50 deg, fit score >= 6, the two bands
+  agree within 1.5 mm.
+- RESULT (Domino centre minus the middle of the two arrises, + = toward the leg's front): left -0.29 (n 7, sd 0.88), right
+  -0.74 (n 12, sd 0.61), both -0.58 (n 19, sd 0.73, se 0.17). All 27 photos: left +0.61 (n 13, sd 1.25), right -0.69 (n 14).
+  Arris to arris: left 41.26, right 38.13 (40.26 on the 5 square-on right photos); model flat face 40.39.
+- CAUSE: the v12 centre sat at u -6.22 on the face plane = the middle of the leg's whole section (-28.57..+16.08, middle -6.24,
+  including the slanted rear face), not of the flat outer face (-24.40..+15.99, middle -4.20). Most likely cause; the
+  original reading figure does not say which edges were used.
+- CHANGE: `parts/dominos.json` front_leg centre_xyz [-284.2, 466.7, 394.8] -> [-284.4, 468.2, 394.8] (+1.52 mm along the
+  face, design = mean of the legs, -0.515). Joined end vs the flat face's middle: v18 -2.07, v19 -0.55 (both legs).
+- MODEL v19 = main after #24: `tools/model.sh --out parts/model_v19`, assembly check PASS, identical to the branch trial build
+  (all 23 joined parts). vs v18: `_shapes.glb` all 13 parts vertex-identical; joined: DOMINO_FL/FR (+1.5 mm y), FLEG_L/R and
+  SEAT (mortises; SEAT -0.011 cm3), ARM_L/R and DOMINO_AL/AR (the hidden arm/front-leg Domino moved 0.2-0.4 mm: joinery.py
+  5b places it at the centroid of an even surface sampling of the leg, which shifts when the leg mesh changes; sampling noise).
+- OPEN: (1) height not changed: right-leg photo sets disagree by about 7 mm (1469-1477 fit v 11.8-14.8, 1488-1490 v 19.1-24.6,
+  model 19.2); left photos v 15.6-20.4. (2) tilt not changed (15 deg): fits 12-18 deg, 8 deg on 1488-1490. (3) for the joinery
+  session: the arm/front-leg Domino's position depends on mesh sampling (5b), 0.2-0.4 mm jitter per rebuild of the leg.
+- NEXT: the 3 mm question at the seat's right front corner (LEDGER 17:33 and 19:05), then left-side scoop check, arm underside
+  and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.
