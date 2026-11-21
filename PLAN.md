@@ -72,7 +72,7 @@ rest of the plan as written"). Joe gave these to the HUB, so the hub does them, 
 session's files. Joinery session: please do not start the same items; the hub keeps its edits to `tools/joinery.py`,
 `parts/dominos.json` and `parts/joints.json` small and names each one in its PR.** New photos for them: IMG_1618, 1619, 1620
 (close-ups, not registered; half-resolution registration only).
-1. [ ] **Dominos missing at the back of the chair** (IMG_1620, from behind): each back leg shows TWO Domino ends on its
+1. [x] (PR #22, model v17; `parts/joints.json` `back_leg_rear`, parts `DOMINO_RS*` and `DOMINO_RA*`) **Dominos missing at the back of the chair** (IMG_1620, from behind): each back leg shows TWO Domino ends on its
    rear / outer face, one at seat height and one higher, at the arm. The model has only the seat one (`DOMINO_BR/BL`) and an
    unmodelled "contact face" at arm / back leg. Add the arm / back-leg Domino and check the seat one comes out where the photo
    shows it.
@@ -80,7 +80,7 @@ session's files. Joinery session: please do not start the same items; the hub ke
    to a round nose across the laminations). The model's rocker ends do not have these shapes. Rockers are the hub's part.
 3. [ ] **Front-leg Domino sits off-centre on the leg** (Joe's viewer screenshot of v15: the slot is to one side of the leg's
    width). Re-measure the slot's position on the leg face against the leg's two edges and centre it if the photos agree.
-4. [ ] **The seat's back edge is not modelled right** (Joe, 19:20: "the top, front and sides are pretty accurate but not the
+4. [x] (PR #21, model v17; `parts/seat_back.json`: a bow in plan, a back face leaning 10.5 degrees, a 46 degree under-bevel lens) **The seat's back edge is not modelled right** (Joe, 19:20: "the top, front and sides are pretty accurate but not the
    back edge"; no hurry, but it is tied to item 1). Model v16: a straight back edge at y 10.8, 21 mm BEHIND the back legs'
    rear faces, with a slanted corner that wraps behind each leg. Photos from behind (IMG_1502, 1513, 1578, 1620): the back edge
    is flush with the leg's rear face where they meet (a Domino end lies flat across both) and bows backward toward the centre
@@ -94,6 +94,17 @@ height, across the seam between the leg's inner face and the seat's back edge, d
 arm height, centred on the leg's width: a Domino through the leg into the arm's end. (b) and (c) are the missing ones. All
 four rear ends were measured on photos that are already registered (IMG_1499-1503, 1513, 1578); IMG_1620 itself did not
 register and is not needed.
+
+**For the joinery session, from PRs #21 and #22 (hub, 20:15):**
+- The seat top behind the tape dots is lower now (it falls to the measured back arris instead of climbing). The slats' feet
+  (SLAT_C bottom at z 328.0, SLAT_L/R at 329.7) sit only 4 to 5 mm into the seat top; v16 had 9 to 11 mm. Slat lengths and
+  mortise depths are yours.
+- At the rear the real seam between back leg and seat sits 3.4 mm (left) and 2.5 mm (right) INBOARD of the model leg's inner
+  face (seen across the rear Domino's end, `figures/joinery/rear_dominos_1501.jpg`). Leg placement is yours; the rear Domino
+  at the seat is placed by its measured position, so it will sit right once the leg does.
+- `tools/audit_joints.py`: the inside test now runs in slices of 250 points (it went over the 3 GB cap on the first rear
+  Domino pair; the old pairs were close to the cap too). Four pairs added. `tools/joinery.py`: step 5c added.
+- New tools of the hub's: `tools/rear_ortho.py`, `tools/rear_dominos/`, `tools/seat_back/`.
 
 Rules:
 1. **Model numbers come only from the hub, on main.** No branch commits `parts/model_v*`. After another session's PR lands

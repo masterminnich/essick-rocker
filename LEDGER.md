@@ -841,3 +841,42 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   (2) rear Dominos (b) and (c) in `parts/joints.json` + `tools/joinery.py` + the audit's pair list (small named edits; PR);
   model v17; then items 2 and 3.
 
+
+## 20:15 PST seat back edge (PR #21) and rear Dominos (PR #22) merged; MODEL v17 on main
+- SEAT BACK EDGE (Joe's item 4; PR #21, `parts/seat_back.json`, `tools/seat_back/`): three edges triangulated from 12 photos
+  from behind (rear sheet, plane y 30): top arris (11 photos, rms 0.21-1.11 mm, leave-one-out <= 0.61 mm y / 0.15 z), hard
+  line (7 photos, 0.71-1.13, <= 0.58 y / 0.49 z), bottom arris (10 photos, 0.16-1.23, <= 1.68 y at the ends, 0.74 inside).
+  Section: sharp top arris, back face leaning forward going down by 10.5 deg (sd 0.6), hard line, under-bevel 45.8 deg
+  (sd 0.6; sides: 46.2), bottom arris on the same underside plane as the sides (-0.44..+0.09 mm). Plan: a bow, top arris
+  y -3.7 on the centre line, 28.5 at |x| 180 (32.2 mm), meeting the leg flush (y 31.5 at |x| 188; leg's rear face 30.2).
+  Lens 16.6 mm on centre, 9.6 at |x| 120, 1.5 at 165, tip 173.5 (fitted).
+- v16 was wrong there: straight edge at y 10.8 (14.5 mm too far forward on centre, 17.7 too far back at |x| 180, running on
+  behind the legs), vertical, and the top climbed to 351.1 at (0, 14) (cloud polynomial pulled up by the slats' feet;
+  measured arris 324.8, new top there 327.4). Sparse cloud on the strip behind the dots (189 points): cloud minus model
+  median -2.52 / rms 7.56 in v16, +0.94 / 2.85 now.
+- In `tools/build_model.py` SEAT: back outline = the bow (x -192..192); side outline starts at y 45 inside the leg; top
+  behind the dots (y < 64) = ruled strip from the arris to the measured surface (fitted); underside's back edge moved to the
+  bottom arris; one wall ring on the hard line inside the lens. Only SEAT changed against v16 (648 vertices, max 18.0 mm).
+- DEAD ENDS: tilting the old cloud polynomial to the arris (it was 35 mm high on the new edge line: gave a hollow); a
+  re-entrant corner in the outline (12 open edges; the corner is inside the leg, closed with one straight line).
+- OPEN (seat back): bottom arris depth L/R differ up to 4.8 mm at the ends (weak direction); hard line's left half 1.1 mm
+  lower on average (to 1.6): design = mean, visible on IMG_1502; lens tips and the last stretch to the legs are straight
+  continuations; top arris drawn sharp; IMG_1542's outline sits 1.9 mm off the hard line on the right half.
+- REAR DOMINOS (Joe's item 1; PR #22, `parts/joints.json` `back_leg_rear`, `tools/joinery.py` step 5c, `tools/rear_ortho.py`,
+  `tools/rear_dominos/`): `DOMINO_RS*` at the seat seam (centre |x| 186.8, z 313.55 on the rear face, 24 x 10, 25 deep,
+  level) and `DOMINO_RA*` at the arm (centre |x| 211.3, z 476.8, through the leg 45.5 mm + 25 into the arm's end). Direction
+  (square to the rear face) and depths ASSUMED. Centre of the seat one: first tip minus 12 (187.55), then centred on the
+  visible end (24.6 in the close-up IMG_1578, to 26.5 in distant photos): 186.5-187.3, 186.8 taken.
+- Checked on IMG_1502 and IMG_1501: the arm ends sit on the ovals; at the seat the photo's end runs 1-2 mm further into the
+  seat than the model's (soft rim on the seat side), and the model leg's inner face is 2.5-3.4 mm outboard of the real seam
+  (leg placement, joinery session), so 10.8 mm of the model Domino's end is in the leg against about 14 in the photos.
+- AUDIT: `tools/audit_joints.py` inside test in slices of 250 points (the first new pair was killed at the 3 GB cap: 3000
+  rays x 800-1900 candidate triangles in one call); whole check now peaks at 1.4 GB. JOINERY: the rear face must be fitted on
+  the leg AS TRACED (after the side Domino's mortise is cut its back wall also looks backward: 5.6 mm rms).
+- MODEL v17 = main after #21 and #22: `tools/model.sh --out parts/model_v17`, every part closed, assembly check PASS (26
+  pairs; new: DOMINO_RSR~BLEG_R 9.9 cm2, ~SEAT 11.2, DOMINO_RAR~BLEG_R 32.5, ~ARM_R 21.1).
+- NEXT: Joe's item 2 (rocker ends: IMG_1618 tail tip, IMG_1619 front nose; both unregistered close-ups, so start from the
+  registered photos that show the rocker ends and the rocker face sheets; a manual PnP of 1618/1619 at half resolution only
+  if those are not enough), then item 3 (front-leg Domino centring on the leg face, `tools/domino_ortho.py`), then the 3 mm
+  question at the seat's right front corner, left-side scoop check, arm underside (new file), rocker bottom edge, seat side
+  edge behind y 400.
