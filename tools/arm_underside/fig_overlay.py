@@ -1,4 +1,5 @@
-"""USAGE: work/toolkit/rk.sh tools/arm_underside/fig_overlay.py SIDE(L|R) PHOTO OUT.jpg YA:YB [YA:YB ...]   env PXMM (10), INNER=1 (draw the inner bottom arris too)
+"""USAGE: work/toolkit/rk.sh tools/arm_underside/fig_overlay.py SIDE(L|R) PHOTO OUT.jpg YA:YB [YA:YB ...]   env PXMM (10), INNER=1 (draw the inner bottom arris too),
+DROPS=FILE.json (from tools/arm_underside/glb_drops.py: draw the drops read off two BUILT models instead of the design; LABELS="old|new" names them)
 Before/after overlay of the arm's underside on ONE real photo: crops of the photo around stations YA..YB of one arm, enlarged to PXMM pixels per mm
 at the arm, with the model's lines projected into it: the outer top arris (white), the bottom arris of the OLD model (orange: the assumed 25 mm
 square to the top) and of the NEW one (blue: parts/arm_underside.json design). Lines hang from THIS arm's own outer top arris
@@ -10,6 +11,7 @@ sys.path.insert(0, ".")
 from rocker.cameras import Cameras
 from PIL import Image, ImageOps
 side, n, out = sys.argv[1:4]; wins = [tuple(float(v) for v in w.split(":")) for w in sys.argv[4:]]; PX = float(os.environ.get("PXMM", 10)); INNER = os.environ.get("INNER") == "1"
+GD = json.load(open(os.environ["DROPS"])) if os.environ.get("DROPS") else None; LB = os.environ.get("LABELS", "old model (25 mm assumed)|new (traced)").split("|")
 sg = 1.0 if side == "R" else -1.0; c = Cameras.load(); name = f"IMG_{n}.JPG"
 D = json.load(open("parts/arms.json"))["design"]; U = json.load(open("parts/arm_underside.json"))["design"]
 pin, pout, pz, pzx = (np.array(D[k][q]) for k, q in (("inner_x_of_y", "poly_in_(y-300)"), ("outer_x_of_y", "poly_in_(y-300)"), ("top_z_of_y", "poly_in_(y-300)"), ("top_z_of_y", "cross_slope_outer_minus_inner_poly")))
@@ -30,6 +32,9 @@ def line(y, which):
     xo, xi = ext(y, O, 0), ext(y, I_, 0)
     x, z = {"top": (xo, zo), "top_in": (xi, zi), "old": (xo, zo - old), "new": (xo, zo - np.interp(y, U["y"], U["h_outer_mm"])),
             "old_in": (xi, zi - old), "new_in": (xi, zo - np.interp(y, U["y"], U["h_inner_mm"]))}[which]
+    if GD and which in ("old", "new", "old_in", "new_in"):   # drops read off the built model (below the outer top arris, both faces)
+        t_, f_ = which.split("_")[0], "inner" if which.endswith("_in") else "outer"
+        x, z = (xi if f_ == "inner" else xo), zo - np.interp(y, GD["y"], np.nan_to_num(np.array(GD[side][f"{t_}_{f_}"], float), nan=np.nanmean(GD[side][f"{t_}_{f_}"][-6:])))
     return np.c_[x, y, z]
 im = np.array(ImageOps.exif_transpose(Image.open(f"drive/{name}")).convert("RGB"))[:, :, ::-1]
 BLUE, ORANGE, WHITE, INK = (214, 120, 42), (52, 104, 235), (250, 250, 250), (11, 11, 11)
@@ -54,12 +59,12 @@ for ya, yb in wins:
         cv2.circle(cr, tuple(p), 6, WHITE, -1, cv2.LINE_AA); cv2.putText(cr, f"y {yt}", (p[0] + 8, p[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, WHITE, 2, cv2.LINE_AA)
     panels.append(cr); print(f"window y {ya:.0f}-{yb:.0f}: {pxmm:.2f} px/mm in the photo, shown at {PX:.0f} px/mm, crop {x1 - x0}x{y1 - y0} px")
 H = 70
-txt = [("IMG_" + n + (" right" if side == "R" else " left") + " arm", INK), ("top arris (as this photo sees it)", (140, 140, 140)), ("old model (25 mm assumed)", ORANGE), ("new (traced)", BLUE)] + ([("dashed = inner bottom arris", INK)] if INNER else [])
-tw = 16 + sum(cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, 0.95, 2)[0][0] + 36 + (50 if t.startswith(("top", "old", "new")) else 0) for t, _ in txt)
+txt = [("IMG_" + n + (" right" if side == "R" else " left") + " arm", INK), ("top arris (as this photo sees it)", (140, 140, 140)), (LB[0], ORANGE), (LB[1], BLUE)] + ([("dashed = inner bottom arris", INK)] if INNER else [])
+tw = 16 + sum(cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, 0.95, 2)[0][0] + 36 + (50 if col in (ORANGE, BLUE) or t.startswith("top") else 0) for t, col in txt)
 W = max(max(p.shape[1] for p in panels), tw); head = np.full((H, W, 3), (251, 252, 252), np.uint8)
 x = 16
 for t, col in txt:
-    if t.startswith(("top", "old", "new")): cv2.line(head, (x, 38), (x + 40, 38), col, 5, cv2.LINE_AA); x += 50
+    if col in (ORANGE, BLUE) or t.startswith("top"): cv2.line(head, (x, 38), (x + 40, 38), col, 5, cv2.LINE_AA); x += 50
     cv2.putText(head, t, (x, 47), cv2.FONT_HERSHEY_SIMPLEX, 0.95, col if col != (140, 140, 140) else INK, 2, cv2.LINE_AA); x += cv2.getTextSize(t, cv2.FONT_HERSHEY_SIMPLEX, 0.95, 2)[0][0] + 36
 rows = [head] + [np.pad(p, ((8, 0), (0, W - p.shape[1]), (0, 0)), constant_values=252) for p in panels]
 cv2.imwrite(out, np.vstack(rows), [cv2.IMWRITE_JPEG_QUALITY, 88]); print(out)

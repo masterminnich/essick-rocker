@@ -18,7 +18,7 @@ from rocker.sideframe import side_plane, to_plane, from_plane
 
 ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); ap.add_argument("--params", default=None)
 ap.add_argument("--legacy", action="store_true", help="v3 crest and arms from the cloud instead of parts/crest.json + parts/arms.json")
-ap.add_argument("--arm-underside", action="store_true", help="arm underside from parts/arm_underside.json instead of the assumed 25 mm (OFF until joinery 5c cuts the back leg with the untrimmed Domino: PLAN.md)")
+ap.add_argument("--arm-slab", action="store_true", help="the old arm (model v20 and before): an assumed 25 mm slab square to the traced top, instead of the measured underside in parts/arm_underside.json")
 a = ap.parse_args()
 PRM = {  # sizes not (yet) measured from photos
     "rocker_width_across": (31.0, "tape", "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"),
@@ -623,7 +623,7 @@ else:
     Y = np.where(S_ == 1, np.polyval(pf, X), Y)   # front row exactly on the design front line
     Z = np.polyval(pz, Y - 300) + (T_ - 0.5) * np.polyval(pzx, Y - 300)
     UJ = None
-    if a.arm_underside:
+    if not a.arm_slab:
         # underside from parts/arm_underside.json: drops of the outer and inner bottom arrises below the OUTER top arris, straight across between them
         UJ = json.load(open(ROOT / "parts/arm_underside.json"))["design"]; uy = np.array(UJ["y"])
         hu = lambda y, t: np.interp(y, uy, UJ["h_inner_mm"]) + t * (np.interp(y, uy, UJ["h_outer_mm"]) - np.interp(y, uy, UJ["h_inner_mm"]))

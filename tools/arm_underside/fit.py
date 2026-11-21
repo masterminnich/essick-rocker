@@ -6,7 +6,7 @@ above_*: the OUTER bottom arris from the photos above and level with the arm (it
 obot_*:  the same arris in the photos from below (a held at 0; a check, and the reference for the inner drop on the same photos);
 inner_*: the INNER bottom arris (the lower silhouette from below), its inboard offset held at the arm's width (inner face vertical).
 Every drop h is the VERTICAL distance below that arm's own outer top arris (parts/arms.json), as each photo sees it.
-Design (what tools/build_model.py --arm-underside reads): outer drop = left/right mean of the above_* solves; inner drop = outer drop + the mean of the
+Design (what tools/build_model.py reads, model v21 on): outer drop = left/right mean of the above_* solves; inner drop = outer drop + the mean of the
 two sides' cross drops (inner minus outer, each from its own photos from below). Ends: the photos stop at y 60 (the back leg) and
 y 490 (the front end's rounding); the drops are continued straight (slope of the end 20 mm) to y 40 and y 510 and marked extrapolated."""
 import sys, json, numpy as np
@@ -59,7 +59,7 @@ J = {
   "outer_bottom_arris_from_below": "the photos from below put the same arris 0.6-1.4 mm LOWER at the back and 0.9-1.9 mm HIGHER from y 300 on than the photos from above and level (an eased arris seen from either side of its rounding); design keeps the from-above/level value, the tolerance carries half the difference",
   "outer_face": "vertical: the outer bottom arris sits straight below the outer top arris (a fitted -1.7..+3.1 mm on both arms, within its se); assumed exactly 0",
   "inner_face": "assumed vertical (the inner bottom arris straight below the inner top arris; the inner face itself is not seen from outside)",
-  "build": "tools/build_model.py --arm-underside (OFF by default until joinery 5c is fixed, see PLAN.md): arm underside z = (outer top arris z) - (h_inner + t (h_outer - h_inner)), t = 0 inner .. 1 outer across the arm; replaces parts/arms.json 'thickness' (assumed 25 mm square to the top) in the build. parts/arms.json is unchanged."},
+  "build": "tools/build_model.py (the default from model v21; --arm-slab builds the old assumed slab): arm underside z = (outer top arris z) - (h_inner + t (h_outer - h_inner)), t = 0 inner .. 1 outer across the arm; replaces parts/arms.json 'thickness' (assumed 25 mm square to the top) in the build. parts/arms.json is unchanged."},
  "right": {"photos_above": list(S["above_R"]["photos"]), "photos_below": list(S["obot_R"]["photos"]), "photos_inner": list(S["inner_R"]["photos"]),
            "y_seen": [S["above_R"]["y"][0], S["above_R"]["y"][-1]], "h_outer_mm": r1(hR), "h_outer_se_mm": r1(seR), "a_outer_mm": r1(aR),
            "cross_drop_inner_minus_outer_mm": r1(np.where(vR, dR, np.nan)), "inner_y_seen": [S["inner_R"]["y"][0], S["inner_R"]["y"][-1]],
