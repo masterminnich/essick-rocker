@@ -5,3 +5,5 @@ __pycache__/
 .DS_Store
 drive
 work
+viewer/model-dirs.local
+node_modules/
