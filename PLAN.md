@@ -44,6 +44,10 @@ Optional:
   the right side sits 3.7-5.9 mm lower there and the whole right side frame is pitched about 0.5 deg nose-down against the left
   (parts/lr_skew.json). If the tape shows the same difference, the skew is the chair and the model's left/right mean is right;
   if the tape shows none, the camera solve is warped by that much and every single-side number is suspect.
+- M10 depth of the front scallop: a straightedge laid against the front of the seat, touching the pommel tip and one front
+  corner; the largest gap between it and the seat's top front edge in the thigh hollow (one reading, either side). The photos
+  say 21.3 mm (parts/seat_front.json), but forward depth is the weak direction of that solve: it moves by 2-3 mm when its
+  assumptions change, so the front outline is +-2 mm instead of 1/16 in. One reading would pin it.
 - Leg stock thickness across (now +-3 mm), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
 (replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (in: IMG_1588-1592). Every dimension that stays
