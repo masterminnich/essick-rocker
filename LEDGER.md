@@ -1139,3 +1139,32 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   ends, arm ends), crest front face, faces seen flat-on, rocker flat middle, shadowed underside; creases not ranked.
 - NEXT: rocker inner face (hub): read the rocker's thickness across (IMG_1618/1619 end views or calipers); if 33-34 mm, widen
   the rocker block inward in `tools/build_model.py`, build model v23, rerun `tools/critique/` and compare items 5 and 14.
+
+## 2026-11-21 01:26 PST model v23: the rocker's thickness across measured from the photos (PR #32), critique fix 1
+- RUN ON Opus 5.5. Squash-merged as be265e1; main then built parts/model_v23 (assembly check: PASS, identical to the trial
+  work/trial/v23) and reran the critique (reports/critique_v23.md / .json, figures/critique/ranked_v23.png).
+- TAPE: IMG_1493 lies across the top face 15-25 mm from the tail tip (u ~ -470), hook over the outer face: 1.20 in
+  (1.19-1.24) = 30.5 +-1.6 mm. The only reading, at the thinnest place.
+- METHOD (`tools/rocker_thickness/`): the top face resampled per photo onto a (u, d) ribbon at 5 px/mm; both arrises traced
+  per column in the same photo, so thickness is pose-free; stations every 20 mm, per-photo median over >= 5 columns; outboard
+  views only (inboard far-edge traces wander into the face); native 0.7-2.8 px/mm, up to 4.7. Parallax term k ~ 0 (no trend
+  with elevation 8-80 deg). Kept stations: spread <= 2, n >= 6; L u 80 dropped (back leg's shadow, by eye).
+- FINDING (b), varies along the length: L 28.9 / R 30.5 at the tail tip, 33.5 / 34.1 at u -300, 32.7 / 33.2 at the back leg,
+  35.2-35.9 / 36.0-37.1 between the legs, 33.6 / 34.4 at the front leg; 12-30 photos per station and side, spread 0.2-1.0.
+  Design (L+R mean, smoothed) 29.7 -> 36.2 -> 33.6. Easing bias at the tape: ribbon 29.3 / 30.2 vs 30.5 -> -0.8 +-1.6, not
+  corrected. Faces: L outer 2-4 mm outward rear/mid; R outer 5-7.5 inward at the tail, 4-5 outward at the front (R yaw ~0.6
+  deg: placement, request to joinery in PLAN); design outer face = L+R mean (0 tail, +1.2 inward at u -260, -2.25 outward at
+  u 200-400), confirmed by the critique's outer arrises (front -2..-3, rear ~+1).
+- CHANGED: new parts/rocker_section.json; build_model.py rocker block (extrude_side_var, 5 mm strips; falls back to 31 mm
+  without the file). ROCKER_L/R 933.3 -> 1031.7 cm3, the only _shapes change. Joined: front feet re-cut (lip gone, lowest point
+  +2.61; foot direction 160.8 -> 164.6 deg from joinery's rocker SVD), back feet -0.02 cm3, arm Dominos moved 0.1-0.5 mm.
+  Feet on the rocker top: front 94.9 -> 98.3 %, back 80.1 -> 86.7 %.
+- CRITIQUE v22 -> v23: rocker items 9 (16.07) -> 7 (9.29); all rocker sil mean |gap| 1.53/1.64 -> 1.45/1.52 (rank/held);
+  top/inner -2.04 gone; bottom/inner -3.15 (#5) -> -2.74 (#18); rest is R placement. Worse: bottom/inner front 1.06/0.99 ->
+  1.51/1.23 (R -3.3), top/inner rear 1.38 -> 1.68 ranking (held 1.73 -> 1.75), bottom tail 1.66 -> 2.05 ranking (held flat).
+  Non-rocker mean change -0.01/-0.00; front-leg foot lip item (-2.88) gone.
+- Trials on the way: v23 (outer face kept, all extra inward) overshot the front-half inner face (+2.0 new item); v23c (measured
+  outer face to the tip) worsened the tail; v23d (tail outer face held at 0) = landed.
+- NEXT: side slats' inner front edge (v23 #16 +2.9 [+1.3..+3.0], z 850-1000), then the seat roll underside and seat top back
+  edge at the slats, then the rocker top at the nose and tail, then the arm underside inner edge; the seat front corner waits
+  for a reading; then 6c edge radii.
