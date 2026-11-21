@@ -1196,3 +1196,28 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   unchanged. Pose-free held-out widths do improve (L 1.84/1.77/2.48 -> 1.22/0.52/1.06, R 0.43/1.07/1.17 -> 0.13/0.64/0.92).
 - OPEN (hub): apply the turn, or first read the slats' position near the crest pose-free (forward shift, R ~1.8 inboard).
 - NEXT: seat roll underside edge and seat top back edge at the slats, rocker top at the nose and tail, arm underside inner edge; the seat front corner waits for a reading; then 6c edge radii
+
+## 2026-11-21 02:40 PST seat edges (critique fix 3): front roll underside fixed (PR #34, model v24); top back edge measured, no change (PR #35)
+- RUN ON Opus 5.5 (hub). PR #34 squash-merged as 6077718; model v24 + critique pass 3 committed on main as 01318a5; PR #35
+  squash-merged as 94bdfc3 (measurement only, no build change).
+- EDGE 1, seat front roll underside (v23 -2.2..-2.5 [-3.8]). MODELLED: `parts/seat_front_face.json` bottom arris, from PR #15's
+  `tools/tube_tri.py` (r 1 tube, 9 photos). SLIP: `tools/seat_front_face_fit.py` stored the tube's spine, not its outline;
+  PR #15's own r 4 variant moved the "arris" 2.7-3.1 mm. DIRECT (`tools/seat_roll/strip.py` + `pick.py`, 14 single photos,
+  2.0-6.4 px/mm): IMG_1496 (6.4) +1.14, IMG_1559 (5.9) +1.30 vs the slip's 1.17 / 1.31; median +1.49 (q 1.18-2.29); all 14
+  positive; high ones 1526-1529 (pose, as PR #15 found). REAL. CHANGE: arris = spine + r k (k 0.44 fwd / -0.94 z per mm,
+  `design.bottom_arris.from_tube`, format addition): 0.90-1.00 lower, 0.40-0.50 forward; corner point unchanged.
+- MODEL v24: tools/model.sh PASS; main build identical to the trial (glb, _shapes, _edges, _params byte-equal; _joinery /
+  _joints differ in source path and sampler noise only). Only SEAT: 533 / 5892 vertices, max 1.000 mm, y 461-537, z 370-405;
+  joined max 1.94 (one re-triangulated vertex); FLEG lap trim 24.55 -> 24.59 cm3; slat ends unchanged (2-7 mm).
+- CRITIQUE v23 -> v24 (93 photos, 50 s, 0.86 GB): bottom/front silhouette mean |gap| 1.85/2.18 -> 1.50/1.96, |sym| 1.58 -> 0.95,
+  held-out like-for-like better 9/9; held-out crease 1558 |sym| 1.26 -> 0.40 (ranking low views 0.60 -> 0.97: eased arris?,
+  6c); item x 0-50 gone, x 200-250 -2.54 -> -2.01 (R only). Non-seat mean change -0.001. 36 items (the trial run had 37:
+  `joint_frac` is sampled, region medians identical).
+- EDGE 2, seat top back edge at the slats (v24 #10 +1.78 [-0.1..+1.7], tol 0.8). MODELLED: `parts/seat_back.json`
+  `design.top_arris`, sharp, traced from behind in 11 photos (rms 0.2-1.1). CRITIQUE: silhouette +1.6..+2.2 per stretch
+  (front-above, overhead, behind-below), crease from behind +0.1..+0.3. DIRECT (rows between the slats only; slat rows read the
+  slat): 1559 -2.8/-3.1, 1528 -2.1/-1.8, 1549 -2.2/-2.2, 1492 -2.8/-3.4, 1540 (a tracing photo) +0.3/-0.1 mm; 2.0-3.0 px/mm;
+  1551 (14 px/mm) shows no edge. CANNOT BE TOLD: a round r >= 4-5 mm or a top roll-off; no change; reading M13 added.
+- PLAN: critique fix 3 ticked (both edges), pass 3 noted, hub/Templates rows call out `design.bottom_arris.from_tube`, 6c lists
+  the two seat-edge radii.
+- NEXT: rocker top at the nose and tail; arm underside inner edge; the seat front corner waits for a reading; the slat turn waits for Joe's yes/no; then 6c edge radii.
