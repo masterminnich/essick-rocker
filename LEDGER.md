@@ -1242,7 +1242,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - PLAN: both items ticked with findings; M14, M15 added; NEXT hub fix 6c.
 - next: 6c edge radii: measure the easing / radius of the arrises from the photos where it can be told, as a measurement and a hub parts file, applied to the model only where measured; waiting on Joe: slat turn yes/no, seat front corner reading, M13, M12, M9, M8, M6; joinery-session requests and frozen-file doubts stay as requests
 
-## 2026-11-21 03:27 PST phase 6c edge radii: measured per family, record only, model stays v24 (PR #37)
+## 2026-11-21 03:26 PST phase 6c edge radii: measured per family, record only, model stays v24 (PR #37)
 - RUN ON Opus 5.5 (hub). PR #37 squash-merged as 9ab044b. `parts/edge_radii.json` (new), `tools/edge_radii/` (rerun:
   `tools/py.sh tools/edge_radii/run_all.py`, 0.3 GB, 6 s), `figures/edge_radii/`. No build, no critique rerun (no round qualified).
 - SILHOUETTE PAIRS FIRST (all 93 critique photos, pose-free: S = gap_a + gap_b = section misfit + r (k_a + k_b); 10903
