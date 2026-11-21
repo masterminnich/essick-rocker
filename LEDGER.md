@@ -1052,3 +1052,40 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - OPEN: M6 tape (arm outer-face thickness at y ~490 and ~70); the left inner arris (one photo); DOMINO_AL/AR differ by 1.7 mm in
   |x| (joinery's 5b, noted in PLAN).
 - NEXT: rocker bottom edge traced directly for u -330..572, seat side edge behind y 400, register IMG_1588-1593, then phase 6.
+
+## 23:53 PST model v22: the rocker's bottom edge traced directly for u -330..572 (PR #29)
+- Hub: Opus 5.5 (claude-opus-5-5), the calling hub's item 5.
+- BEFORE: between the ends the bottom was `mean_top` minus a fitted face height (`tools/rocker_profile.py`: bottom trusted only
+  outside u 45..345, a smoothing spline of the square height across it); the 1066 mm rocking radius was fitted to that.
+- METHOD (new `tools/rocker_bottom/`): `ribbon.py` resamples every solved photo onto the side's own face plane along its own top
+  edge (0.25 x 0.2 mm; L 20 photos, R 18, 16 used); `trace.py` finds top and bottom arris per photo every 1 mm ("unlike the face",
+  as PR #23), after a per-photo pose offset from both edges (up to 6.6 mm); bottom level 3.5 (level 5 ran across the rocker's own
+  shadow near the contact, 1-2 mm too low); cameras < 30 mm above the table and views onto the underside dropped; `fit.py` per
+  5 mm station: the photos' heights run with camera height (up to 2 mm per unit tan(elevation), sign changing along the rocker:
+  the face is a few degrees off square to its plane), so h is read at a square view from a line over the photos. A plain median
+  would have made the front (u 480-545) 1.3-1.8 thinner; read square it is within 1.0 (L) / 0.5 (R). Checked by eye on single
+  photos at 10 px/mm: tail L1507/1516, R1472; contact L1508, R1472, R1489/1492 (low); front L1508/1509, R1473/1488.
+- RESULT (design = L/R mean minus model, mm): u -330 -2.07, -300 -2.37, -270 -1.15, -210 -1.23, -120 -1.11, -60 -0.84, -30 to 572
+  within 1.3 (worst +1.3 at u 155, the right's dark face vs its shadow; else <= 1.0). Median photos per station 13 L / 10 R, spread
+  typically 0.2-0.6 (up to 1.0 at the front foot). Unseen (< 3 photos), one side only: L u -220, -145..-135, 290-295; R -250, -190,
+  25. L-R mostly within 0.6; R deeper by up to 1.5 at u 390-540, 2.0 at -300. Rocking radius of the trace over u -75..405 1045 mm
+  rms 0.32 vs the model's 1065 at the same stations (file 1066.05): 0.5 mm of sagitta over 480 mm, from the contact stretch
+  (shadow); kept. Traced lowest point u 155 v -0.95 (the shadow point), model u 190 v -0.19: kept.
+- CHANGE: new hub file `parts/rocker_bottom.json` (`correction` u / dv_mm, both sides, design, provenance and tol per stretch);
+  `tools/build_model.py` adds dv to `mean_bot` and to the tail end's bot (fading 2.20 at -330 to 0 at -400); dv = traced design
+  smoothed over 35 mm for u <= -90, cosine to 0 at -30, 0 from -30 to 572: bottom up 2.20 at -330, 1.76 -300, 1.11 -240, 0.81
+  -150, 1.10 -90, 0.38 -60. `rocker_profile.json`, `rocker_ends.json`, the top edge untouched. PLAN Templates and hub rows name it.
+- MODEL v22 = main after #29: `tools/model.sh --out parts/model_v22`, assembly check PASS. `_shapes.glb` vs v21: only ROCKER_L/R
+  (446 of 3740 vertices, all at y -398..-32, max 2.199 mm; 945.5 -> 933.3 cm3), everything else vertex-identical; z min 0.305 and
+  overall bounds unchanged. Joined vs v21: also FLEG_L/R, BLEG_L/R, ARM_L/R, DOMINO_AL/AR differ although their inputs are
+  identical and joinery reruns byte-identical on v21's shapes: the feet are cut by booleans of the WHOLE rocker, so a change at the
+  tail re-triangulates the cut near the feet. FLEG_L foot up to 1.56 mm at z 87-96 (v21's left foot bottom z 85.15 vs right 83.50;
+  v22 both 83.66), FLEG_R up to 0.95, BLEG one sample 0.85 / 0.16 (99th pct 0.000); the arm Domino's sampled contact-face centre
+  follows: DOMINO_AR +0.7 y +0.2 z, DOMINO_AL +0.2 y, and the leg-top / arm mortises with it (ARM 0.22 / 0.72 max). Volumes equal.
+- FIGURES `figures/rocker_bottom/face_height.png` (L, R, design, model, change, photo count), `photos.jpg` (IMG_1507, 1472 tail;
+  1508 contact; 1473 front foot; model lines hung from each photo's own top edge).
+- OPEN: top or bottom at the tail? The trace measures the height; the model keeps the top (feet hang from it) and moves the bottom
+  (PR #23 split it about half and half at u -320: the absolute bottom may be 0.7 high, within tolerance). Contact stretch u 90..240
+  left as fitted (the face/shadow boundary). Joinery: the foot cut and 5b's sampled Domino centre move with re-triangulation (an
+  exact-input-only determinism); the joinery session may want them pinned.
+- NEXT: seat side edge behind y 400 where it meets the back leg, register IMG_1588-1593 at half resolution, then phase 6 critique loop.
