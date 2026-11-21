@@ -230,6 +230,13 @@ Optional:
 - M12 rocker thickness across, between the legs (about 300 mm forward of the back leg's front edge), one caliper reading on
   either rocker. The photos say 36 mm there and 29.7 at the tail tip (PR #32, `parts/rocker_section.json`); the only tape
   (IMG_1493, tail) cannot tell an easing bias of -0.8 +-1.6 from zero. One reading pins both.
+- M13 seat top back edge between the slats (PR #35): the shape of the edge where the seat top meets the back face, at |x|
+  about 50 (between the centre and a side slat) or 140 (between a side slat and the leg). A radius gauge, or a coin held in the
+  corner (a US cent is 19 mm across, r 9.5; a dime 18 mm, r 9), says whether it is rounded and how much; and a straightedge laid
+  front to back on the seat top says whether the top rolls off over the last 10-20 mm before the edge. The photos see the
+  outline 2-3 mm inside the model's top arris from the front, from overhead and from behind-below, but on it from behind-above,
+  where the arris was traced; a round of r 4-5 mm or more, or a roll-off of the top, would each do that, and the photos cannot
+  tell which. Decides the critique item seat top/back (+1.8 [+1.4]) and that edge's 6c radius.
 - Leg stock thickness across (now +-3 mm; part of M11), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
 (replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (IMG_1588-1592: taken, not registered; see phase 6 pass 1). Every dimension that stays
