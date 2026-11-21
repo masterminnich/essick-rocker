@@ -1,0 +1,33 @@
+{
+ "traces": [
+  "tools/arm_underside/inputs/traces_below_R.json"
+ ],
+ "curve": "bot",
+ "photos": {
+  "1488": [
+   [
+    55,
+    425
+   ]
+  ],
+  "1489": [
+   [
+    55,
+    425
+   ]
+  ],
+  "1490": [
+   [
+    55,
+    240
+   ]
+  ]
+ },
+ "register": true,
+ "y": [
+  60,
+  425
+ ],
+ "deg": 4,
+ "fix_a": "width"
+}

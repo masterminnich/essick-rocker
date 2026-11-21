@@ -1,0 +1,25 @@
+{
+ "traces": [
+  "tools/arm_underside/inputs/traces_below_L.json"
+ ],
+ "curve": "ibot",
+ "photos": {
+  "1519": [
+   [
+    115,
+    265
+   ],
+   [
+    305,
+    420
+   ]
+  ]
+ },
+ "register": true,
+ "y": [
+  100,
+  425
+ ],
+ "deg": 3,
+ "fix_a": "width"
+}
