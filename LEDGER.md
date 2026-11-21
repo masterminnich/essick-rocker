@@ -440,3 +440,64 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   (leg 1.4 mm proud). A side template of the leg is not affected (it is the outer-face profile); the blend is shaping after glue-up.
 - NEXT: (b) seat edge lines on the side sheets; (c) arm underside/thickness from the side sheets; (d) K1-K6 and the caliper
   sheet when they arrive; (e) register IMG_1588-1593 at half resolution only.
+
+## 16:18 PST seat side edge measured on both sides; model v9 (branch seat-edge)
+- NEW FILE parts/seat_edge.json (tools/seat_edge_fit.py). No existing parts JSON changed format. For the templates session:
+  the seat blank's side outline, edge height and edge lean are in `design` (polynomials in (y-250), valid y 110-400, plus a
+  `stations` table); `parts/model_v9_params.json` parts.seat gained `underside` and `side_edge`, and its `outline` text changed.
+- METHOD. Bottom arris: side sheets (u = height), outline against the background, tools/edge_tri.py. Top arris: the side sheet
+  alone was not good enough (no camera sees the top line "clean" from the side; depth = x came out 10 mm different at the ends
+  with ddeg 1 vs 2). So a second sheet was laid in the seat's rim plane (normal 0, -0.186, 0.9825; u = x). On it the top arris is
+  the seat's horizon against the floor from the overhead cameras on the far side (1537-1539 for the left edge, 1547-1549 for the
+  right) and the face/top tone boundary from the near-side cameras: about 100 deg between the two groups, so the plan
+  half-width is the strong direction. Seeds: parts/seat_plan_seeds_{L,R}.json, parts/seat_edge_seeds_{L,R}.json.
+- SOLVES (residual rms; photos): left plan 0.66 mm (9), right plan 0.62 (13), left bottom 0.53 (8), right bottom 0.65 (11),
+  left top on the side sheet 0.54 (8), right 0.66 (11).
+- DESIGN (mean of right and mirrored left), y / top half-width / top z / bottom half-width / bottom z / edge height / lean under:
+  110 / 233.0 / 349.5 / 224.0 / 306.9 / 42.5 / 9.0;  200 / 249.5 / 364.9 / 232.6 / 323.0 / 41.9 / 16.9;
+  260 / 258.0 / 375.9 / 238.4 / 333.8 / 42.1 / 19.7;  320 / 264.2 / 387.5 / 244.1 / 344.5 / 43.0 / 20.1;
+  400 / 268.6 / 403.8 / 251.8 / 358.8 / 45.0 / 16.8.
+  Edge thickness square to the seat plane: mean 42.0 mm (41.2-44.3), triangulated, +-3 mm. Bottom plane tilt 10.13 deg.
+  Tolerances: top half-width +-1.5, top z +-2.5, bottom half-width +-3.0 (depth-limited, a straight line by construction),
+  bottom z +-2.5. The top arris solved twice (plan sheet vs side sheet): z differs 0.8 mm (left) / 0.7 (right) on average;
+  half-width 0.4 / 1.2 mean but sd 2.2 / 2.5 (the side-sheet depth is the weak one).
+- LEFT vs RIGHT (right minus mirrored left): top half-width +3.8 mm (1.3..6.0), top z -2.3 (plan) / -3.8 (side), bottom z -4.6
+  (-7.1..-2.7), bottom half-width 0.0 (sd 2.2). Same sense as the arms (parts/arms.json: both arms 3.6 mm to +x, left 5 mm
+  higher). As a rigid roll that would be 0.3-0.5 deg, but solve/metric_frame.json found only -0.09 deg of mirror-plane roll for
+  the whole cloud, so it is NOT settled whether the frame is rolled or the seat and arms really sit skew. The design is the
+  mean, so on any one side the model is 1-2.5 mm (up to 3.5 at the front of the bottom arris) off the wood. OPEN.
+- MODEL v9 (tools/build_model.py, reads parts/seat_edge.json; --legacy skips it):
+  - side outline y 110-400 = measured top arris: +1.7 mm mean vs the cloud outline (-0.6..+4.7); beyond the range the cloud
+    outline is kept, shifted +0.0 (back) / +4.6 (front) and faded over 60 mm. Half-width at mid 258.9 (v8 257.0).
+  - underside = plane through the two bottom arrises: 12.3 / 7.6 / 2.9 mm lower than v8 at y 100 / 300 / 500. Thickness near
+    the edge 42.3 / 43.9 / 45.6 (v8 30.1 / 36.3 / 43.2). Least wood under the scoop 20.5 mm (flat underside ASSUMED).
+  - side face leans under by the measured amount; in front of y 400 the bottom line is carried straight on for 60 mm.
+  - top surface between the dotted region (|x| 251) and the outline tilted to reach the measured top-arris height (the shifted
+    cloud polynomial fell up to 5.7 mm short): model top at the outline minus measured arris +0.3 mean (-0.2..+1.9).
+  - mesh bug fixed (present since v1): the front wall's top edge was ONE straight line from corner to corner, bridging over the
+    thigh hollows of the measured surface. Front and back edges now have a point every 10 mm. This is what made the seat
+    outline look wrong from low viewpoints (Joe's question at 16:10); the measured surface itself was never changed.
+  - overall box unchanged: 42.62 in high, 24.86 wide, 43.01 long.
+- CHECKED BY EYE on single photos (figures/seat_edge/):
+  - plan traces on the rectified plan sheet: left on 1538, 1518, 1522, 1509; right on 1548, 1480, 1475, 1472: on the edge
+    (1472 wobbles slightly at v 370-410).
+  - side traces: left 1507, 1505, 1510 good except 1505 bottom at v > 300 (dark on dark); right 1491 and 1475 good; 1472 / 1470
+    bottom line partly wood on wood where the far rocker passes behind (v 150-400), cannot be judged there.
+  - raw lines and design lines projected into the ORIGINAL photos: IMG_1491 (right) and IMG_1507 (left): the raw lines sit on
+    both arrises; the design lines sit 1-3 mm off, above on the right and below on the left at the bottom arris, as the
+    left/right numbers say.
+  - v8 vs v9 outlines: 1507, 1491: bottom line was through the middle of the edge band, now on its lower edge; 1491, 1472,
+    1538, 1548: the outline now follows the front hollows and the horizon of the seat.
+- STILL WRONG / OPEN on the seat: the front corners are square in the model and stick out past the front legs (the real corners
+  are rounded and notched at the leg); the front and back edges are straight in plan (cloud); the section of the edge face
+  between the arrises is taken straight (its lower 12-17 mm reads darker in low photos, 4 mm in the high photo 1510: a reflection
+  that moves with the camera, so the face curves under; not a third arris); underside between the bottom arrises unmeasured.
+- CORRECTION to PLAN.md: "no photo sees the underside" is wrong. IMG_1570, 1572, 1573, 1576 look up at it from close range
+  (figures/seat_edge/underside_photos.jpg). Not used yet. M1 and M2 (edge thickness by hand) are now a check on 42.0 +-3, no
+  longer a missing number.
+- manifest.json: Drive sync picked up 3 new seat-dot photos (IMG_1594, 1596, 1607); not registered, not used here.
+- NEXT: (a) seat front corners and front edge in plan from the plan sheet / overhead photos 1545, 1544 (same method);
+  (b) arm underside and thickness from the side sheets (parts/arms.json is the crest session's: write a separate file);
+  (c) left/right skew: compare rocker and leg heights L vs R to decide roll vs real; (d) underside from 1570-1576;
+  (e) register IMG_1588-1593 at half resolution only; (f) M1-M8 if Joe sends them (never block). Templates: the templates
+  session (branch `templates`), not here.
