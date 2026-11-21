@@ -92,9 +92,14 @@ def pooled_edges(name):
         if S == "R": ea, eb = (rigid(e, RVL["rotation_deg"], RVL["shift_u_mm"], RVL["shift_v_mm"]) for e in (ea, eb))
         A.append(ea); B.append(eb)
     return np.vstack(A), np.vstack(B)
-rock_poly = to_mean(np.r_[np.c_[U, rtop], np.c_[U[::-1], rbot[::-1]]])
+# the two ends (parts/rocker_ends.json, tools/rocker_ends/): the tail thins to a slim rounded tip, the nose is cut to a round end. Each end's
+# top and bot run from blend_u[0], where they equal the profile above, out to the landmark (the tail's tip, the nose's top corner).
+rends = json.load(open(ROOT / "parts/rocker_ends.json"))["design"]; r_tail, r_nose = rends["tail"], rends["nose"]; mid = (U > r_tail["blend_u"][0]) & (U < r_nose["blend_u"][0])
+rock_poly = to_mean(np.r_[np.array(r_tail["top"])[::-1], np.c_[U, rtop][mid], np.array(r_nose["top"]), np.array(r_nose["bot"])[::-1][1:], np.c_[U, rbot][mid][::-1], np.array(r_tail["bot"])[:-1]])
 meshes["ROCKER_R"] = extrude_side(rock_poly, 0, P("rocker_width_across"), +1); meshes["ROCKER_L"] = mirror(meshes["ROCKER_R"])
 report["rocker"] = {"profile": "fitted (face orthophoto, both sides averaged)", "length_traced_mm": float(U[-1] - U[0]),
+                    "ends": "triangulated (parts/rocker_ends.json: each end traced in 11 to 18 photos, left and right averaged)", "tail_tip_uv": r_tail["landmark_uv"], "nose_top_corner_uv": r_nose["landmark_uv"],
+                    "tail_tip_to_nose_top_corner_mm": float(np.hypot(*(np.array(r_nose["landmark_uv"]) - r_tail["landmark_uv"]))), "length_overall_mm": float(np.ptp(rock_poly[:, 0])),
                     "face_height_mm": [float(np.min(rtop - rbot)), float(np.max(rtop - rbot))], "rocking_radius_mm": rp["rocking_radius_mm"],
                     "left_right_shape_rms_mm": rp["right_vs_left"]["residual_rms_mm"]}
 
