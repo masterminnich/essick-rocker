@@ -21,7 +21,7 @@ ap.add_argument("--legacy", action="store_true", help="v3 crest and arms from th
 ap.add_argument("--arm-slab", action="store_true", help="the old arm (model v20 and before): an assumed 25 mm slab square to the traced top, instead of the measured underside in parts/arm_underside.json")
 a = ap.parse_args()
 PRM = {  # sizes not (yet) measured from photos
-    "rocker_width_across": (31.0, "tape", "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"),
+    "rocker_width_across": (31.0, "tape", "only used without parts/rocker_section.json: IMG_1493 read 1.20 in at the rear tip, +-1/16; constant along the rocker"),
     "fleg_thickness_across": (33.0, "cloud+tape", "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"),
     "bleg_thickness_across": (38.0, "cloud+tape", "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"),
     "arm_thickness": (25.0, "assumed", "not measurable yet; caliper A1-A3 will replace"),
@@ -48,6 +48,27 @@ def extrude_side(poly_uv, depth0, depth1, sign):
     m = trimesh.creation.extrude_polygon(pg, depth1 - depth0)
     V = np.c_[m.vertices[:, 0], m.vertices[:, 1], m.vertices[:, 2] + depth0]
     m.vertices = from_plane(V, sign)
+    if sign < 0: m.invert()
+    m.fix_normals(); return m
+
+
+def extrude_side_var(poly_uv, D0_of_u, T_of_u, sign, step=5.0):
+    """polygon in side-plane (u, v), solid between inward depths D0(u) (the outer face) and D0(u) + T(u): cut into strips square to u
+    (every `step` mm, D0 and T linear inside each strip), each extruded to depth 1 and stretched; the walls between strips dropped"""
+    pg = Polygon(poly_uv).buffer(0); u0, _, u1, _ = pg.bounds
+    cuts = np.r_[u0 - 1, np.arange(np.floor(u0 / step) * step + step + 0.37, u1, step), u1 + 1]
+    parts = []
+    for a, b in zip(cuts[:-1], cuts[1:]):
+        piece = pg.intersection(Polygon([(a, -1e4), (b, -1e4), (b, 1e4), (a, 1e4)]))
+        for g in getattr(piece, "geoms", [piece]):
+            if g.geom_type != "Polygon" or g.area < 1e-6: continue
+            m = trimesh.creation.extrude_polygon(g, 1.0); V = m.vertices.copy()
+            uu = np.clip(V[:, 0], u0, u1); V[:, 2] = D0_of_u(uu) + V[:, 2] * T_of_u(uu); m.vertices = V
+            inner_wall = np.all(np.isin(np.round(V[m.faces][:, :, 0], 6), np.round(cuts[1:-1], 6)), axis=1) & \
+                np.all(np.ptp(V[m.faces][:, :, 0], axis=1)[:, None] < 1e-6, axis=1)
+            m.update_faces(~inner_wall); parts.append(m)
+    m = trimesh.util.concatenate(parts); m.merge_vertices(digits_vertex=5); m.remove_unreferenced_vertices()
+    m.vertices = from_plane(np.asarray(m.vertices), sign)
     if sign < 0: m.invert()
     m.fix_normals(); return m
 
@@ -102,12 +123,27 @@ rb_file = ROOT / "parts/rocker_bottom.json"; rbc = json.load(open(rb_file))["cor
 bot_dv = lambda q: np.c_[q[:, 0], q[:, 1] + np.interp(q[:, 0], rbc["u"], rbc["dv_mm"], left=0.0, right=0.0)]
 rbot = rbot + np.interp(U, rbc["u"], rbc["dv_mm"], left=0.0, right=0.0); r_tail_bot = bot_dv(np.array(r_tail["bot"])); r_nose_bot = bot_dv(np.array(r_nose["bot"]))
 rock_poly = to_mean(np.r_[np.array(r_tail["top"])[::-1], np.c_[U, rtop][mid], np.array(r_nose["top"]), r_nose_bot[::-1][1:], np.c_[U, rbot][mid][::-1], r_tail_bot[:-1]])
-meshes["ROCKER_R"] = extrude_side(rock_poly, 0, P("rocker_width_across"), +1); meshes["ROCKER_L"] = mirror(meshes["ROCKER_R"])
+# the thickness across (parts/rocker_section.json, tools/rocker_thickness/): both arrises of the top face traced in single photos, 29.7 mm
+# at the tail tip to 36.2 mm between the legs. The outer face sits at depth d_outer(u) (the mean of the two rockers' measured outer arris:
+# 0 in the tail, up to 1.2 mm inward at the rear, up to 2.3 mm outward in the front half), the inner face at d_outer + T. The side outline
+# is unchanged. Without the file: depth 0 to the constant tape value.
+rs_file = ROOT / "parts/rocker_section.json"
+if rs_file.exists():
+    rsd = json.load(open(rs_file))["design"]; T_of_u = lambda q: np.interp(q, rsd["u"], rsd["T_mm"])
+    D0_of_u = (lambda q: np.interp(q, rsd["u"], rsd["d_outer_mm"])) if "d_outer_mm" in rsd else (lambda q: np.zeros_like(q))
+    meshes["ROCKER_R"] = extrude_side_var(rock_poly, D0_of_u, T_of_u, +1)
+else:
+    meshes["ROCKER_R"] = extrude_side(rock_poly, 0, P("rocker_width_across"), +1)
+meshes["ROCKER_L"] = mirror(meshes["ROCKER_R"])
 report["rocker"] = {"profile": "top fitted (face orthophoto, both sides averaged); bottom " + ("traced in single photos between the ends (parts/rocker_bottom.json), fitted where it agrees" if rb_file.exists() else "fitted"), "length_traced_mm": float(U[-1] - U[0]),
                     "ends": "triangulated (parts/rocker_ends.json: each end traced in 11 to 18 photos, left and right averaged)", "tail_tip_uv": r_tail["landmark_uv"], "nose_top_corner_uv": r_nose["landmark_uv"],
                     "tail_tip_to_nose_top_corner_mm": float(np.hypot(*(np.array(r_nose["landmark_uv"]) - r_tail["landmark_uv"]))), "length_overall_mm": float(np.ptp(rock_poly[:, 0])),
                     "face_height_mm": [float(np.min(rtop - rbot)), float(np.max(rtop - rbot))], "rocking_radius_mm": rp["rocking_radius_mm"],
-                    "left_right_shape_rms_mm": rp["right_vs_left"]["residual_rms_mm"]}
+                    "left_right_shape_rms_mm": rp["right_vs_left"]["residual_rms_mm"],
+                    "thickness_across": ({"source": "measured (parts/rocker_section.json: both arrises of the top face traced in single photos, outboard views, L+R averaged)", "outer_face_depth_mm_min_max": [float(min(rsd.get("d_outer_mm", [0.0]))), float(max(rsd.get("d_outer_mm", [0.0])))],
+                                          "T_mm_min_max": [float(min(rsd["T_mm"])), float(max(rsd["T_mm"]))], "T_mm_at_tail_tip": float(T_of_u(-488.2)), "T_mm_at_nose": float(T_of_u(626.7)),
+                                          "watertight": bool(meshes["ROCKER_R"].is_watertight)}
+                                         if rs_file.exists() else {"source": "tape", "T_mm": P("rocker_width_across")})}
 
 # ---------------------------------------------------------------- legs in the side plane
 fa, fb = pooled_edges("fleg")                     # a = rear edge, b = front edge (travel is upward)
