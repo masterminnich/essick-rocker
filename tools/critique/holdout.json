@@ -1,0 +1,81 @@
+{
+ "rule": "(deterministic, chosen to span the views): camera azimuth about the seat centre (0 = in front, +90 = the chair's right)\nin 12 sectors of 30 degrees, elevation -15..45; from every sector holding at least 3 solved photos, the photo whose\nelevation is the sector's median (ties: lower number); plus the median-elevation photo of the overhead group (elevation > 45\ndegrees) and of the low group (elevation < -15), each on the chair's right half and left half. Run once and committed; do not regenerate it to suit a result.",
+ "n_solved": 93,
+ "held_out": {
+  "IMG_1471.JPG": {
+   "why": "azimuth 90..120, 6 photos",
+   "azimuth": 109.9,
+   "elevation": 14.0
+  },
+  "IMG_1474.JPG": {
+   "why": "azimuth 60..90, 3 photos",
+   "azimuth": 80.0,
+   "elevation": 22.2
+  },
+  "IMG_1478.JPG": {
+   "why": "azimuth 120..150, 9 photos",
+   "azimuth": 130.8,
+   "elevation": 25.3
+  },
+  "IMG_1493.JPG": {
+   "why": "low (elevation < -15), right half, 12 photos",
+   "azimuth": 162.5,
+   "elevation": -24.4
+  },
+  "IMG_1498.JPG": {
+   "why": "azimuth -180..-150, 6 photos",
+   "azimuth": -178.1,
+   "elevation": -3.1
+  },
+  "IMG_1499.JPG": {
+   "why": "azimuth 150..180, 9 photos",
+   "azimuth": 162.5,
+   "elevation": 10.5
+  },
+  "IMG_1510.JPG": {
+   "why": "azimuth -120..-90, 5 photos",
+   "azimuth": -118.5,
+   "elevation": 10.8
+  },
+  "IMG_1511.JPG": {
+   "why": "azimuth -150..-120, 7 photos",
+   "azimuth": -135.1,
+   "elevation": 10.9
+  },
+  "IMG_1520.JPG": {
+   "why": "azimuth -90..-60, 4 photos",
+   "azimuth": -72.9,
+   "elevation": 7.6
+  },
+  "IMG_1526.JPG": {
+   "why": "azimuth -60..-30, 6 photos",
+   "azimuth": -43.2,
+   "elevation": 8.8
+  },
+  "IMG_1534.JPG": {
+   "why": "azimuth -30..0, 6 photos",
+   "azimuth": -26.2,
+   "elevation": 10.3
+  },
+  "IMG_1537.JPG": {
+   "why": "overhead (elevation > 45), right half, 4 photos",
+   "azimuth": 112.2,
+   "elevation": 55.0
+  },
+  "IMG_1544.JPG": {
+   "why": "overhead (elevation > 45), left half, 5 photos",
+   "azimuth": -176.3,
+   "elevation": 61.9
+  },
+  "IMG_1558.JPG": {
+   "why": "azimuth 0..30, 3 photos",
+   "azimuth": 1.8,
+   "elevation": -4.4
+  },
+  "IMG_1573.JPG": {
+   "why": "low (elevation < -15), left half, 6 photos",
+   "azimuth": -69.7,
+   "elevation": -25.1
+  }
+ }
+}
