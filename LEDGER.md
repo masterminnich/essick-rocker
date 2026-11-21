@@ -994,3 +994,31 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   underside is symmetric, so on the left photos its bottom arris sits below the left wood by the L/R lean (not changed here).
 - NEXT: arm underside and thickness (NEW file, not `parts/arms.json`), rocker bottom edge u -330..572, seat side edge behind
   y 400, register IMG_1588-1593.
+
+## 23:05 PST arm underside and thickness measured (PR #27); NO model change: joinery 5c sliver, main stays model v20
+- Worker: Opus 5.5 (claude-opus-5-5), hub item 4 of HUB_HANDOFF.md.
+- BEFORE: the arm was a 25 mm slab square under the traced top (`parts/arms.json` `thickness`, assumed), flat and parallel;
+  vertical 27.4 at the back leg to 25.8 at the front; no left/right.
+- METHOD `tools/arm_underside/` (survey -> strip -> snap -> solve -> fit): each arm's outer face unrolled on the vertical
+  surface through its OWN outer top arris; top and bottom lines seeded by eye, snapped, each photo registered on its own
+  top trace; h(y) (drop) and a(y) (inboard offset) solved over all photos (Legendre 6, Huber 0.6), jackknife se. Photos
+  2.1-3.8 px/mm native, checked enlarged to 10 px/mm. Outer bottom arris: right 10 photos (rms 0.19-1.18), left 14
+  (0.27-1.15); from below as a check: right 4, left 1. Inner bottom arris (lower silhouette from below, inner face vertical):
+  right 1488/1489/1490 (rms 0.57-1.0), left 1519 only (0.72). Dropped: 1491, 1492 (inner), 1486/1487/1523-1525 (70 deg
+  oblique), 1570 (registration), 1537-1539/1547-1549 (steep, < 2 px/mm).
+- RESULT vertical thickness at the outer face, design = L/R mean (R / L): y 60 36.7 (36.6/36.8), 100 33.3, 200 26.2
+  (26.9/25.5), 300 22.1, 400 21.0, 440 21.1 (21.6/20.7), 480 21.3 (22.5/20.0); square to the top 33.6 -> 20.2-20.6. Smooth
+  concave underside, lowest y 380-420. a = -1.7..+3.1 (outer face vertical). Below-photos read the arris 0.6-1.4 lower at the
+  back, 0.9-1.9 higher from y 300 (eased arris): in the tolerance (1.1-1.8 seen, 2.7 at y 480). Across: inner arris lower than
+  outer by R 2.9 (y 60) / 1.5 (200) / 0.8-1.2 (300-400); L 9.3 (100) / 5.1 / 3.6 / 2.9 (one photo; arms.json left inner arris
+  is 12-14 mm narrower than the design near the back, worth about 2 mm). M6 front-end thickness reads about 21 vertical.
+- CHANGE `parts/arm_underside.json` (new); `tools/build_model.py` arm block reads it ONLY with `--arm-underside` (default off;
+  with it off the build is vertex-identical to v20, checked). `parts/arms.json` unchanged.
+- TRIAL with the flag: `_shapes.glb` vs v20: only ARM_L/R (704.7 -> 682.4 cm3) and FLEG_L/R (top cut 621.9 -> 625.8, +3.1 cm3)
+  change. Joined: DOMINO_AR/AL +3.4 z, -1.6 y; DOMINO_RAR/RAL identical. Assembly check FAIL on DOMINO_RAR~BLEG_R overlap
+  0.22 cm3, a coplanar sliver from 5c cutting the leg with the trimmed Domino; `cut(BL, raw, ...)` on a work/ copy -> PASS.
+  Written for the joinery session in PLAN.md. No model number issued.
+- OPEN: M6 tape (outer-face thickness at y ~490 and ~70; also settles the 2.5 mm L/R at the front); tape/caliper on the
+  inside face at y ~150 and ~400 (the left inner arris, one photo).
+- NEXT: when joinery 5c lands, make `--arm-underside` the default and issue the next model number; then rocker bottom edge
+  traced directly for u -330..572, seat side edge behind y 400, register IMG_1588-1593, then phase 6.
