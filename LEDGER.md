@@ -27,25 +27,22 @@ Sessions on this machine get cut off without warning; this file says where thing
 - [x] FIRST MODEL: tools/model.sh --out parts/model_v1 -> parts/model_v1.glb, _params.json (provenance per number), _edges.json.
       Check views: tools/overlay_sil.py (part outlines on photos) -> work/overlay_v1/sil_*.jpg.
 
-## Now
-- [→] Critique loop on model v1. Known faults seen in the overlays (1507 side, 1502 back, 1484 front-quarter):
-      * crest rail: too long (sticks out past the back legs), drawn as a straight vertical extrusion; needs its arch and tilt
-      * arms: cloud-extent plank, back end pinches to 10 mm wide, front too wide (88 mm); needs a traced top-view outline
-      * back legs upper: cloud centreline only; no traced edges above the arm joint
-      * slats: OK in back view to a few mm; widths biased narrow
-      * seat: outline has no front scallops / leg notches; scoop surface fit 1.8 mm rms
-      * rocker width across (31 mm), leg thicknesses across (33 / 38 mm), arm thickness (25 mm) are tape/assumed values
-      * no numeric model-vs-photo residual yet: build one (distance from projected outline to image edges per part)
-      Next traces to make: back view plane (crest front face, back legs, slats) from 1501/1502/1513; top view (arms, seat
-      outline, crest plan) from 1544/1545/1538/1539.
+## Now (rewritten 17:45 PST, model v12; the list that stood here described model v1)
+- Phase 5b, known fixes and joinery, split between two sessions: PLAN.md, "Sessions and who owns what". Read it after every
+  pull of main; it is the only channel between the sessions.
+- Hub's open 5b items (this session): [ ] arm underside and thickness (new file) · [ ] seat underside from IMG_1570-1576 ·
+  [ ] SEAT mesh closed · [ ] rocker bottom edge traced directly · [ ] seat side edge behind y 400 · [ ] 3 mm question at the
+  right front corner of the seat (17:33 entry).
+- Joinery session's 5b items: leg / seat joints with Dominos, legs on the rockers, arm / crest / slat joints, assembly check.
+  The hub does not work on those; it merges that session's PRs after a trial build and issues the next model number.
 
 ## Next
-- [ ] Fold in Joe's hand measurements M1-M8 (PLAN.md, 'Hand measurements') if/when he sends them; never block on them. The
-      caliper sheet and K1-K6 are retired (Joe, 2026-11-20); any later 'K1-K6 / caliper sheet' NEXT item means M1-M8.
-- [ ] Templates (1:1 PDF/DXF). Rocker bending-form template comes from parts/rocker_profile.json (mean_bot / mean_top).
-- [ ] IMG_1592 (new in Drive at 12:00) not yet looked at or registered.
-- [ ] File delivery by link: no working uploader on this machine (the atrium repo's upload-r2.py depends on a path that is
-      not on CB). Repo push needs Joe's GitHub repo `masterminnich/essick-rocker`.
+- [ ] Phase 6 critique loop (per-part photo error, ~15% of photos held out) once 5b is done.
+- [ ] Phase 6b tape readings M1, M3, M4, M5, M9, M11 as checks, whenever Joe sends them. Model work never waits for them;
+      the FINAL templates do (PLAN.md, 'Hand measurements').
+- [ ] Phase 6c: edge-rounding radii; the shop templates in IMG_1507.
+- [ ] Phase 7 final templates (templates session; its PR #6, #7 files are drafts until then).
+- [ ] IMG_1588-1593 not registered (half resolution only, one job).
 
 ## Incidents
 - 12:13 machine restart during a capped (3-4 GB, 2 threads) matching job. Panic log: launchd (pid 1) died with SIGBUS;
@@ -670,3 +667,43 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   the right front corner: seat surface near (180-230, 480-500) against the level photos 1558 / 1562 / 1559 (horizon check),
   report to the seat session; (d) underside from 1570-1576; (e) register IMG_1588-1593 at half resolution only; M1-M10 if
   Joe sends them (never block).
+
+## 17:45 PST plan change (phase 5b) and two-session split; audit PRs #12 and #14 landed; model v12 (branch joinery-merge)
+- JOE (in the joinery / audit session, 17:20-17:26, his words): "I want everything perfect before we make the templates";
+  known flaws are fixed before the critique loop; the hub (this session) "remains the central hub that works until completion",
+  the other session fixes the things he pointed out in the audit. To the hub, 17:36: that session is subdividing the work,
+  "ensure we don't clash and we can collaborate effectively".
+- The audit session's hand-over message never arrived (sessions cannot message each other here); read from its transcript and
+  ACCEPTED as written. PLAN.md now has phase 5b (known fixes and joinery), 6b (tape checks), 6c (finish detail) ahead of
+  templates, and a section "Sessions and who owns what" with the owner table, the 5b checklist and seven rules (model numbers
+  only from the hub; one PR per fix from current main; PLAN / LEDGER edited only by the hub; say so before editing the other
+  session's block of build_model.py, or hand over data; formats stable; one compute job at a time).
+- HAND MEASUREMENTS wording changed: model work, the critique loop and draft templates never wait for them; the FINAL template
+  sign-off waits for M1, M3, M4, M5, M9, M11 (phase 6b). M11 is new (one Domino end and the leg thickness across); the joinery
+  session has since read the Domino ends off true-scale leg-face views (25-26 x 11-11.5 mm, taken as a 10 mm Domino 24 x 10,
+  parts/dominos.json), so M11 is a check. To confirm with Joe: his earlier instruction to the hub was "never block on them".
+- MERGED: PR #15 (seat front face, v11, 9eb0cd0). PR #12 (audit report, squash b048fbc). PR #14 (back leg as one board +
+  Domino ends) could not be merged as it stood: after #12's squash it conflicted in tools/audit_bleg.py (added on both sides,
+  edited later on joinery). Landed instead through branch joinery-merge = main + joinery 3f913f1, that one file taken from
+  joinery, plus model v12 and this entry; #14 closed with a pointer. Lesson, now rule 2: after a squash, merge main into the
+  branch before stacking more work on it.
+- TRIAL BUILD before merging (rule 3): main + joinery against v11: BLEG_L / BLEG_R changed (267 of 480 vertices moved, largest
+  16.9 mm to the nearest old vertex), the other 11 parts vertex-identical; overall box unchanged.
+- MODEL v12 = v11 + back leg as one board (joinery session's code, tools/build_model.py, "one_board" in the report): one
+  smoothing spline per outline through the measured stretches only (front z <= 270.1 and >= 607.8, rear z <= 261.1 and >= 607.8);
+  fit to the measured lines rms 0.08 / 0.05 mm, largest 0.40 / 0.21 (front / rear). Fore-aft width in side view at z 300 / 450 /
+  600: 48.5 / 46.6 / 36.7 (v11 48.7 / 47.5 / 36.2). Between z 265 and 608 the leg is NOT measured: a smooth guess, tagged so.
+- CHECKED BY EYE (figures/joinery/v11_v12_back_leg_1507.jpg, _1527.jpg, zoomed crops of 4032 px overlays): v11's steps in
+  the outline at seat height are gone; in 1527 the outline follows the near leg past the arm joint on both edges. In the level
+  side view 1507 the two legs overlap in the picture, so the fit inside the unmeasured band cannot be read there.
+- ASSEMBLY CHECK baseline on v12 (tools/audit_joints.py, the joinery session's tool; nothing fixed yet): legs float above the
+  rockers by 0.8 mm (front) and 1.8 mm (back); SEAT not watertight (every seat pair unmeasurable by boolean); arm into back
+  leg 4.1 mm / 2.26 cm3; back leg into crest 3.6 mm / 4.28 cm3; slats into crest 14.8-15.0 mm (20.5 / 11.6 cm3).
+- FORMATS: no parts file changed format. NEW: parts/dominos.json (joinery session's file), parts/model_v12.*.
+- OPEN INTERFACE (PLAN rule 5): the cut of the seat's side edge at the back leg sits in the SEAT outline (hub's block). Waiting
+  for the joinery session's choice: the cut line as data for the hub to apply, or its own marked block after the seat is built.
+- NEXT (hub): (b) arm underside and thickness from the side sheets (new file); (c) the 3 mm question at the right front corner
+  of the seat; (d) seat underside from 1570-1576, then close the SEAT mesh (the joinery checks need a watertight seat: do this
+  early); (e) rocker bottom edge traced directly; (f) seat side edge behind y 400; (g) register IMG_1588-1593 at half
+  resolution. At the start of every turn: pull main, read open PRs and their comments, trial-build and merge what the joinery
+  session left open, issue the next model number.
