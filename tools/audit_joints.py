@@ -11,7 +11,8 @@ for k, g in G.items():
                        "bbox_min": g.bounds[0].round(1).tolist(), "bbox_max": g.bounds[1].round(1).tolist()}
 JOIN = [("ROCKER_R", "FLEG_R"), ("ROCKER_R", "BLEG_R"), ("FLEG_R", "SEAT"), ("BLEG_R", "SEAT"), ("FLEG_R", "ARM_R"), ("BLEG_R", "ARM_R"),
         ("BLEG_R", "CREST"), ("BLEG_L", "CREST"), ("SLAT_C", "SEAT"), ("SLAT_R", "SEAT"), ("SLAT_C", "CREST"), ("SLAT_R", "CREST"), ("SLAT_L", "CREST"),
-        ("ARM_R", "SEAT"), ("SLAT_R", "BLEG_R"), ("SLAT_C", "SLAT_R"), ("DOMINO_FR", "FLEG_R"), ("DOMINO_FR", "SEAT"), ("DOMINO_BR", "BLEG_R"), ("DOMINO_BR", "SEAT")]
+        ("ARM_R", "SEAT"), ("SLAT_R", "BLEG_R"), ("SLAT_C", "SLAT_R"), ("DOMINO_FR", "FLEG_R"), ("DOMINO_FR", "SEAT"), ("DOMINO_BR", "BLEG_R"), ("DOMINO_BR", "SEAT"),
+        ("DOMINO_AR", "FLEG_R"), ("DOMINO_AR", "ARM_R")]
 from trimesh.proximity import ProximityQuery
 for a_, b_ in [p for p in JOIN if p[0] in G and p[1] in G]:
     A, B = G[a_], G[b_]; r = {}

@@ -9,7 +9,8 @@ Joints (chair frame mm, right side; left = mirror):
   back leg / seat    seat side edge BUTTS the leg's front edge, outer faces flush; seat cut to the leg; Domino across the joint line
   legs / rockers     feet carried down onto the rocker top and cut to its curve (hidden fastener not modelled: not seen)
   arm / back leg     arm end coped to the leg (hidden tenon not modelled: not seen)
-  arm / front leg    leg top already cut to the arm underside by build_model.py (round through-tenon: TODO, see report)
+  arm / front leg    leg top cut to the arm underside by build_model.py; a hidden vertical 10 mm Domino along the leg axis, from the
+                     leg top into the arm (ASSUMED: parts/joints.json; the oval on the left arm top is not over the leg, see there)
   crest / back legs  crest ends coped to the legs (hidden joint not modelled)
   slats              their stub ends become tenons; mortises cut into the seat and the crest
 Domino sizes and positions: parts/dominos.json (measured on leg-face orthophotos; 10 mm Domino, 24 x 10 section).
@@ -70,6 +71,17 @@ def place_domino(center, tilt_deg, depth, side):
     m.apply_translation(center); return m
 
 
+def domino_along(c, w, long_dir, a, b, d_down, d_up, n=24):
+    """Domino body: stadium (long a along long_dir, short b) extruded along unit axis w from c - w*d_down to c + w*d_up"""
+    w = np.asarray(w, float) / np.linalg.norm(w); l = np.asarray(long_dir, float) - w * (np.asarray(long_dir, float) @ w)
+    l /= np.linalg.norm(l); s = np.cross(w, l); r = b / 2; h = a / 2 - r; t1 = np.linspace(-np.pi / 2, np.pi / 2, n); t2 = t1 + np.pi
+    P = np.r_[np.c_[h + r * np.cos(t1), r * np.sin(t1)], np.c_[-h + r * np.cos(t2), r * np.sin(t2)]]
+    from shapely.geometry import Polygon
+    m = trimesh.creation.extrude_polygon(Polygon(P), d_down + d_up); V = m.vertices
+    m.vertices = np.asarray(c, float) + np.outer(V[:, 0], l) + np.outer(V[:, 1], s) + np.outer(V[:, 2] - d_down, w)
+    m.fix_normals(); return m
+
+
 def leg_depth_at(leg, p, side):
     """thickness across of the leg at point p on its outer face (ray inward)"""
     ray = trimesh.ray.ray_triangle.RayMeshIntersector(M[leg])
@@ -106,12 +118,28 @@ for side, S in ((1, "R"), (-1, "L")):
         rep["joints"][name] = {"centre_xyz": c.round(1).tolist(), "section_mm": sec, "depth_mm": round(depth, 1), "tilt_deg": tilt,
                                "provenance": "section + position measured on leg-face orthophotos (parts/dominos.json); depth ASSUMED (" +
                                              ("leg thickness + 25 mm into the seat edge" if key == "front_leg" else "25 mm, straddling the leg/seat joint line") + ")"}
+# 5b arm / front leg: hidden vertical Domino centred on the leg top's contact face, along the leg axis, long axis fore-aft
+J = json.load(open(ROOT / "parts/joints.json"))["arm_front_leg"]["design"]
+for side, S in ((1, "R"), (-1, "L")):
+    FL, AR = f"FLEG_{S}", f"ARM_{S}"; L = M[FL]; zt = L.bounds[1, 2]
+    cs = [L.section([0, 0, 1], [0, 0, z]).vertices.mean(0) for z in (zt - 120, zt - 30)]          # leg centreline near the top
+    w = cs[1] - cs[0]; w /= np.linalg.norm(w)
+    P, _ = trimesh.sample.sample_surface_even(L, 40000, radius=0.6, seed=1)
+    from scipy.spatial import cKDTree
+    Q, _ = trimesh.sample.sample_surface_even(M[AR], 60000, radius=0.6, seed=1); d, _ = cKDTree(Q).query(P); top = P[d < 0.8]
+    c = top.mean(0)                                                                                   # centre of the contact face
+    dom = domino_along(c, w, [0, 1, 0], J["section_mm"][0], J["section_mm"][1], J["depth_in_leg_mm"], J["depth_in_arm_mm"])
+    name = f"DOMINO_A{S}"; M[name] = dom
+    cut(FL, dom, f"mortise for {name} in the top of {FL}"); cut(AR, dom, f"mortise for {name} in the underside of {AR}")
+    rep["joints"][name] = {"centre_xyz": c.round(1).tolist(), "axis": w.round(3).tolist(), "section_mm": J["section_mm"],
+                           "depth_mm": [J["depth_in_leg_mm"], J["depth_in_arm_mm"]],
+                           "provenance": "ASSUMED, hidden joint (parts/joints.json arm_front_leg)"}
 # 6 crest coped to the back legs; slats into mortises in the seat and the crest
 for L in ("BLEG_R", "BLEG_L"): cut("CREST", M[L], f"crest end coped to {L} (the crest's joint into the leg is hidden and NOT modelled)")
 for s_ in ("SLAT_C", "SLAT_R", "SLAT_L"):
     cut("SEAT", M[s_], f"mortise for {s_} in the seat (depth = how far the traced slat runs in; NOT measured)")
     cut("CREST", M[s_], f"mortise for {s_} in the crest (depth = how far the traced slat runs in; NOT measured)")
-rep["open"] = ["arm / front leg: round end grain on the arm top over the leg (IMG_1528) = through round tenon or plug: not modelled yet",
+rep["open"] = ["arm / front leg: hidden; modelled as an ASSUMED vertical 10 mm Domino (the oval on the left arm top is not over the leg)",
                "legs / rockers, arm / back leg, crest / back legs: the joints are hidden; contact faces only",
                "Domino depth not visible; slat mortise depth not measured",
                "leg feet sit about 3 mm off the rocker faces in x (rocker width is a tape value, 31 mm); not changed"]
