@@ -1,0 +1,160 @@
+{
+ "traces": [
+  "tools/seat_scoop/inputs_L/traces_low_px.json",
+  "tools/seat_scoop/inputs_L/traces_above_px.json",
+  "tools/seat_scoop/inputs_L/traces_steep_px.json"
+ ],
+ "y": {
+  "crescent": [
+   105,
+   440
+  ],
+  "bottom": [
+   140,
+   440
+  ]
+ },
+ "use": {
+  "crescent": {
+   "1523": [
+    [
+     90,
+     415
+    ]
+   ],
+   "1530": [
+    [
+     90,
+     360
+    ]
+   ],
+   "1531": [
+    [
+     90,
+     345
+    ]
+   ],
+   "1524": [
+    [
+     90,
+     405
+    ]
+   ],
+   "1505": [
+    [
+     250,
+     455
+    ]
+   ],
+   "1519": [
+    [
+     100,
+     435
+    ]
+   ],
+   "1506": [
+    [
+     120,
+     450
+    ]
+   ],
+   "1521": [
+    [
+     125,
+     320
+    ]
+   ],
+   "1518": [
+    [
+     85,
+     405
+    ]
+   ],
+   "1522": [
+    [
+     85,
+     405
+    ]
+   ],
+   "1547": [
+    [
+     85,
+     420
+    ]
+   ],
+   "1548": [
+    [
+     85,
+     420
+    ]
+   ]
+  },
+  "bottom": {
+   "1523": [
+    [
+     90,
+     370
+    ]
+   ],
+   "1530": [
+    [
+     85,
+     320
+    ]
+   ],
+   "1531": [
+    [
+     100,
+     320
+    ]
+   ],
+   "1524": [
+    [
+     140,
+     405
+    ]
+   ],
+   "1505": [
+    [
+     100,
+     245
+    ],
+    [
+     270,
+     325
+    ]
+   ],
+   "1519": [
+    [
+     90,
+     435
+    ]
+   ],
+   "1506": [
+    [
+     90,
+     155
+    ],
+    [
+     200,
+     280
+    ],
+    [
+     315,
+     440
+    ]
+   ]
+  }
+ },
+ "note": "LEFT side. Trusted station ranges per photo, checked by eye on the unrolled strips at 10 px/mm (work: tools/seat_scoop/strip.py ZOOM). crescent = the hard line: low photos 1505, 1506, 1519, 1523, 1524, 1530, 1531 (elevation -12 to +3 deg, azimuth -44 to +73) see it as the top of the dark under-bevel; 1518, 1521, 1522 (31-38 deg above) as the top of the grey sliver / the wood's lower silhouette; 1547, 1548 (68-71 deg above) as the seat's outer silhouette on ALT strips. bottom = the arris between the under-bevel and the underside (low photos only). Left out: 1549 (steep; a floor shadow lies under the silhouette, the snap ran along its corridor wall 41 %), 1521 beyond y 320 (sliver boundary fades), background notches in the bottom traces of 1505, 1506 and 1524. Init from a first pass without the steep photos (inputs_L/solve0.json).",
+ "init": {
+  "crescent": [
+   "work/seat_scoop_L/solved0.json",
+   "crescent"
+  ],
+  "bottom": [
+   "work/seat_scoop_L/solved0.json",
+   "bottom"
+  ]
+ }
+}

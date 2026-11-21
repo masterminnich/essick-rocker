@@ -427,7 +427,7 @@ if edge_rep:
         _SD = json.load(open(_sf))["design"]; _gt = _SD["hard_line_height_above_underside_of_y"]; _gy, _gh = np.array(_gt["y"]), np.array(_gt["height_mm"]); _bev = np.radians(_SD["bevel_angle_deg"]["value"])
         scoop_h = lambda y: np.interp(y, _gy, _gh, left=0.0, right=0.0); _bh_old = _bh.copy(); _bh = _top - scoop_h(pts2[:, 1]) / np.tan(_bev)
         _so_ = np.arange(len(pts2) - len(outline), len(pts2))[:len(half)]; _yy_ = pts2[_so_, 1]; _m_ = (_yy_ >= _y0) & (_yy_ <= _y1)
-        scoop_rep = {"source": "parts/seat_scoop.json (hard line and bottom arris of the right side edge triangulated in 14 and 8 photos; left = mirror, assumed)", "y_range": [float(_gy[0]), float(_gy[-1])],
+        scoop_rep = {"source": "parts/seat_scoop.json (hard line and bottom arris triangulated on both side edges: right 14 and 8 photos, left 12 and 7; design = left/right mean, built symmetric)", "y_range": [float(_gy[0]), float(_gy[-1])],
                      "max_height_of_hard_line_above_underside_mm": float(_gh.max()), "bevel_angle_deg": float(np.degrees(_bev)), "max_bevel_run_mm": float(_gh.max() / np.tan(_bev)), "edge_face": "vertical from the plan outline to the hard line",
                      "bottom_half_width_minus_old_straight_wall_mm": {f"y{int(y)}": float(np.interp(y, _yy_, (_bh - _bh_old)[_so_])) for y in (110, 150, 200, 250, 300, 350, 400)},
                      "outside_y_range": "edge face vertical for the full thickness (was: leaning under at the ratio found at the end of the measured range)"}
