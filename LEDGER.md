@@ -1168,3 +1168,31 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - NEXT: side slats' inner front edge (v23 #16 +2.9 [+1.3..+3.0], z 850-1000), then the seat roll underside and seat top back
   edge at the slats, then the rocker top at the nose and tail, then the arm underside inner edge; the seat front corner waits
   for a reading; then 6c edge radii.
+
+## 2026-11-21 02:05 PST side slats' turn measured from the photos (PR #33), critique fix 2; NO model change, main stays model v23
+- RUN ON Opus 5.5. Squash-merged as a68b60a. Measurement only: `parts/slat_turn.json` `apply_in_build` false, so the build is
+  identical to v23 (checked: every part's vertices equal); no model_v24 and no critique_v24 (nothing to rerun).
+- MODELLED (v23): `parts/slats.json` sweeps a flat 10 mm (assumed, M4) rectangle along each back-face profile; edges by
+  eye-seed + edge_snap in the unrolled rear view (IMG_1502 first, L+R averaged); no turn, no plan curvature; SLAT_L = mirror.
+- FOUR EDGES (`tools/slat_width/decomp.py`, critique per-point gaps): side slats turned, model - wood -4..-7 deg (L), -2..-7
+  (R); width right within ~1 mm; forward shift 0..+2 (bend line); centre slat control -0.3..-1.0 deg; L/R antisymmetric
+  shift = the known set offset.
+- METHOD (`tools/slat_width/measure.py`, `fit.py`): per photo, slat and station (z 350-1025 / 25 mm) both silhouette edges on
+  one line across the slat in the same photo (pose-free W); colour moving toward the background, moved out past a visible
+  side face; native 1.7-2.4 px/mm, checked by eye at 6-10 px/mm (IMG_1502, 1526, 1527, 1528, 1485). W(alpha) fitted per 100 mm
+  band for w, t, turn on the 78 ranking photos; held-out photos predicted only.
+- FINDING: turn (outer edge forward) L 1.7 (z 400, 9 photos) / 6.1 / 6.1 / 5.2 / 4.4 / 5.6 / 5.5 deg (z 500-1000, 16-27
+  photos, se 0.3-1.2); R 7.2 / 7.3 / 6.5 / 5.4 / 2.8 / 4.7 / 1.4 (8-25 photos, se 0.5-3.5); centre slat 2.3 .. -1.0, weighted
+  +0.6 (control). Width fit - model L 0..+0.9, R -0.6..+0.9 mm: kept. Thickness 7.4-11 (easing-dependent): kept (M4). Easing
+  (rho 2) or t fixed at 8 / 10 moves the turn by < 1.5 deg. Centre frontal width under the crest 98.3 = tape IMG_1553 98.3
+  (trace 97.2; M5). Tape note IMG_1553 "outer slat is twisted": agrees. Design = L/R mean, line 7.2 (z 375) -> 3.6 (z 1000).
+- TRIAL work/trial/v24 (applied): assembly check PASS; only SLAT_L/R change in _shapes; joined: CREST and SEAT slat
+  mortises. Corner depth in the crest 23.5/25.4/0.0/18.9 -> 22.7/26.1/21.7/18.2 (outer back corner was out behind the
+  crest); in the seat 2.3/6.1/7.0/3.7 -> 2.7/5.7/6.9/4.0.
+- CRITIQUE v23 -> trial, 52 side-slat regions: ranking median |gap| 0.72 -> 0.54, out of tolerance 6 -> 3; inner/front
+  +1.65 -> +1.02 (z 950 +3.23 -> +2.54), outer/back +0.81 -> -0.05, inner/back -0.67 -> -0.26, outer/front +0.02 -> +0.76
+  (L low z worse). Held-out: median |held| 0.83 -> 0.90; per edge inner/front +0.62 -> +1.14, inner/back -0.07 -> +0.52,
+  outer/back +1.14 -> -0.45, outer/front -0.70 -> -0.15: NOT confirmed, so measurement only. Five worst other regions
+  unchanged. Pose-free held-out widths do improve (L 1.84/1.77/2.48 -> 1.22/0.52/1.06, R 0.43/1.07/1.17 -> 0.13/0.64/0.92).
+- OPEN (hub): apply the turn, or first read the slats' position near the crest pose-free (forward shift, R ~1.8 inboard).
+- NEXT: seat roll underside edge and seat top back edge at the slats, rocker top at the nose and tail, arm underside inner edge; the seat front corner waits for a reading; then 6c edge radii
