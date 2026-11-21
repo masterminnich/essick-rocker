@@ -26,7 +26,7 @@ const DEPTH = { 'x+': 235, 'x-': -235, 'y+': 495, 'y-': -165, 'z+': 600 }
 const RANGE = { x: [-340, 340], y: [-480, 620], z: [0, 1090] }
 
 const state = {
-  view: 'free', models: [], modelId: null, modelMtime: 0, follow: true, opacity: 0.55, edges: true, hidden: new Set(),
+  view: 'free', models: [], modelId: null, follow: true, opacity: 0.55, edges: true, hidden: new Set(),
   planes: { x: { on: true, pick: 'auto' }, y: { on: true, pick: 'auto' }, z: { on: false, pick: 'auto' } },
   depth: { ...DEPTH }, bgOpacity: 1, grid: false, photo: null, cams: {}, zoom: { s: 1, x: 0, y: 0 },
 }
@@ -58,7 +58,7 @@ const loader = new GLTFLoader()
 const partOf = (name) => PARTS.find(([p]) => name.startsWith(p)) || ['OTHER', 'Other', '#6b7280']
 
 async function loadModel(m, quiet) {
-  const gltf = await loader.loadAsync(`/models/${encodeURIComponent(m.id)}?t=${m.mtime}`)
+  const gltf = await loader.loadAsync(new URL(`${m.file}?v=${encodeURIComponent(m.tag || Date.now())}`, PARTS_URL).href)
   modelGroup.clear()
   gltf.scene.traverse((o) => {
     if (!o.isMesh) return
@@ -70,7 +70,7 @@ async function loadModel(m, quiet) {
     edges.applyMatrix4(o.matrixWorld); edges.renderOrder = 2
     const g = new THREE.Group(); g.add(mesh, edges); g.userData = { key, mesh, edges }; modelGroup.add(g)
   })
-  state.modelId = m.id; state.modelMtime = m.mtime
+  state.modelId = m.id; commitInfo(m)
   applyModelStyle(); renderVersion(); request()
   if (!quiet) toast(`Showing v${m.version}`)
 }
@@ -326,15 +326,18 @@ function renderVersion() {
   const m = state.models.find((x) => x.id === state.modelId); if (!m) return
   const latest = state.models[0]?.id === m.id
   $('verNum').textContent = `v${m.version}`
-  $('verMeta').innerHTML = `${latest ? '<b>newest</b> · ' : ''}saved ${ago(m.mtime)}<br>${m.dir === 'repo' ? 'committed copy' : 'working copy'} · ${(m.size / 1024).toFixed(0)} KB`
+  const c = m.commit
+  $('verMeta').innerHTML = `${latest ? '<b>newest</b> · ' : ''}${c ? `committed ${ago(c.date)}` : `${(m.size / 1024).toFixed(0)} KB`}` +
+    (c ? `<br><a href="${c.url}" target="_blank" rel="noopener" title="${esc(c.title)}">${esc(c.title.length > 46 ? c.title.slice(0, 45) + '…' : c.title)}</a>` : '')
   $('verSel').value = m.id
 }
+const esc = (t) => String(t).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]))
 const ago = (t) => { const s = (Date.now() - t) / 1000; return s < 60 ? 'just now' : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : new Date(t).toLocaleDateString() }
 
 const stamp = (t) => { const d = new Date(t); return d.toDateString() === new Date().toDateString() ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString([], { month: 'short', day: 'numeric' }) }
 function renderVersions() {
   const sel = $('verSel'); const cur = state.modelId
-  sel.innerHTML = state.models.map((m) => `<option value="${m.id}">v${m.version} · ${stamp(m.mtime)}</option>`).join('')
+  sel.innerHTML = state.models.map((m) => `<option value="${m.id}">v${m.version}${m.commit ? ` · ${stamp(m.commit.date)}` : ''}</option>`).join('')
   if (cur) sel.value = cur
 }
 
@@ -412,17 +415,56 @@ function bindUI() {
   new ResizeObserver(layout).observe(stage)
 }
 
-// ------------------------------------------------------------------ newest model polling
+// ------------------------------------------------------------------ newest model: static discovery
+// The viewer is plain files (GitHub Pages serves the repo's main branch). It finds models by asking for
+// ../parts/model_vN.glb with N counting up (up to 3 missing numbers in a row), then keeps asking for the next one.
+const PARTS_URL = new URL('../parts/', location.href)
+const GH = location.hostname.endsWith('.github.io') ? { owner: location.hostname.split('.')[0], repo: location.pathname.split('/')[1] } : null
+const known = new Map()                                           // version -> { id, file, version, tag, size }
+const bust = () => `?t=${Date.now()}`                             // past the CDN's 10-minute cache
+async function probe(v) {
+  const file = `model_v${v}.glb`
+  try {
+    const r = await fetch(new URL(file + bust(), PARTS_URL), { method: 'HEAD', cache: 'no-store' })
+    if (!r.ok) return null
+    return { id: file, file, version: v, tag: r.headers.get('etag') || r.headers.get('last-modified') || '', size: +r.headers.get('content-length') || 0,
+      mtime: Date.parse(r.headers.get('last-modified') || '') || 0 }
+  } catch { return null }
+}
+async function discover() {
+  if (!known.size) {                                              // first look: 24 at once, then more if the top one exists
+    let lo = 1
+    for (;;) {
+      const got = await Promise.all(Array.from({ length: 24 }, (_, i) => probe(lo + i)))
+      got.forEach((m) => m && known.set(m.version, m)); if (!got[got.length - 1]) break; lo += 24
+    }
+  }
+  let v = (known.size ? Math.max(...known.keys()) : 0) + 1, misses = 0
+  while (misses < 3) { const m = await probe(v); if (m) { known.set(v, m); misses = 0 } else misses++; v++ }
+}
+async function commitInfo(m) {                                    // which commit brought this version (GitHub API, once per version)
+  if (!GH || m.commit !== undefined) return
+  m.commit = null
+  try {
+    const r = await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}/commits?path=parts/${m.file}&per_page=1`)
+    const c = (await r.json())[0]; if (c) m.commit = { title: c.commit.message.split('\n')[0], date: Date.parse(c.commit.committer.date), url: c.html_url }
+  } catch { /* rate-limited or offline: show the file only */ }
+  renderVersion()
+}
 async function poll() {
   try {
-    const r = await fetch('/api/models', { cache: 'no-store' }); const j = await r.json()
-    state.models = j.models; renderVersions()
-    if (!j.models.length) { showState('No model yet', 'No parts/model_vN.glb was found in the model folders.'); return }
+    await discover()
+    state.models = [...known.values()].sort((a, b) => b.version - a.version); renderVersions()
+    if (!state.models.length) { showState('No model yet', 'No parts/model_vN.glb was found next to the viewer.'); return }
     showState()
-    const cur = j.models.find((m) => m.id === state.modelId)
-    if (state.follow && (j.latest !== state.modelId || (cur && cur.mtime !== state.modelMtime))) await loadModel(j.models[0], !state.modelId)
+    const cur = state.models.find((m) => m.id === state.modelId)
+    if (cur) {                                                    // same version re-published with new bytes?
+      const now = await probe(cur.version)
+      if (now && now.tag && cur.tag && now.tag !== cur.tag) { Object.assign(cur, now, { commit: undefined }); if (state.follow) { await loadModel(cur, true); toast(`v${cur.version} was updated`) } }
+    }
+    if (state.follow && state.models[0].id !== state.modelId) await loadModel(state.models[0], !state.modelId)
     else renderVersion()
-  } catch (e) { if (!state.modelId) showState('Can’t reach the viewer server', String(e.message || e)) }
+  } catch (e) { if (!state.modelId) showState('Can’t load the model list', String(e.message || e)) }
 }
 function showState(title, text) { const el = $('state'); el.hidden = !title; if (title) el.innerHTML = `<div><b>${title}</b>${text}</div>` }
 let toastT
@@ -443,7 +485,7 @@ async function main() {
   bindUI(); renderParts()
   state.cams = await (await fetch('photos/cameras.json')).json()
   renderPhotoList(); renderPlanes(); setView('free')
-  await poll(); setInterval(poll, 5000); setInterval(renderVersion, 30000)
+  await poll(); setInterval(poll, 20000); setInterval(renderVersion, 30000)
   tick()
 }
 main().catch((e) => showState('Viewer failed to start', String(e.message || e)))

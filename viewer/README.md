@@ -1,10 +1,15 @@
 # Model viewer
 
-`npm run dev` (no dependencies; PORT/HOST from the environment, default 127.0.0.1:8765) serves a browser viewer that always
-shows the newest `parts/model_vN.glb`. It checks every 5 s and swaps the model in place when a new version is written.
+**Live: https://masterminnich.github.io/essick-rocker/** (GitHub Pages, serving `main`; the site root redirects here).
 
-- **Model folders**: `parts/` of this checkout, plus one path per line in `viewer/model-dirs.local` (git-ignored) and
-  `ESSICK_MODEL_DIRS`. Point `model-dirs.local` at the working checkout's `parts/` to see a model before it is committed.
+Plain static files, no server and no build. The page finds the newest model on its own by requesting `../parts/model_vN.glb`
+with N counting up, and keeps checking every 20 s for the next version. A model therefore shows up about a minute after it reaches
+`main` (the time GitHub takes to republish the site), and the page switches to it without moving the camera. The version line links to the
+commit that brought the model in.
+
+Locally: `python3 -m http.server 8000` in the repo root, then open http://localhost:8000/viewer/ (it shows the models in
+your checkout's `parts/`, committed or not).
+
 - **Views**: 3D orbit; square-on orthographic Front / Right / Left / Back / Top (click two points to measure, mm and inches);
   *Through a photo*, which draws the model through the solved camera of any of the 93 photos. This is exact at every depth.
 - **Photo behind the model** (X / Y / Z planes): the most square-on photo for the side you are looking from is flattened onto a
@@ -14,3 +19,4 @@ shows the newest `parts/model_vN.glb`. It checks every 5 s and swaps the model i
 
 `viewer/photos/` is made by `tools/viewer_photos.py`: each photo undistorted, upright, resampled to a pinhole camera with the
 principal point at the centre (1600 px), plus `cameras.json`. Re-run it only if the camera solve or photo set changes.
+`.nojekyll` in the repo root makes Pages publish the files as they are (no Jekyll pass).

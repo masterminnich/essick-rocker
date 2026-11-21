@@ -139,3 +139,5 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
   .hud-top > span { font-size: 10px; }
   .hud-top .big { font-size: 18px; }
 }
+.ver-meta a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.ver-meta a:hover { color: var(--ink); border-color: var(--ink); }
