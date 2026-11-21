@@ -1,0 +1,7 @@
+{
+ "note": "seeds for tools/rocker_bottom/trace.py. The seed of the top edge is t = 0 (each side's own top edge in parts/rocker_profile.json), of the bottom edge the old profile's bottom (square to the top edge); [S].top / [S].bot = corrections [[u, dt mm], ...] picked by eye on single-photo views (tools/rocker_bottom/view.py at 10 px/mm), linear between, constant beyond. band_top / band_bot = half-width of the search band, mm. level / level_bot = the 'unlike the face' level that ends the face at the top / bottom edge (bottom lower: near the contact the rocker's own shadow on the table is a dark band hugging the bottom arris, too close to the dark face colour for level 5, which then ends the face on the far side of the shadow, 1-2 mm too low). cam_v_min = cameras lower than this above the table (mm) see the table's near edge across the bottom arris; their bottom points are not used (IMG_1487, 1489, 1492). drop = photos not used: 1570 (close-up, badly registered: PLAN, PR #20), 1553 (an 85 mm glimpse at 55 degrees).",
+ "band_top": 3.0, "band_bot": 4.0, "level": 5.0, "level_bot": 3.5, "cam_v_min": 30.0,
+ "drop": ["1570", "1553"],
+ "L": {"top": [], "bot": []},
+ "R": {"top": [], "bot": []}
+}

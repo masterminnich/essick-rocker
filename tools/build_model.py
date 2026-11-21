@@ -96,9 +96,14 @@ def pooled_edges(name):
 # the two ends (parts/rocker_ends.json, tools/rocker_ends/): the tail thins to a slim rounded tip, the nose is cut to a round end. Each end's
 # top and bot run from blend_u[0], where they equal the profile above, out to the landmark (the tail's tip, the nose's top corner).
 rends = json.load(open(ROOT / "parts/rocker_ends.json"))["design"]; r_tail, r_nose = rends["tail"], rends["nose"]; mid = (U > r_tail["blend_u"][0]) & (U < r_nose["blend_u"][0])
-rock_poly = to_mean(np.r_[np.array(r_tail["top"])[::-1], np.c_[U, rtop][mid], np.array(r_nose["top"]), np.array(r_nose["bot"])[::-1][1:], np.c_[U, rbot][mid][::-1], np.array(r_tail["bot"])[:-1]])
+# the bottom edge traced directly between the ends (parts/rocker_bottom.json, tools/rocker_bottom/): bottom v = mean_bot + dv(u), also on the
+# tail end's bottom inside its blend zone (dv fades to 0 at u -400); dv is 0 outside its stations, so the top edge, the feet and the contact stay
+rb_file = ROOT / "parts/rocker_bottom.json"; rbc = json.load(open(rb_file))["correction"] if rb_file.exists() else {"u": [0.0, 1.0], "dv_mm": [0.0, 0.0]}
+bot_dv = lambda q: np.c_[q[:, 0], q[:, 1] + np.interp(q[:, 0], rbc["u"], rbc["dv_mm"], left=0.0, right=0.0)]
+rbot = rbot + np.interp(U, rbc["u"], rbc["dv_mm"], left=0.0, right=0.0); r_tail_bot = bot_dv(np.array(r_tail["bot"])); r_nose_bot = bot_dv(np.array(r_nose["bot"]))
+rock_poly = to_mean(np.r_[np.array(r_tail["top"])[::-1], np.c_[U, rtop][mid], np.array(r_nose["top"]), r_nose_bot[::-1][1:], np.c_[U, rbot][mid][::-1], r_tail_bot[:-1]])
 meshes["ROCKER_R"] = extrude_side(rock_poly, 0, P("rocker_width_across"), +1); meshes["ROCKER_L"] = mirror(meshes["ROCKER_R"])
-report["rocker"] = {"profile": "fitted (face orthophoto, both sides averaged)", "length_traced_mm": float(U[-1] - U[0]),
+report["rocker"] = {"profile": "top fitted (face orthophoto, both sides averaged); bottom " + ("traced in single photos between the ends (parts/rocker_bottom.json), fitted where it agrees" if rb_file.exists() else "fitted"), "length_traced_mm": float(U[-1] - U[0]),
                     "ends": "triangulated (parts/rocker_ends.json: each end traced in 11 to 18 photos, left and right averaged)", "tail_tip_uv": r_tail["landmark_uv"], "nose_top_corner_uv": r_nose["landmark_uv"],
                     "tail_tip_to_nose_top_corner_mm": float(np.hypot(*(np.array(r_nose["landmark_uv"]) - r_tail["landmark_uv"]))), "length_overall_mm": float(np.ptp(rock_poly[:, 0])),
                     "face_height_mm": [float(np.min(rtop - rbot)), float(np.max(rtop - rbot))], "rocking_radius_mm": rp["rocking_radius_mm"],
