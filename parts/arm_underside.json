@@ -976,7 +976,7 @@
   "outer_bottom_arris_from_below": "the photos from below put the same arris 0.6-1.4 mm LOWER at the back and 0.9-1.9 mm HIGHER from y 300 on than the photos from above and level (an eased arris seen from either side of its rounding); design keeps the from-above/level value, the tolerance carries half the difference",
   "outer_face": "vertical: the outer bottom arris sits straight below the outer top arris (a fitted -1.7..+3.1 mm on both arms, within its se); assumed exactly 0",
   "inner_face": "assumed vertical (the inner bottom arris straight below the inner top arris; the inner face itself is not seen from outside)",
-  "build": "tools/build_model.py --arm-underside (OFF by default until joinery 5c is fixed, see PLAN.md): arm underside z = (outer top arris z) - (h_inner + t (h_outer - h_inner)), t = 0 inner .. 1 outer across the arm; replaces parts/arms.json 'thickness' (assumed 25 mm square to the top) in the build. parts/arms.json is unchanged."
+  "build": "tools/build_model.py (the default from model v21; --arm-slab builds the old assumed slab): arm underside z = (outer top arris z) - (h_inner + t (h_outer - h_inner)), t = 0 inner .. 1 outer across the arm; replaces parts/arms.json 'thickness' (assumed 25 mm square to the top) in the build. parts/arms.json is unchanged."
  },
  "right": {
   "photos_above": [

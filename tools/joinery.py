@@ -174,7 +174,7 @@ for side, S in ((1, "R"), (-1, "L")):
         in_leg = vol(trimesh.boolean.intersection([dom, M[BL]], engine="manifold")); in_other = vol(trimesh.boolean.intersection([dom, M[other]], engine="manifold"))
         xs = np.arange(-d["section_mm"][0] / 2 + 0.05, d["section_mm"][0] / 2, 0.1); end_in_leg = 0.1 * int(M[BL].contains(c + w * 3.0 + np.outer(xs, [1.0, 0, 0])).sum())   # along the end's long axis, 3 mm in
         name = f"DOMINO_{tag}{S}"; M[name] = dom
-        cut(BL, dom, f"mortise for {name} in the rear face of {BL}"); cut(other, dom, f"mortise for {name} in " + ("the seat's back edge" if key == "seat" else f"the end of {other}"))
+        cut(BL, raw, f"mortise for {name} in the rear face of {BL}"); cut(other, dom, f"mortise for {name} in " + ("the seat's back edge" if key == "seat" else f"the end of {other}"))
         rep["joints"][name] = {"centre_xyz": c.round(1).tolist(), "axis": w.round(4).tolist(), "long_axis": "level, along x", "section_mm": d["section_mm"],
                                "depth_mm": round(depth, 1), "through_the_leg_mm": None if through is None else round(through, 1),
                                "rear_face_fit_rms_mm": round(rms, 2), "volume_cm3": round(vol(dom), 2), "in_leg_cm3": round(in_leg, 2), f"in_{other.split('_')[0].lower()}_cm3": round(in_other, 2),
