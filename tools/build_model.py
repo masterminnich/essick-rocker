@@ -24,7 +24,7 @@ PRM = {  # sizes not (yet) measured from photos
     "fleg_thickness_across": (33.0, "cloud+tape", "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"),
     "bleg_thickness_across": (38.0, "cloud+tape", "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"),
     "arm_thickness": (25.0, "assumed", "not measurable yet; caliper A1-A3 will replace"),
-    "seat_edge_thickness": (40.0, "fitted", "side-edge face traced 39-45 mm at the back, thinner to the front; constant here"),
+    "seat_edge_thickness": (40.0, "fitted", "only used without parts/seat_edge.json (or --legacy): side-edge face traced 39-45 mm at the back, thinner to the front; constant here"),
     "crest_height": (77.5, "tape", "IMG_1555 read 3.05 in"),
 }
 if a.params: PRM.update({k: tuple(v) for k, v in json.load(open(a.params)).items()})
@@ -264,7 +264,21 @@ for y0 in yb:
 hw = np.array(hw); okb = np.isfinite(hw); c_hw, n_hw, _ = rpoly(yb[okb], hw[okb], 3, clip=6)
 y_back = float(np.percentile(S[S[:, 0] < 120, 1], 1)); y_front = float(np.percentile(S[S[:, 0] < 120, 1], 99.5))
 ys = np.linspace(y_back, y_front, 50); half = np.clip(np.polyval(c_hw, ys), 150, 300)
-outline = np.r_[np.c_[half, ys], np.c_[-half[::-1], ys[::-1]]]
+# side edge between the legs: measured top arris (plan outline) and bottom arris (parts/seat_edge.json, tools/seat_edge_fit.py)
+edge_rep = None; _ef = ROOT / "parts/seat_edge.json"
+if _ef.exists() and not a.legacy:
+    _E = json.load(open(_ef))["design"]; _y0, _y1 = _E["y_range"]; _pv = lambda k, y: np.polyval(_E[k]["poly_in_(y-250)"], np.clip(y, _y0, _y1) - 250.0)
+    half_cloud = half.copy(); d_end = [float(_pv("top_half_width_of_y", yy) - np.clip(np.polyval(c_hw, yy), 150, 300)) for yy in (_y0, _y1)]
+    # outside the measured range the cloud outline is kept, shifted by its mismatch at the end of the range and faded out over 60 mm
+    fade = np.where(ys < _y0, np.clip(1 - (_y0 - ys) / 60, 0, 1) * d_end[0], np.where(ys > _y1, np.clip(1 - (ys - _y1) / 60, 0, 1) * d_end[1], 0.0))
+    _in = (ys >= _y0) & (ys <= _y1); half = np.where(_in, _pv("top_half_width_of_y", ys), half_cloud + fade)
+    edge_rep = {"source": "parts/seat_edge.json (top and bottom arris of the side edge triangulated on both sides, symmetric mean)", "measured_y_range": [_y0, _y1],
+                "outline_minus_cloud_outline_mm": {"mean": float(np.mean((half - half_cloud)[_in])), "min": float(np.min((half - half_cloud)[_in])), "max": float(np.max((half - half_cloud)[_in]))},
+                "outline_beyond_range": "cloud outline shifted by %+.1f mm (back) / %+.1f mm (front) at the end of the range, faded out over 60 mm" % tuple(d_end)}
+# the front and back edges get a point every ~10 mm too: with only the two corner points the front wall's top edge was one straight line from corner to
+# corner, bridging over the thigh hollows of the measured surface (seen as a flat horizon in the level photo 1491)
+_fx = lambda h: np.linspace(h, -h, int(2 * h // 10) + 1)[1:-1]
+outline = np.r_[np.c_[half, ys], np.c_[_fx(half[-1]), np.full(len(_fx(half[-1])), y_front)], np.c_[-half[::-1], ys[::-1]], np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]]
 # top surface (mirrored cloud), smooth bivariate spline on (|x|, y)
 St = S[S[:, 2] > seat_z(S[:, 1]) - 16]
 both = St
@@ -297,6 +311,13 @@ if _sp.exists():
     (mx0, mx1), (my0, my1) = SS["measured_region"]["x"], SS["measured_region"]["y"]
     xc, yc = np.clip(pts2[:, 0], mx0, mx1), np.clip(pts2[:, 1], my0, my1); inside = (xc == pts2[:, 0]) & (yc == pts2[:, 1])
     z_cloud = zt.copy(); zt = z_cloud + tps(xc, yc) - spl.ev(xc, yc)
+    if edge_rep:
+        # the strip between the dotted region and the outline (|x| > the dots' limit): the shifted cloud polynomial falls away too fast there, so it is
+        # tilted to reach the measured top-arris height at the outline (parts/seat_edge.json); nothing changes inside the dotted region
+        _yy = pts2[:, 1]; _hw = np.maximum(np.interp(_yy, ys, half), mx1 + 1.0); _hc = np.interp(np.clip(_yy, _y0, _y1), ys, half); _yc = np.clip(_yy, max(_y0, my0), min(_y1, my1)); _xm = np.minimum(_hc, mx1)
+        _old_edge = spl.ev(_hc, _yc) + tps(_xm, _yc) - spl.ev(_xm, _yc); _fy = np.clip(1 - np.maximum(_y0 - _yy, _yy - _y1) / 60, 0, 1)
+        _t = np.clip((np.abs(pts2[:, 0]) - mx1) / (_hw - mx1), 0, 1); _dz = _fy * _t * (_pv("top_z_of_y", _yc) - _old_edge); zt = zt + _dz
+        edge_rep["strip_beyond_dots_raised_mm"] = {"max": float(_dz.max()), "min": float(_dz.min()), "note": "top surface outside the dotted region tilted to meet the measured top arris at the outline"}
     ry, rz = np.array(SS["rim"]["y"]), np.array(SS["rim"]["z"]); s0, s1 = np.polyfit(ry[:15], rz[:15], 1)[0], np.polyfit(ry[-15:], rz[-15:], 1)[0]
     def rim_z(y): return np.where(y < ry[0], rz[0] + s0 * (y - ry[0]), np.where(y > ry[-1], rz[-1] + s1 * (y - ry[-1]), np.interp(y, ry, rz)))
     zrim = rim_z(pts2[:, 1]); wgt = np.ones(len(pts2))       # no rim lift: the edge strip beyond the dots is the shifted cloud surface
@@ -308,7 +329,21 @@ if _sp.exists():
 # rim: blend the surface to the rim line near the outline so the edge is clean (not inside the measured region)
 zt = wgt * zt + (1 - wgt) * np.maximum(zt, zedge - 2)
 zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")     # underside: NOT measured; this plane matched the lower edge in side photo 1507 by eye
-nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[pts2, zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
+xbm = pts2[:, 0].copy()
+if edge_rep:
+    # underside = the plane through the two measured bottom arrises (flat across: assumed); the side face leans under, so the underside is narrower than
+    # the top by the measured ratio at each y (front and back faces stay vertical)
+    zbm_old = zbm.copy(); zbm = np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], pts2[:, 1] - 250.0); _top = np.interp(pts2[:, 1], ys, half)
+    # bottom half-width: measured in the range; in front of it the measured straight line is carried on for 60 mm (in the level photo 1491 the bottom arris runs
+    # straight on to the front leg), never closer than 2 mm to the top outline; behind the range the ratio at its end is held
+    _bh = np.where(pts2[:, 1] > _y1, np.minimum(np.polyval(_E["bottom_half_width_of_y"]["poly_in_(y-250)"], np.minimum(pts2[:, 1], _y1 + 60) - 250.0), _top - 2.0),
+                   _top * _pv("bottom_half_width_of_y", pts2[:, 1]) / _pv("top_half_width_of_y", pts2[:, 1]))
+    xbm = pts2[:, 0] * _bh / _top
+    edge_rep["underside_moved_mm"] = {f"y{int(y)}": float(np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], y - 250.0) - (seat_z(y) + 4 - P("seat_edge_thickness"))) for y in (100, 300, 500)}
+    edge_rep["min_thickness_mm"] = float((zt - zbm).min()); _o = pts2[-len(outline):]; _s = (_o[:, 1] >= _y0) & (_o[:, 1] <= _y1)
+    edge_rep["model_top_at_outline_minus_measured_top_arris_z_mm"] = {"mean": float(np.mean((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "min": float(np.min((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "max": float(np.max((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s]))}
+    _r = _o[:, 0] > 0; _k = np.argsort(_o[_r, 1]); edge_rep["top_at_outline_by_y"] = {f"y{int(y)}": {"model_z": float(np.interp(y, _o[_r, 1][_k], zt[-len(outline):][_r][_k])), "measured_arris_z": float(_pv("top_z_of_y", y)), "half_width": float(_pv("top_half_width_of_y", y))} for y in (110, 160, 210, 260, 310, 360, 400)}
+nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, pts2[:, 1], zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
 nb = len(outline); base = nP - nb
 for i in range(nb):
     p, q = base + i, base + (i + 1) % nb; F += [[p, q, q + nP], [p, q + nP, p + nP]]
@@ -323,6 +358,10 @@ if seat_src:
     report["seat"]["underside"] = "assumed plane (z = 342 + 0.155 y - edge thickness); checked by eye against the lower edge in IMG_1507 only"
     _e = np.abs(np.abs(pts2[:, 0]) - 240) < 12
     report["seat"]["thickness_near_edge_mm"] = {f"y{int(y)}": float(np.median((zt - zbm)[_e & (np.abs(pts2[:, 1] - y) < 25)])) for y in (100, 300, 500)}
+if edge_rep:
+    report["seat"]["outline"] = "sides y %.0f-%.0f: triangulated top arris, L+R mean (+-1.5 mm); front, back and corners: cloud (98th percentile half-width per station; the front and back edges are straight in plan, their top follows the surface height)" % (_y0, _y1)
+    report["seat"]["underside"] = "plane through the two triangulated bottom arrises of the side edge (+-2.5 mm at the edge; flat across is ASSUMED, no measurement between them)"
+    report["seat"]["side_edge"] = edge_rep
 
 # ---------------------------------------------------------------- arms (plank from the cloud)
 ma = (Cm[:, 0] > 226) & (Cm[:, 0] < 345) & (Cm[:, 1] > 25) & (Cm[:, 1] < 545) & (Cm[:, 2] > 465 + 0.36 * Cm[:, 1]) & (Cm[:, 2] < 540 + 0.36 * Cm[:, 1])
