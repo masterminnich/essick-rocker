@@ -911,7 +911,9 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   `design` (PLAN ownership table).
 - MODEL v18 = main after #23: `tools/model.sh --out parts/model_v18`, identical to the trial build of the branch.
 - HUB HAND-OVER (Joe, this evening: "after it lands continue working unsupervised but do all the remaining work including
-  supervision in opus 5.5"): from here the hub role moves to a new session on Opus 5.5 (PLAN "Sessions and who owns what").
+  supervision in opus 5.5"): the hub could not start a new session itself (only Sean's sessions can). `HUB_HANDOFF.md` is the complete brief; until
+  Joe switches the hub session to Opus 5.5 or starts a new one from that file, the hub gives each remaining item to an
+  Opus 5.5 worker, one at a time (PLAN "Sessions and who owns what").
 - NEXT: Joe's item 3 (front-leg Domino centring on the leg face, `tools/domino_ortho.py`; `parts/dominos.json` is the
   joinery session's: small named edit), then the 3 mm question at the seat's right front corner, left-side scoop check, arm
   underside and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.
