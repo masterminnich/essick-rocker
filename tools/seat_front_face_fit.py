@@ -26,11 +26,26 @@ def line(path, ykey, zkey):
     return np.interp(xs, xo[ko], y[ko]), np.interp(xs, x[k], np.array(t[zkey])[k]), t
 
 
+# The bottom arris is solved as a thin tube (radius 1) and the tube's SPINE is its axis, 1 mm inside the outline the photos traced.
+# The arris itself is the point of the tube's section that the traces fix whatever the radius: the spine moved out by r along K,
+# where K is how far the spine moves in per mm of radius (the same traces solved with radius 4, face_bottom_radius_4, against radius 1).
+# Before PR #34 the design used the spine itself: the bottom arris sat 0.94 mm too high and 0.44 mm too far back.
+def spine_k(s):
+    a, b = (json.load(open(W / d / f"bottom{s}.json")) for d in ("face_bottom", "face_bottom_radius_4"))
+    g = lambda t, k: np.interp(xs, *zip(*sorted(zip(np.abs(t["x"]), t[k]))))
+    dr = g(b, "radius") - g(a, "radius")
+    return np.array([-np.mean((g(b, "spine_y") - g(a, "spine_y")) / dr), -np.mean((g(b, "spine_z") - g(a, "spine_z")) / dr)])
+K = {s: spine_k(s) for s in "RL"}
+
+
 def load(dt, db):
     o = {}
     for s in "RL":
         if dt: o["ty" + s], o["tz" + s], o["tt" + s] = line(W / dt / f"top{s}.json", "plan", "top_of_roll_z")
-        if db: o["by" + s], o["bz" + s], o["bt" + s] = line(W / db / f"bottom{s}.json", "spine_y", "spine_z")
+        if db:
+            o["by" + s], o["bz" + s], o["bt" + s] = line(W / db / f"bottom{s}.json", "spine_y", "spine_z")
+            r = np.interp(xs, *zip(*sorted(zip(np.abs(o["bt" + s]["x"]), o["bt" + s]["radius"]))))
+            o["by" + s] = o["by" + s] + r * K[s][0]; o["bz" + s] = o["bz" + s] + r * K[s][1]
     return o
 
 
@@ -87,7 +102,13 @@ out = {
                "top_of_roll_z_of_abs_x": tab(tz), "top_of_roll": {"provenance": "triangulated", "tol_mm": 1.5, "tol_note": "+-1.5 for |x| 70-250; +-3 on the pommel flanks |x| 8-70 (steep, the trace slides along the edge) and at the corner ends |x| > 250"},
                "roll_radius_mm": {"value": R, "provenance": "assumed", "note": "solved freely it wanders between 2 and 20 mm along the edge, differently left and right, and the fit is no better (rms 0.76/0.81 against 0.80/0.82); "
                                                                                  "the top height moves by about 1 mm and the plan outline by -1.3 / +1.2 mm for radius 4 / 12"},
-               "bottom_arris_y_of_abs_x": tab(by), "bottom_arris_z_of_abs_x": tab(bz), "bottom_arris": {"provenance": "triangulated", "tol_z_mm": 1.5, "tol_y_mm": 2.0},
+               "bottom_arris_y_of_abs_x": tab(by), "bottom_arris_z_of_abs_x": tab(bz), "bottom_arris": {"provenance": "triangulated", "tol_z_mm": 1.5, "tol_y_mm": 2.0,
+                                                                                            "from_tube": {"note": "the arris = the tube's spine moved out by its radius (1 mm) along k: per mm of radius, how far the solved spine moves in (radius 4 against 1, same traces). "
+                                                                                                                  "Before PR #34 the spine itself was used, 0.94 mm above and 0.44 mm behind the traced outline. Checked directly (PR #34, tools/seat_roll/strip.py + pick.py, "
+                                                                                                                  "figures/seat_roll/front_trace_vs_v23.json): on single front-above photos the wood's outline sat 1.14 and 1.30 mm beyond the old line in the two "
+                                                                                                                  "6 px/mm photos IMG_1496 and 1559 (expected: 0.94 plus PR #15's own per-photo residual medians there, 0.23 and 0.37), median 1.49 over 14 photos "
+                                                                                                                  "(quartiles 1.18-2.29; the high ones are 1526-1529, whose poses PR #15 already left out)",
+                                                                                                          "k_yz_right": [round(float(v), 3) for v in K["R"]], "k_yz_left": [round(float(v), 3) for v in K["L"]]}},
                "bottom_corner": {"abs_x": XC, "z": CORNER_BOTTOM_Z, "provenance": "fitted", "tol_mm": 3.0,
                                  "note": "beyond |x| 240 the bottom arris rounds up into the end of the front corner (D-shaped end face); the last point is read on the 5 mm grid of rectified IMG_1558 (397-400)"},
                "bottom_arris_z_of_abs_x_with_corner": [[float(x), round(float(z), 1)] for x, z in zip(xd, bzd)],
@@ -113,7 +134,7 @@ out = {
              "2-3 mm above the wood in the level photo IMG_1558 at x 180-230; the design top of the roll (left/right mean) happens to agree with the dots. Either the dots' heights or the right-hand "
              "rim are off by that much there; a tape reading of the table-to-rim height at one front corner (PLAN.md M9 is the same kind of reading, behind the leg) would settle it",
              "whether the face leans under by 1-2 mm in the hollows is below what the two lines can tell (+-2 each); modelled vertical",
-             "the bottom arris stands 2-3 mm above the plane through the two side bottom arrises carried forward (parts/seat_edge.json): the underside is not one flat plane up to the front, or the "
+             "the bottom arris stands 1.2-3.1 mm (mean 1.7) above the plane through the two side bottom arrises carried forward (parts/seat_edge.json): the underside is not one flat plane up to the front, or the "
              "side plane is off by that much at its front end (its own tolerance is +-2.5). The underside itself is still unmeasured (IMG_1570, 1572, 1573, 1576 not used yet)"]}
 E = json.load(open(ROOT / "parts/seat_edge.json"))["design"]; pl = np.polyval(E["bottom_z_of_y"]["poly_in_(y-250)"], by - 250.0)
 out["design"]["underside_at_front_vs_side_plane_mm"] = {"note": "measured bottom arris z minus the side-arris underside plane at the same y", **st(bz - pl), "abs_x_under_240": st((bz - pl)[xs < 240]), "at_abs_x": at(bz - pl)}
