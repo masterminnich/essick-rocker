@@ -1,0 +1,247 @@
+{
+ "about": "Turn of the two side slats (SLAT_L, SLAT_R) about their own length, measured directly from single photos. Added in model v24 (critique v23 item: side slats' inner front edge near the crest, +2.9 mm). Hub file; read by tools/build_model.py (slat block). Without this file the build makes flat (unturned) slats as before.",
+ "apply_in_build": false,
+ "apply_note": "false = measurement only: tools/build_model.py makes flat slats. The trial build with it applied (work/trial/v24, PR of 2026-11-21) passed the assembly check and improved the direct, pose-free held-out widths, but the critique's held-out edge medians did not confirm it as a whole (see LEDGER 2026-11-21); applying it is the hub's call.",
+ "convention": "turn_deg + = the slat's OUTER edge (the one away from the centre slat) FORWARD, i.e. the slat's face turns toward the middle of the chair. Rotation about the section's own centre line (width and thickness unchanged, the centre of the section stays where parts/slats.json puts it). SLAT_L is the mirror of SLAT_R, so one design value serves both. The centre slat is not turned.",
+ "design": {
+  "z_mm": [
+   375.0,
+   400.0,
+   425.0,
+   450.0,
+   475.0,
+   500.0,
+   525.0,
+   550.0,
+   575.0,
+   600.0,
+   625.0,
+   650.0,
+   675.0,
+   700.0,
+   725.0,
+   750.0,
+   775.0,
+   800.0,
+   825.0,
+   850.0,
+   875.0,
+   900.0,
+   925.0,
+   950.0,
+   975.0,
+   1000.0,
+   1025.0
+  ],
+  "turn_deg": [
+   7.15,
+   7.0,
+   6.85,
+   6.71,
+   6.56,
+   6.41,
+   6.26,
+   6.12,
+   5.97,
+   5.82,
+   5.67,
+   5.53,
+   5.38,
+   5.23,
+   5.08,
+   4.94,
+   4.79,
+   4.64,
+   4.49,
+   4.34,
+   4.2,
+   4.05,
+   3.9,
+   3.75,
+   3.61,
+   3.46,
+   3.31
+  ],
+  "fit": "turn_deg = 9.37 -0.591 x z_mm / 100 (straight line through the L/R band means, 1/se^2 weights)",
+  "slope_deg_per_100mm": -0.591,
+  "slope_se_deg_per_100mm": 0.145
+ },
+ "tolerance_deg": 1.5,
+ "tolerance_note": "+-1.5 deg covers the left/right disagreement about the line (rms of (L-R)/2 = 1.4 deg), the band means' scatter about the line (rms 1.1 deg) and the centre slat control (+0.6 deg). At the slat edge 1 deg = w/2 x 1 deg = 0.4 mm.",
+ "left": {
+  "z_mm": [
+   400.0,
+   500.0,
+   600.0,
+   700.0,
+   800.0,
+   900.0,
+   1000.0
+  ],
+  "turn_deg": [
+   1.74,
+   6.07,
+   6.13,
+   5.18,
+   4.4,
+   5.58,
+   5.45
+  ],
+  "se_deg": [
+   1.41,
+   0.39,
+   0.47,
+   0.72,
+   0.33,
+   0.33,
+   1.22
+  ],
+  "photos": [
+   9,
+   16,
+   20,
+   25,
+   27,
+   26,
+   17
+  ],
+  "width_fit_mm": [
+   40.7,
+   41.9,
+   44.0,
+   45.8,
+   48.2,
+   50.3,
+   52.7
+  ],
+  "width_model_v23_mm": [
+   39.8,
+   41.9,
+   43.6,
+   45.5,
+   47.8,
+   49.7,
+   52.3
+  ],
+  "thickness_fit_mm": [
+   11.1,
+   8.6,
+   8.6,
+   9.9,
+   8.8,
+   8.8,
+   7.6
+  ]
+ },
+ "right": {
+  "z_mm": [
+   400.0,
+   500.0,
+   600.0,
+   700.0,
+   800.0,
+   900.0,
+   1000.0
+  ],
+  "turn_deg": [
+   7.22,
+   7.25,
+   6.52,
+   5.37,
+   2.81,
+   4.69,
+   1.36
+  ],
+  "se_deg": [
+   3.48,
+   1.67,
+   0.63,
+   0.49,
+   0.63,
+   0.87,
+   1.32
+  ],
+  "photos": [
+   8,
+   14,
+   22,
+   22,
+   25,
+   25,
+   22
+  ],
+  "width_fit_mm": [
+   40.7,
+   41.5,
+   43.8,
+   44.9,
+   48.5,
+   50.2,
+   51.4
+  ],
+  "width_model_v23_mm": [
+   39.8,
+   41.9,
+   43.6,
+   45.5,
+   47.8,
+   50.3,
+   51.9
+  ],
+  "thickness_fit_mm": [
+   7.4,
+   9.8,
+   8.8,
+   9.8,
+   8.3,
+   8.3,
+   10.7
+  ]
+ },
+ "band_mean_deg": [
+  4.48,
+  6.66,
+  6.33,
+  5.27,
+  3.61,
+  5.14,
+  3.41
+ ],
+ "band_mean_se_deg": [
+  1.88,
+  0.86,
+  0.39,
+  0.44,
+  0.36,
+  0.46,
+  0.9
+ ],
+ "centre_control": {
+  "turn_deg": [
+   2.32,
+   1.27,
+   0.43,
+   -1.0,
+   1.6,
+   -0.08,
+   1.59
+  ],
+  "se_deg": [
+   1.13,
+   0.62,
+   0.27,
+   0.8,
+   1.0,
+   0.78,
+   0.72
+  ],
+  "weighted_mean_deg": 0.6,
+  "note": "the centre slat (sign: its right edge forward) fitted the same way; a flat slat should read 0. Its weighted mean is kept as the size of a possible method bias and is NOT subtracted (it is within 2 se of 0 and its sign convention is not the side slats' mirror-symmetric one)."
+ },
+ "method": "tools/slat_width/measure.py: per photo, slat and station (z 350-1025 every 25 mm) both silhouette edges of the slat read on ONE line across the slat, square to the line of sight, in the same photo (pose-free width W; 0.1 mm samples averaged over 3 mm along the slat; edge = colour moving toward the background, moved outward past a visible side face; checked by eye at 10 px/mm on single photos, native 1.7-2.4 px/mm). tools/slat_width/fit.py: W(alpha) = w|cos(alpha-th)| + t|sin(alpha-th)| fitted per 100 mm band over the 78 ranking photos (robust, 3.5 MAD rejection, bootstrap se over photos); the 15 held-out photos are only predicted. Eased arrises: the fit with rho = 2 mm and with t held at 8 or 10 mm moves the turn by under 1.5 deg (the turn is set by how W changes between photos looking from the left and from the right, which easing does not change); widths and thickness are NOT changed by this file.",
+ "source": {
+  "widths": "measurements/slat_widths_v23.npz (tools/py.sh -t 20 tools/slat_width/measure.py parts/model_v23.glb measurements/slat_widths_v23.npz)",
+  "fit": "measurements/slat_width_fit_v23.json",
+  "model": "parts/model_v23.glb"
+ }
+}
