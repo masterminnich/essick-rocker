@@ -918,7 +918,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   joinery session's: small named edit), then the 3 mm question at the seat's right front corner, left-side scoop check, arm
   underside and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.
 
-## 21:52 PST front-leg Domino centred on the leg face (PR #24); MODEL v19 on main
+## 21:49 PST front-leg Domino centred on the leg face (PR #24); MODEL v19 on main
 - FRONT-LEG DOMINO (Joe's item 3; PR #24, `tools/front_domino/`, figures `figures/front_domino/`). Run on Opus 5.5. Straightened
   orthophotos of each front leg's outer face (0.1 mm/px, sheared by the leg's lean 0.185 so the edges stand vertical); Domino
   end by a matched filter from eye seeds; arrises by the strongest tone step within 4 mm of a seed, in a band below and one
