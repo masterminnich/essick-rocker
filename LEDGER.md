@@ -941,3 +941,28 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   session: the arm/front-leg Domino's position depends on mesh sampling (5b), 0.2-0.4 mm jitter per rebuild of the leg.
 - NEXT: the 3 mm question at the seat's right front corner (LEDGER 17:33 and 19:05), then left-side scoop check, arm underside
   and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.
+
+## 22:07 PST seat front corners: the 3 mm question is L/R asymmetry (PR #25); no model change, main stays model v19
+- Run on Opus 5.5. `tools/seat_corner/` (sil.py -> aggregate.py -> fig_chart.py; cloud_check.py), figures
+  `figures/seat_corner/`, numbers `tools/seat_corner/data/`. Silhouette method: contour-generator edges of the v19 SEAT mesh
+  every 1 mm, outer contour only, top surface, unoccluded (depth raster of the other parts); the photo profiled along the image
+  normal; two edge readings (first departure from the wood colour, outermost strong gradient peak) must agree within 0.5 mm.
+  Corner region |x| 170-255, 0-40 mm behind the front edge, photos >= 2.2 px/mm.
+- RESULT (wood edge minus model, mm along the surface normal, - = model proud): right corner -2.61 (15 photos, sd 1.07);
+  left corner +1.00 (14 photos, sd 1.76); same photo right - left -3.91 median, -3.59 mean (10 photos, sd 1.49); same photo
+  mean of the sides -0.91 (sd 0.96). Zones: surface R -2.66 (8) / L +0.74 (4); roll R -2.19 (12) / L +1.21 (10); end R -0.65
+  (17) / L +0.57 (15). Eye checks at 10 px/mm on 1523, 1531, 1558, 1562, both sides. Not eye-checked: 1581 (both about -3.5),
+  1518/1521 (left +4.4/+2.9).
+- CAUSE: the real chair (or the main solve) has its right front corner 3.6-3.9 mm lower than the left, the same skew as
+  `parts/lr_skew.json`. Dense cloud, independent of the dots: R-L -3.2 to -3.6 at |x| 180-210, y 300-480. The model top is the
+  mirrored right-half tape dots, which sit near the left wood's height, so the model is about 1 mm above the L/R mean (inside
+  the 1.6 mm free-curve tolerance). The 1.85 mm sideways offset (19:05) explains only about 0.9 mm (model slope 0.25 mm/mm).
+  Confidence: high that it is asymmetry, not shape; medium on chair vs solve tilt.
+- DOUBT (seat/ frozen, not acted on): the seat-session dots sit about 2.6 mm above the main-solve right wood near the corner;
+  dots 103-105 on the roll sit +1.6 to +2.4 above the model.
+- SETTLE: M9 (PLAN 6b), table to the top of the seat's side edge behind the front leg, L and R. 3-4 mm lower on the right
+  = the chair is asymmetric, the model is the mean. Equal = the solve is tilted, the model is still within about 1 mm.
+- Left-side scoop (underside) check: NOT answered by this work. The centre (|x| < 170) can't be checked by silhouette: highlight
+  bands on the glossy roll fool the edge detector.
+- NEXT: left-side check of the seat scoop, arm underside and thickness (new file), rocker bottom edge u -330..572, seat side
+  edge behind y 400.

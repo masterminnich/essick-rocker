@@ -63,8 +63,9 @@ Phase 5b checklist:
   underside along the side edges (PR #20, model v16, `parts/seat_scoop.json`: square edge, hard line, 46 degree under-bevel
   scooped between the legs; right side measured, left assumed mirror; the close-ups IMG_1570-1576 turned out too badly
   registered to use; flat ACROSS is by reflection only) · [ ] **Joe's fix list of 19:00, next, in this order** (below) ·
-  [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33; now with a lead: the right side edge measures
-  2-3 mm outboard of the symmetric model along its whole length, LEDGER 19:05) · [ ] left-side check of the seat scoop ·
+  [x] the 3 mm question at the right front corner of the seat (PR #25, no model change: L/R asymmetry, not a model error;
+  same photo, right corner 3.9 mm lower than the left, 10 photos, sd 1.5; model 2.6 mm proud on the right, 1.0 inside on the
+  left, about 1 mm above the mean of the two sides, inside tolerance; M9 tells chair from solve tilt) · [ ] left-side check of the seat scoop ·
   [ ] arm underside and thickness (new file, not `parts/arms.json`) · [ ] rocker bottom edge traced directly (today it is the
   top edge minus a fitted face height; lead from PR #23: at u -320 the directly traced side face is 26.4 mm high on the left and
   26.0 on the right where the profile says 27.7, while at the nose old and new agree; the ends in `parts/rocker_ends.json` are
