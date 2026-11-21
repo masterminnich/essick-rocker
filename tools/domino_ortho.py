@@ -27,6 +27,6 @@ for leg in LEGS:
             col = int((g + 70) / 0.25); row = int((60 + VOFF - g) / 0.25)
             if 0 <= col < img.shape[1]: img[:, col] = (img[:, col] * 0.6 + np.array([0, 200, 255]) * 0.4 * (g % 50 == 0)).astype(img.dtype) if g % 50 == 0 else img[:, col]
             if 0 <= row < img.shape[0] and g % 50 == 0: img[row, :] = (img[row, :] * 0.6 + np.array([0, 200, 255]) * 0.4).astype(img.dtype)
-        cv2.imwrite(f"{out}/{leg}_{nm.replace('.JPG','')}.jpg", cv2.cvtColor(img, cv2.COLOR_RGB2BGR) if img.ndim == 3 else img)
+        cv2.imwrite(f"{out}/{leg}_{nm.replace('.JPG', '')}.jpg", img)   # ortho() returns BGR already
         rep[leg]["photos"].append([nm, round(float(ang), 1)])
 json.dump(rep, open(f"{out}/planes.json", "w"), indent=1); print(json.dumps(rep, indent=1))
