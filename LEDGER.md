@@ -1261,3 +1261,18 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   +2.4..+2.9.
 - PLAN: 6c done; M16 added (arm, rocker tail corners and bottom arris, one leg arris); hub row owns edge_radii; crest doubt note.
 - NEXT: Part 2 of the closing brief (HUB_HANDOFF rewrite, PLAN agreement, accuracy report, closing entry).
+
+## 2026-11-21 03:29 PST closing entry: hub's unattended work complete, model v24 (main 22ae914 + this entry)
+- RUN ON Opus 5.5 (hub). Main 22ae914 before this entry; model v24 (unchanged since PR #34). Tree clean. No open PRs.
+- Written: HUB_HANDOFF.md "State and what is left" (PR #24-#37 one line each with model number; waits-on-Joe list with the
+  model's current value per reading; joinery requests; frozen-file doubts; phase 7 inputs); PLAN hub row STATUS, phase 7 links
+  `reports/accuracy_v24.md` (new; table from `python3 -I tools/critique/accuracy.py`), Templates row PR #37 note.
+- WHO WAITS ON WHOM: the hub waits on Joe (slat turn yes/no; readings M1-M16 and the seat front corner) and on the joinery
+  session (back-leg foot, front-leg placement and top, right rocker placement, arm/front-leg Domino centre). The templates
+  session waits on the hub for the final parts (after the slat-turn answer and whichever readings Joe wants before sign-off).
+- NEXT: nothing for the hub until Joe answers or a reading arrives; then:
+  - slat turn YES: set `parts/slat_turn.json` apply_in_build true on a branch, tools/model.sh --out work/trial/v25, critique
+    rerun (ranking + 15 held-out), PR, v25 on main, Templates-row note. NO: note it in PLAN and here.
+  - a reading: compare with the model value in HUB_HANDOFF; if outside tolerance, fix the owning parts file on a branch, trial
+    build, critique, PR, next model number; if inside, tick it in PLAN as a check passed.
+  - a joinery change: trial-build main + its branch, critique, merge, next model number.
