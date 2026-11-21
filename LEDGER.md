@@ -707,3 +707,15 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   early); (e) rocker bottom edge traced directly; (f) seat side edge behind y 400; (g) register IMG_1588-1593 at half
   resolution. At the start of every turn: pull main, read open PRs and their comments, trial-build and merge what the joinery
   session left open, issue the next model number.
+
+## 17:52 PST seat mesh closed; model v13 (main, small fix)
+- The SEAT mesh had 28 open and 76 three-faced edges, all along the scalloped front top edge (audit PR #12: "not watertight").
+  Cause: tools/build_model.py kept a Delaunay triangle when its centroid was within 0.5 mm of the outline polygon; in the
+  hollows of the front edge Delaunay puts a thin fan of triangles OUTSIDE the outline, and part of that fan passed the test.
+  Fix: centroid strictly inside the polygon, zero-area triangles dropped.
+- Model v13: all 13 parts vertex-identical to v12; the seat has 48 fewer faces, is watertight with consistent winding, volume
+  8507 cm3. New in the report: parts.seat.mesh_closed, parts.seat.mesh_volume_cm3. --legacy still builds.
+- For the joinery session: the seat is a solid now, so tools/joinery.py's repair step has nothing to do and booleans on SEAT
+  work directly. `git merge main` to get it.
+- PLAN 5b: [x] SEAT mesh closed.
+- NEXT (hub): seat underside from IMG_1570/1572/1573/1576; arm underside and thickness; then the rest of the 17:45 list.

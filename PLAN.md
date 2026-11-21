@@ -56,7 +56,7 @@ Phase 5b checklist:
   · [ ] arm / front leg (round tenon or dowel), arm into back leg, crest to back legs, slat mortises · [ ] assembly check
   (`tools/audit_joints.py`) passing on every build.
 - Hub: [x] seat front face and bottom edge (PR #15, model v11) · [ ] arm underside and thickness (new file, not
-  `parts/arms.json`) · [ ] seat underside from IMG_1570-1576 · [ ] SEAT mesh closed (watertight) · [ ] rocker bottom edge
+  `parts/arms.json`) · [ ] seat underside from IMG_1570-1576 · [x] SEAT mesh closed (watertight; model v13) · [ ] rocker bottom edge
   traced directly (today it is the top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the
   back leg (today extrapolated) · [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33).
 

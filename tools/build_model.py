@@ -330,7 +330,10 @@ from shapely.geometry import Point
 ins = np.array([pg.contains(Point(p)) for p in np.c_[gx.ravel(), gy.ravel()]])
 if face_rep: ins &= (front_y(gx.ravel()) - gy.ravel()) > _rr + 5          # no grid points inside the roll
 pts2 = np.r_[np.c_[gx.ravel(), gy.ravel()][ins], roll_pts, outline]
-tri = Delaunay(pts2); cent = pts2[tri.simplices].mean(1); keep = np.array([pg.buffer(0.5).contains(Point(c)) for c in cent]); T = tri.simplices[keep]
+# keep the triangles inside the outline. The test is the centroid strictly inside the polygon: with a 0.5 mm allowance (as before) part of the thin fan Delaunay puts OUTSIDE a
+# hollow of the scalloped front edge was kept, which left open and three-faced edges there (the seat was not watertight, model audit PR #12)
+tri = Delaunay(pts2); _sx = pts2[tri.simplices]; cent = _sx.mean(1); _e1, _e2 = _sx[:, 1] - _sx[:, 0], _sx[:, 2] - _sx[:, 0]; _ar = 0.5 * np.abs(_e1[:, 0] * _e2[:, 1] - _e1[:, 1] * _e2[:, 0])
+keep = np.array([pg.contains(Point(c)) for c in cent]) & (_ar > 1e-6); T = tri.simplices[keep]
 zt = spl.ev(pts2[:, 0], pts2[:, 1]); zedge = seat_z(pts2[:, 1]) + 4
 dist = np.array([pg.exterior.distance(Point(p)) for p in pts2]); wgt = np.clip(dist / 25, 0, 1)
 seat_src = None; _sp = ROOT / "seat" / "surface.json"
@@ -404,12 +407,13 @@ nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, pts2[:, 1], zbm]]; F = lis
 nb = len(outline); base = nP - nb
 for i in range(nb):
     p, q = base + i, base + (i + 1) % nb; F += [[p, q, q + nP], [p, q + nP, p + nP]]
-seat = trimesh.Trimesh(V, np.array(F), process=True); seat.fix_normals(); meshes["SEAT"] = seat
+seat = trimesh.Trimesh(V, np.array(F), process=True); seat.fix_normals(); meshes["SEAT"] = seat; seat_closed = bool(seat.is_watertight and seat.is_winding_consistent)
 dish = float(((zrim if seat_src else zedge) - zt).max())
 report["seat"] = {"outline": "cloud (98th percentile half-width per station; front-edge scallops NOT modelled)", "surface": "cloud (polynomial surface even in x, mirrored L+R)",
                   "surface_fit_rms_mm": float(np.sqrt(np.mean(rs ** 2))), "n_surface_points": int(len(St)), "depth_y_mm": [y_back, y_front],
                   "half_width_mm": {"back": float(half[0]), "mid": float(half[len(half) // 2]), "front": float(half[-1])},
                   "max_scoop_below_rim_mm": dish, "rim_tilt_deg": float(np.degrees(np.arctan(0.155)))}
+report["seat"]["mesh_closed"] = seat_closed; report["seat"]["mesh_volume_cm3"] = float(abs(seat.volume)) / 1000.0 if seat_closed else None
 if seat_src:
     report["seat"].update(seat_src); report["seat"]["rim_tilt_deg"] = float(np.degrees(np.arctan(np.polyfit(ry, rz, 1)[0])))
     report["seat"]["underside"] = "assumed plane (z = 342 + 0.155 y - edge thickness); checked by eye against the lower edge in IMG_1507 only"
