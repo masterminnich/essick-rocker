@@ -290,6 +290,13 @@ if _ff.exists() and edge_rep and not a.legacy:
     front_rep = {"source": "parts/seat_front.json (rolled front edge traced in 8 overhead photos, tube solve, symmetric mean)", "tol_mm": _F["tol_mm"], "pommel_tip_y": float(front_y(0.0)), "hollow": _F["hollow"],
                  "corner": [_xcn, _ycn], "was": "straight line at y %.1f from corner to corner (half-width %.1f)" % (y_front_cloud, half_front_cloud),
                  "front_minus_old_straight_line_mm": {"pommel": float(front_y(0.0) - y_front_cloud), "hollow": float(_fxy[:, 1].min() - y_front_cloud), "corner": float(_ycn - y_front_cloud)}}
+# section of the front edge: measured (parts/seat_front_face.json, tools/seat_front_face_fit.py). The top edge is rolled over: the plan outline is the furthest-forward line of the roll,
+# its top sits one radius behind and one radius above. Three rows of points carry it (top of the roll, 45 degrees, plan outline = top of the front face); the bottom of the face is the measured bottom arris
+face_rep = None; _fc = ROOT / "parts/seat_front_face.json"; roll_pts = np.zeros((0, 2))
+if _fc.exists() and front_rep and not a.legacy:
+    _FD = json.load(open(_fc))["design"]; _rr = float(_FD["roll_radius_mm"]["value"]); _tz = np.array(_FD["top_of_roll_z_of_abs_x"]); _bzc = np.array(_FD["bottom_arris_z_of_abs_x_with_corner"])
+    _q = _rr * (1 - np.sin(np.pi / 4)); roll_pts = np.r_[np.c_[_xf, front_y(_xf) - _q], np.c_[_xf, front_y(_xf) - _rr]]
+    face_rep = {"source": "parts/seat_front_face.json (top of the rolled edge: 8 overhead + 6 level/low front photos in one tube solve; bottom arris: 9 front photos; symmetric mean)", "roll_radius_mm": _rr, "roll_radius_provenance": "assumed"}
 outline = np.r_[np.c_[half, ys], front_pts, np.c_[-half[::-1], ys[::-1]], np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]]
 # top surface (mirrored cloud), smooth bivariate spline on (|x|, y)
 St = S[S[:, 2] > seat_z(S[:, 1]) - 16]
@@ -308,7 +315,8 @@ spl = _S
 pg = Polygon(outline); gx, gy = np.meshgrid(np.arange(-290, 291, 10), np.arange(y_back, y_front + 1, 10))
 from shapely.geometry import Point
 ins = np.array([pg.contains(Point(p)) for p in np.c_[gx.ravel(), gy.ravel()]])
-pts2 = np.r_[np.c_[gx.ravel(), gy.ravel()][ins], outline]
+if face_rep: ins &= (front_y(gx.ravel()) - gy.ravel()) > _rr + 5          # no grid points inside the roll
+pts2 = np.r_[np.c_[gx.ravel(), gy.ravel()][ins], roll_pts, outline]
 tri = Delaunay(pts2); cent = pts2[tri.simplices].mean(1); keep = np.array([pg.buffer(0.5).contains(Point(c)) for c in cent]); T = tri.simplices[keep]
 zt = spl.ev(pts2[:, 0], pts2[:, 1]); zedge = seat_z(pts2[:, 1]) + 4
 dist = np.array([pg.exterior.distance(Point(p)) for p in pts2]); wgt = np.clip(dist / 25, 0, 1)
@@ -340,6 +348,18 @@ if _sp.exists():
                 "rim_z_mm": {f"y{int(y)}": float(rim_z(np.array([float(y)]))[0]) for y in (100, 200, 300, 400, 500)}}
 # rim: blend the surface to the rim line near the outline so the edge is clean (not inside the measured region)
 zt = wgt * zt + (1 - wgt) * np.maximum(zt, zedge - 2)
+if face_rep:
+    _nR = len(_xf); _iB = int(ins.sum()) + np.arange(_nR); _iC = _iB + _nR; _iF = len(pts2) - len(outline) + len(half) + np.arange(_nR); _px, _py = pts2[:, 0], pts2[:, 1]
+    # top of the roll: the surface is moved to the measured height on the line one radius behind the plan outline; the correction fades out over 30 mm behind that line.
+    # Outside the solved range (|x| under 8, over 262) the correction found at the end of the range is held
+    _k = (_xf >= _tz[0, 0]) & (_xf <= _tz[-1, 0]); _o = np.argsort(_xf[_k]); _dzin = (np.interp(_xf[_k], _tz[:, 0], _tz[:, 1]) - zt[_iC][_k])[_o]; _dzx = lambda x: np.interp(np.abs(x), _xf[_k][_o], _dzin)
+    _zc_before = zt[_iC].copy(); zt = zt + np.clip(1 - np.maximum(front_y(_px) - _rr - _py, 0) / 30.0, 0, 1) * _dzx(_px)
+    zt[_iB] = zt[_iC] - _q; zt[_iF] = zt[_iC] - _rr
+    # front corners: the corner point and the side arris just behind it come down with the roll (assumed: the horn's end is rounded over, not traced)
+    _so = np.arange(len(pts2) - len(outline), len(pts2)); _sd = np.setdiff1d(_so, _iF); _cd = _ycn - _py[_sd]; _cm = (_cd < 16) & (_py[_sd] > _y1)
+    zt[_sd[_cm]] -= _rr * (1 - _cd[_cm] / 16.0)
+    face_rep["top_of_roll_moved_mm"] = {"note": "measured top of the roll minus the surface the model had on that line (seat/surface.json carried to the edge)", "mean": float(_dzin.mean()), "min": float(_dzin.min()), "max": float(_dzin.max()),
+                                        "at_x": {f"x{int(round(x))}": float(_dzx(x)) for x in (8, 40, 80, 130, 180, 230, 260)}, "fades_out_over_mm_behind_the_roll": 30}
 zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")     # underside: NOT measured; this plane matched the lower edge in side photo 1507 by eye
 xbm = pts2[:, 0].copy()
 if edge_rep:
@@ -354,6 +374,15 @@ if edge_rep:
     if front_y is not None:      # the front face is vertical (tape dots on it sit on the plan outline within about 1 mm): the side lean fades out over the last 40 mm before the front edge
         _ratio = 1 + (_ratio - 1) * np.clip((front_y(pts2[:, 0]) - pts2[:, 1]) / 40.0, 0, 1)
     xbm = pts2[:, 0] * _ratio
+    if face_rep:
+        # bottom of the front face = the measured bottom arris. It stands 2-4 mm above the side-arris plane carried forward: the underside is raised by that much at the front, fading out
+        # over 60 mm behind the front edge (ASSUMED shape; the underside itself is not measured). Beyond |x| 240 the arris rounds up into the horn's end: that extra fades out over 25 mm
+        _fya = front_y(_px); _pl = np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], _fya - 250.0); _ax = np.abs(_px)
+        _g = np.interp(np.minimum(_ax, 240.0), _bzc[:, 0], _bzc[:, 1]) - np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], front_y(np.minimum(_ax, 240.0)) - 250.0)
+        _e = np.interp(_ax, _bzc[:, 0], _bzc[:, 1]) - _pl - _g; _back = _fya - _py
+        zbm = zbm + np.clip(1 - _back / 60.0, 0, 1) * _g + np.clip(1 - _back / 25.0, 0, 1) * np.where(_ax > 240, _e, 0.0)
+        face_rep["underside_raised_at_front_mm"] = {"note": "measured bottom arris minus the side-arris plane carried forward; fades out over 60 mm behind the front edge (assumed)", "min": float(_g[_iF].min()), "max": float(_g[_iF].max())}
+        face_rep["bottom_corner_extra_mm"] = {"note": "beyond |x| 240 the bottom arris rounds up into the end of the front corner; extra rise over the line above, fades out over 25 mm behind the front edge (assumed)", "at_corner": float(np.interp(_xcn, _bzc[:, 0], _bzc[:, 1]) - np.interp(240.0, _bzc[:, 0], _bzc[:, 1]))}
     edge_rep["underside_moved_mm"] = {f"y{int(y)}": float(np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], y - 250.0) - (seat_z(y) + 4 - P("seat_edge_thickness"))) for y in (100, 300, 500)}
     edge_rep["min_thickness_mm"] = float((zt - zbm).min()); _o = pts2[-len(outline):]; _s = (_o[:, 1] >= _y0) & (_o[:, 1] <= _y1)
     edge_rep["model_top_at_outline_minus_measured_top_arris_z_mm"] = {"mean": float(np.mean((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "min": float(np.min((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "max": float(np.max((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s]))}
@@ -382,6 +411,15 @@ if front_rep:
     front_rep["top_z_along_front_edge"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], _zf[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}
     front_rep["front_edge_height_top_to_underside_mm"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], (_zf - zbm[-len(outline):])[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}
     report["seat"]["front_edge"] = front_rep; report["seat"]["depth_y_mm"] = [y_back, y_front]
+if face_rep:
+    _k = np.argsort(_xf); _at = lambda v, x: float(np.interp(x, _xf[_k], v[_k])); _X = (0, 40, 80, 130, 180, 230, 260)
+    front_rep["top_z_along_front_edge"] = {f"x{x}": _at(zt[_iC], x) for x in _X}; front_rep["top_z_along_front_edge_was"] = {f"x{x}": _at(_zc_before, x) for x in _X}
+    front_rep["front_edge_height_top_to_underside_mm"] = {f"x{x}": _at(zt[_iC] - zbm[_iF], x) for x in _X}
+    face_rep["bottom_of_front_face_z"] = {f"x{x}": _at(zbm[_iF], x) for x in _X}; face_rep["top_of_front_face_z"] = {f"x{x}": _at(zt[_iF], x) for x in _X}
+    face_rep["face"] = "vertical (measured lean of the bottom arris against the top outline is within +-2 mm for |x| < 240)"; face_rep["min_height_of_flat_face_below_the_roll_mm"] = float((zt - zbm)[_iF].min())
+    _nf = np.setdiff1d(np.arange(len(pts2)), np.r_[_iF, _iB]); edge_rep["min_thickness_mm"] = float((zt - zbm)[_nf].min())
+    report["seat"]["outline"] = report["seat"]["outline"].replace("scalloped in plan;", "scalloped in plan, rolled over (radius %.0f assumed), top height and bottom arris triangulated (parts/seat_front_face.json);" % _rr)
+    report["seat"]["front_face"] = face_rep
 if edge_rep:
     report["seat"]["underside"] = "plane through the two triangulated bottom arrises of the side edge (+-2.5 mm at the edge; flat across is ASSUMED, no measurement between them)"
     report["seat"]["side_edge"] = edge_rep

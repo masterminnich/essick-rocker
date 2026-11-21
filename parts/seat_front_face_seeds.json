@@ -1,0 +1,676 @@
+[
+ {
+  "name": "bottomR",
+  "seed_photo": "1558",
+  "x": [
+   8,
+   262
+  ],
+  "r_fixed": 1,
+  "outward": [
+   0,
+   0.7,
+   -0.7
+  ],
+  "y_guess": [
+   [
+    0.0,
+    539.0
+   ],
+   [
+    10.0,
+    535.7
+   ],
+   [
+    20.0,
+    532.6
+   ],
+   [
+    30.0,
+    529.7
+   ],
+   [
+    40.0,
+    527.2
+   ],
+   [
+    50.0,
+    525.1
+   ],
+   [
+    60.0,
+    523.4
+   ],
+   [
+    70.0,
+    522.0
+   ],
+   [
+    80.0,
+    520.6
+   ],
+   [
+    90.0,
+    519.3
+   ],
+   [
+    100.0,
+    518.0
+   ],
+   [
+    110.0,
+    517.0
+   ],
+   [
+    120.0,
+    516.5
+   ],
+   [
+    130.0,
+    516.4
+   ],
+   [
+    140.0,
+    516.6
+   ],
+   [
+    150.0,
+    517.1
+   ],
+   [
+    160.0,
+    517.6
+   ],
+   [
+    170.0,
+    518.4
+   ],
+   [
+    180.0,
+    519.2
+   ],
+   [
+    190.0,
+    520.3
+   ],
+   [
+    200.0,
+    521.5
+   ],
+   [
+    210.0,
+    522.9
+   ],
+   [
+    220.0,
+    524.5
+   ],
+   [
+    230.0,
+    526.8
+   ],
+   [
+    240.0,
+    529.5
+   ],
+   [
+    250.0,
+    532.2
+   ],
+   [
+    260.0,
+    534.8
+   ]
+  ],
+  "seed": "8,382.5 50,382.5 100,381.5 150,381.5 200,382 240,384 250,386 260,389",
+  "photos": {
+   "1558": [
+    [
+     8,
+     100
+    ],
+    [
+     136,
+     262
+    ]
+   ],
+   "1559": [
+    [
+     8,
+     98
+    ],
+    [
+     136,
+     262
+    ]
+   ],
+   "1496": [
+    [
+     8,
+     95
+    ],
+    [
+     130,
+     262
+    ]
+   ],
+   "1562": [
+    [
+     8,
+     90
+    ],
+    [
+     120,
+     240
+    ]
+   ],
+   "1533": [
+    15,
+    185
+   ],
+   "1534": [
+    15,
+    190
+   ],
+   "1525": [
+    25,
+    140
+   ],
+   "1485": [
+    8,
+    235
+   ],
+   "1484": [
+    8,
+    235
+   ]
+  },
+  "r0": 1,
+  "band": 5,
+  "note": "bottom front arris of the seat, traced on the vertical front sheet work/parts/seatF/ff (tools/face_ortho.py --point 0 525 0 --normal 0 1 0 --u-axis 1 0 0 --urange -310 310 --vrange 330 450 --res 0.5). 1526 and 1527 left out: their traces sit on the wood but 1.2-2.0 mm below the line the other nine photos agree on, on both halves alike (camera pose, not the edge); variant with_1526_1527"
+ },
+ {
+  "name": "bottomL",
+  "seed_photo": "1558",
+  "x": [
+   -262,
+   -8
+  ],
+  "r_fixed": 1,
+  "outward": [
+   0,
+   0.7,
+   -0.7
+  ],
+  "y_guess": [
+   [
+    0.0,
+    539.0
+   ],
+   [
+    10.0,
+    535.7
+   ],
+   [
+    20.0,
+    532.6
+   ],
+   [
+    30.0,
+    529.7
+   ],
+   [
+    40.0,
+    527.2
+   ],
+   [
+    50.0,
+    525.1
+   ],
+   [
+    60.0,
+    523.4
+   ],
+   [
+    70.0,
+    522.0
+   ],
+   [
+    80.0,
+    520.6
+   ],
+   [
+    90.0,
+    519.3
+   ],
+   [
+    100.0,
+    518.0
+   ],
+   [
+    110.0,
+    517.0
+   ],
+   [
+    120.0,
+    516.5
+   ],
+   [
+    130.0,
+    516.4
+   ],
+   [
+    140.0,
+    516.6
+   ],
+   [
+    150.0,
+    517.1
+   ],
+   [
+    160.0,
+    517.6
+   ],
+   [
+    170.0,
+    518.4
+   ],
+   [
+    180.0,
+    519.2
+   ],
+   [
+    190.0,
+    520.3
+   ],
+   [
+    200.0,
+    521.5
+   ],
+   [
+    210.0,
+    522.9
+   ],
+   [
+    220.0,
+    524.5
+   ],
+   [
+    230.0,
+    526.8
+   ],
+   [
+    240.0,
+    529.5
+   ],
+   [
+    250.0,
+    532.2
+   ],
+   [
+    260.0,
+    534.8
+   ]
+  ],
+  "seed": "-8,384 -50,383.7 -100,383.3 -150,383 -200,383.7 -240,384.5 -255,387 -262,390.5",
+  "photos": {
+   "1558": [
+    [
+     -262,
+     -118
+    ],
+    [
+     -82,
+     -8
+    ]
+   ],
+   "1559": [
+    [
+     -262,
+     -106
+    ],
+    [
+     -70,
+     -8
+    ]
+   ],
+   "1496": [
+    [
+     -262,
+     -118
+    ],
+    [
+     -82,
+     -8
+    ]
+   ],
+   "1562": [
+    [
+     -240,
+     -120
+    ],
+    [
+     -90,
+     -8
+    ]
+   ],
+   "1533": [
+    [
+     -235,
+     -88
+    ],
+    [
+     -32,
+     -8
+    ]
+   ],
+   "1534": [
+    [
+     -235,
+     -88
+    ],
+    [
+     -32,
+     -8
+    ]
+   ],
+   "1525": [
+    -215,
+    -8
+   ],
+   "1485": [
+    -240,
+    -30
+   ],
+   "1484": [
+    -240,
+    -30
+   ]
+  },
+  "r0": 1,
+  "band": 5,
+  "note": "bottom front arris of the seat, traced on the vertical front sheet work/parts/seatF/ff (tools/face_ortho.py --point 0 525 0 --normal 0 1 0 --u-axis 1 0 0 --urange -310 310 --vrange 330 450 --res 0.5). 1526 and 1527 left out: their traces sit on the wood but 1.2-2.0 mm below the line the other nine photos agree on, on both halves alike (camera pose, not the edge); variant with_1526_1527"
+ },
+ {
+  "name": "topR",
+  "seed_photo": "1545",
+  "x": [
+   8,
+   262
+  ],
+  "seed": "6,541 10,539.5 20,534.7 40,525.8 60,519 80,513.3 100,510 120,508.3 140,508 160,510 180,512.8 200,517.5 220,525 235,532.5 250,538 262,542.5",
+  "photos": {
+   "1545": [
+    8,
+    262
+   ],
+   "1544": [
+    8,
+    262
+   ],
+   "1549": [
+    [
+     8,
+     96
+    ],
+    [
+     150,
+     262
+    ]
+   ],
+   "1548": [
+    8,
+    262
+   ],
+   "1547": [
+    8,
+    262
+   ],
+   "1539": [
+    8,
+    126
+   ],
+   "1538": [
+    8,
+    122
+   ],
+   "1537": [
+    8,
+    36
+   ],
+   "1558": [
+    8,
+    262
+   ],
+   "1562": [
+    8,
+    262
+   ],
+   "1531": [
+    30,
+    255
+   ],
+   "1530": [
+    45,
+    255
+   ],
+   "1523": [
+    55,
+    250
+   ],
+   "1524": [
+    50,
+    250
+   ]
+  },
+  "sheets": {
+   "1558": "work/parts/seatF/ff",
+   "1562": "work/parts/seatF/ff",
+   "1531": "work/parts/seatF/ff",
+   "1530": "work/parts/seatF/ff",
+   "1523": "work/parts/seatF/ff",
+   "1524": "work/parts/seatF/ff"
+  },
+  "init": "work/parts/seatF/tube/frontR.json",
+  "r0": 8,
+  "band": 5,
+  "note": "rolled TOP front edge, solved from both sides at once: the 8 overhead photos on the plan sheet work/parts/seatF/fp (as parts/seat_front_seeds.json) plus 6 level and low front photos on the vertical front sheet work/parts/seatF/ff. Run with PREFIX work/parts/seatF/fp. Start: plan position from the overhead-only solve (init), height from init_top_z = the top outline read by eye off the 10 mm grid on IMG_1558 (level, straight on). Radius 8 assumed: solved, it wanders between 2 and 20 mm with no better fit. 1486 and 1487 (15 and 26 degrees below the edge, 53-59 degrees to the side) left out: they look at the roll from about 40 degrees below in the section plane, where the section is not a circle (2-2.5 mm misfit); variant with_1486_1487",
+  "init_top_z": [
+   [
+    10,
+    424.3
+   ],
+   [
+    20,
+    421
+   ],
+   [
+    40,
+    414.6
+   ],
+   [
+    60,
+    409.6
+   ],
+   [
+    80,
+    406.4
+   ],
+   [
+    100,
+    404.3
+   ],
+   [
+    120,
+    403.9
+   ],
+   [
+    140,
+    404.9
+   ],
+   [
+    160,
+    406.7
+   ],
+   [
+    180,
+    409.6
+   ],
+   [
+    200,
+    413.1
+   ],
+   [
+    220,
+    417.4
+   ],
+   [
+    240,
+    421.7
+   ],
+   [
+    260,
+    425.3
+   ]
+  ],
+  "r_fixed": 8
+ },
+ {
+  "name": "topL",
+  "seed_photo": "1545",
+  "x": [
+   -262,
+   -8
+  ],
+  "seed": "-6,541 -10,538.3 -30,528.3 -50,521.3 -70,516.3 -90,512.8 -110,510.8 -130,510.3 -150,511.3 -170,514.2 -190,517.5 -210,521.3 -230,530 -250,538.3 -262,542.5",
+  "photos": {
+   "1545": [
+    -262,
+    -8
+   ],
+   "1544": [
+    -262,
+    -8
+   ],
+   "1539": [
+    -262,
+    -8
+   ],
+   "1538": [
+    -262,
+    -8
+   ],
+   "1537": [
+    -262,
+    -8
+   ],
+   "1549": [
+    -180,
+    -8
+   ],
+   "1548": [
+    -165,
+    -8
+   ],
+   "1547": [
+    -145,
+    -8
+   ],
+   "1558": [
+    -262,
+    -8
+   ],
+   "1562": [
+    -262,
+    -8
+   ],
+   "1531": [
+    -255,
+    -8
+   ],
+   "1530": [
+    -255,
+    -8
+   ],
+   "1523": [
+    -250,
+    -8
+   ],
+   "1524": [
+    -250,
+    -8
+   ]
+  },
+  "sheets": {
+   "1558": "work/parts/seatF/ff",
+   "1562": "work/parts/seatF/ff",
+   "1531": "work/parts/seatF/ff",
+   "1530": "work/parts/seatF/ff",
+   "1523": "work/parts/seatF/ff",
+   "1524": "work/parts/seatF/ff"
+  },
+  "init": "work/parts/seatF/tube/frontL.json",
+  "r0": 8,
+  "band": 5,
+  "note": "rolled TOP front edge, solved from both sides at once: the 8 overhead photos on the plan sheet work/parts/seatF/fp (as parts/seat_front_seeds.json) plus 6 level and low front photos on the vertical front sheet work/parts/seatF/ff. Run with PREFIX work/parts/seatF/fp. Start: plan position from the overhead-only solve (init), height from init_top_z = the top outline read by eye off the 10 mm grid on IMG_1558 (level, straight on). Radius 8 assumed: solved, it wanders between 2 and 20 mm with no better fit. 1486 and 1487 (15 and 26 degrees below the edge, 53-59 degrees to the side) left out: they look at the roll from about 40 degrees below in the section plane, where the section is not a circle (2-2.5 mm misfit); variant with_1486_1487",
+  "init_top_z": [
+   [
+    -260,
+    428.1
+   ],
+   [
+    -240,
+    426.1
+   ],
+   [
+    -220,
+    423.2
+   ],
+   [
+    -200,
+    418.4
+   ],
+   [
+    -180,
+    411.8
+   ],
+   [
+    -160,
+    407.3
+   ],
+   [
+    -140,
+    405.1
+   ],
+   [
+    -120,
+    404.7
+   ],
+   [
+    -100,
+    405.1
+   ],
+   [
+    -80,
+    406.2
+   ],
+   [
+    -60,
+    408.4
+   ],
+   [
+    -40,
+    412.1
+   ],
+   [
+    -20,
+    417.7
+   ],
+   [
+    -10,
+    421.5
+   ]
+  ],
+  "r_fixed": 8
+ }
+]

@@ -55,7 +55,8 @@ out = {
                "hollow": {"abs_x": float(xt[np.argmin(yt)]), "y": round(float(yt.min()), 1), "scallop_depth_from_tip_mm": round(float(tip_y - yt.min()), 1), "scallop_depth_from_corner_mm": round(float(yt[-1] - yt.min()), 1)},
                "corner": {"abs_x": XC, "y": round(float(yt[-1]), 1), "provenance": "fitted (outline carried 6 mm straight on to the side line x = 268; the corner reads at |u| 267-268 on the rectified photos 1545, 1544)", "tol_mm": 2.0},
                "provenance": "triangulated", "tol_mm": 2.0, "roll_radius_mm": {"value": 8.0, "provenance": "assumed", "note": "the photos cannot tell 4 from 16 mm (same residual); the outline moves by under 1 mm over that range"},
-               "face_below": "vertical within about 1 mm at the five tape dots on the front face (11-23 mm below the top); the model's front wall is vertical"},
+               "face_below": "vertical within about 1 mm at the five tape dots on the front face (11-23 mm below the top); the model's front wall is vertical. "
+                             "Heights of the top of the roll and the bottom arris of the face: parts/seat_front_face.json"},
     "checks": {"front_face_dots": {"note": "the seat session's dots on the front face (seat/front_face.csv), not used in the solve: on a vertical face they lie on the plan outline. 107 (on the horn, 35 mm below "
                                            "the top) and 108 (the pommel tip, used for the tip) are listed but not counted",
                                    "dots": face, "design_minus_dot_mm": st(fd), "design_minus_dot_rms_mm": round(float(np.sqrt(np.mean(fd ** 2))), 2), "right_outline_minus_dot_rms_mm": round(float(np.sqrt(np.mean(fr ** 2))), 2)},
@@ -64,8 +65,9 @@ out = {
     "open": ["depth is the weak direction of this solve (the overhead cameras look at the edge from 0-35 degrees round the roll): tying the roll's height to the measured seat surface instead of solving it "
              "moves the outline by up to 3 mm in places, and dropping the two steepest photos by up to 3 mm; hence tol 2 mm, not 1/16 inch",
              "right half beyond x 126 rests on two camera groups only (1545/1544 and 1549/1548/1547); the right arm hides it from 1539/1538/1537",
-             "the roll radius (8 mm) and the section of the front face are not measured; the front face's bottom edge and the front edge thickness (PLAN.md M1) are still unmeasured. "
-             "IMG_1539 shows a dark band outside the top edge on the right flank of the pommel (lower part of the front face, further forward than the top edge by a few mm): not measured",
+             "the roll radius (8 mm) is assumed. The front face's bottom arris and the height of the top of the roll are measured since in parts/seat_front_face.json (front edge 38 mm high "
+             "at the pommel flank, 21 mm in the hollows). The dark band IMG_1539 shows outside the top edge on the right flank of the pommel (about 5 mm wide) is NOT explained by it: the bottom arris "
+             "stands only 0-2.5 mm forward of the top edge there and that camera looks along the face (2 degrees from behind edge-on); still open",
              "pommel tip region |x| < 8 and the corners |x| > 262 are straight joins, not traced"]}
 json.dump(out, open(a.out, "w"), indent=1)
 k = np.arange(0, len(xs), 16)
