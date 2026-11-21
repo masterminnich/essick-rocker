@@ -602,18 +602,27 @@ report["crest"] = {"plan": "cloud (front/back extents per station, symmetric qua
 
 # ---------------------------------------------------------------- slats (traced in the unrolled back view)
 SLJ = json.load(open(ROOT / "parts/slats.json")); thick = float(SLJ["thickness_mm"]); ex60 = np.tile([1.0, 0, 0], (60, 1))
-def slat(sheet, lo_c, hi_c, sign=1.0):
-    """sheet = the slat's BACK face; the solid extends thick mm forward of it"""
+STJ = json.load(open(ROOT / "parts/slat_turn.json")) if (ROOT / "parts/slat_turn.json").exists() else None   # side slats' turn (hub file)
+def slat(sheet, lo_c, hi_c, sign=1.0, turn=None):
+    """sheet = the slat's BACK face; the solid extends thick mm forward of it. turn = (z, deg) table: the section turned about its own
+    centre line, + = the +x edge forward (SLAT_R's outer edge; SLAT_L is its mirror)"""
     zt_s, yt_s, st_s = sheet_tables(sheet); vs = np.linspace(8, min(st_s[-1] - 2, 742), 60); vcl = np.clip(vs, *SLJ["v_range"])
     zs, ys = np.interp(vs, st_s, zt_s), np.interp(vs, st_s, yt_s); ds = np.interp(vs, st_s, np.gradient(yt_s, zt_s)); nr = np.hypot(1, ds)
     nb = np.c_[np.zeros(len(vs)), -1 / nr, ds / nr]; lo, hi = np.polyval(lo_c, vcl) * sign, np.polyval(hi_c, vcl)
-    return sweep(np.c_[(lo + hi) / 2, ys, zs] - nb * thick / 2, ex60, nb, hi - lo, np.full(len(vs), thick)), (hi - lo)
+    ctr = np.c_[(lo + hi) / 2, ys, zs] - nb * thick / 2; ew, et = ex60, nb
+    if turn is not None:
+        th = np.radians(np.interp(zs, *turn))[:, None]; ew = np.cos(th) * ex60 - np.sin(th) * nb; et = np.sin(th) * ex60 + np.cos(th) * nb
+    return sweep(ctr, ew, et, hi - lo, np.full(len(vs), thick)), (hi - lo)
 SY = SLJ["symmetric"]
 meshes["SLAT_C"], wc_ = slat(SLJ["sheet_centre"], SY["centre_half"], SY["centre_half"], -1.0)
-meshes["SLAT_R"], wo_ = slat(SLJ["sheet_outer"], SY["outer_in"], SY["outer_out"]); meshes["SLAT_L"] = mirror(meshes["SLAT_R"])
+TRN = (STJ["design"]["z_mm"], STJ["design"]["turn_deg"]) if STJ and STJ.get("apply_in_build") else None    # measured; applied only when the hub sets apply_in_build
+meshes["SLAT_R"], wo_ = slat(SLJ["sheet_outer"], SY["outer_in"], SY["outer_out"], turn=TRN); meshes["SLAT_L"] = mirror(meshes["SLAT_R"])
 report["slats"] = {"edges": "fitted (unrolled back view, by-eye seeded edges, L+R averaged)", "surface": "back face located by photo consistency in 7 height bands, separately for centre and outer slats",
                    "thickness_mm": thick, "thickness_provenance": "front-face cloud layer vs photo-consistent back face (about 10 mm)",
-                   "centre_width_mm": {"near_seat": float(wc_[8]), "under_crest": float(wc_[-5])}, "outer_width_mm": {"near_seat": float(wo_[8]), "under_crest": float(wo_[-5])}}
+                   "centre_width_mm": {"near_seat": float(wc_[8]), "under_crest": float(wc_[-5])}, "outer_width_mm": {"near_seat": float(wo_[8]), "under_crest": float(wo_[-5])},
+                   "side_slat_turn": ({"source": "parts/slat_turn.json (design = left/right mean, straight line in z)", "convention": "+ = outer edge forward, about the section centre line",
+                                       "deg_at_z": {str(int(zz)): float(np.interp(zz, *TRN)) for zz in (400, 600, 800, 1000)}, "tolerance_deg": STJ["tolerance_deg"]}
+                                      if TRN else "none: flat slats" + (" (parts/slat_turn.json measured, apply_in_build false)" if STJ else ""))}
 
 # ---------------------------------------------------------------- crest rail and arms from the overhead photos (parts/crest.json, parts/arms.json)
 def grid_solid(top, bot, ns, nt):
