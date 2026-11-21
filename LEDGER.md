@@ -27,14 +27,16 @@ Sessions on this machine get cut off without warning; this file says where thing
 - [x] FIRST MODEL: tools/model.sh --out parts/model_v1 -> parts/model_v1.glb, _params.json (provenance per number), _edges.json.
       Check views: tools/overlay_sil.py (part outlines on photos) -> work/overlay_v1/sil_*.jpg.
 
-## Now (rewritten 17:45 PST, model v12; the list that stood here described model v1)
+## Now (rewritten 18:00 PST, model v14)
 - Phase 5b, known fixes and joinery, split between two sessions: PLAN.md, "Sessions and who owns what". Read it after every
   pull of main; it is the only channel between the sessions.
-- Hub's open 5b items (this session): [ ] arm underside and thickness (new file) · [ ] seat underside from IMG_1570-1576 ·
-  [ ] SEAT mesh closed · [ ] rocker bottom edge traced directly · [ ] seat side edge behind y 400 · [ ] 3 mm question at the
-  right front corner of the seat (17:33 entry).
-- Joinery session's 5b items: leg / seat joints with Dominos, legs on the rockers, arm / crest / slat joints, assembly check.
-  The hub does not work on those; it merges that session's PRs after a trial build and issues the next model number.
+- Model v14 is the first JOINED model: `tools/model.sh` builds the parts, cuts the joints (`tools/joinery.py`, PR #17) and
+  runs the assembly check; a number is issued only on PASS (PLAN rule 8).
+- Hub's open 5b items (this session): [ ] seat underside from IMG_1570-1576 (the photos show it is sculpted, not a plane) ·
+  [ ] arm underside and thickness (new file) · [ ] rocker bottom edge traced directly · [ ] seat side edge behind y 400 ·
+  [ ] 3 mm question at the right front corner of the seat (17:33 entry). Done: seat front face (v11), seat mesh closed (v13).
+- Joinery session's open item: arm / front leg round through-tenon or plug (IMG_1528). The hub does not work on joints; it
+  merges that session's PRs after a trial build and issues the next model number.
 
 ## Next
 - [ ] Phase 6 critique loop (per-part photo error, ~15% of photos held out) once 5b is done.
@@ -719,3 +721,27 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   work directly. `git merge main` to get it.
 - PLAN 5b: [x] SEAT mesh closed.
 - NEXT (hub): seat underside from IMG_1570/1572/1573/1576; arm underside and thickness; then the rest of the 17:45 list.
+
+## 18:00 PST joinery PR #17 landed; the build is now three steps; model v14 (main)
+- PR #17 (joinery session, squash 78dee09): `tools/joinery.py`, a step AFTER the build that cuts the joints into the finished
+  parts: front legs lapped on the seat edge with a through-Domino, back legs butted with the Domino across the joint, feet
+  carried 5 mm down and cut to the rocker tops, arm and crest coped to the legs, slat mortises in seat and crest. It also made
+  `tools/audit_joints.py` lighter (KD-tree distances; 1.5 GB peak, 25 s on v14).
+- Trial before merging (main 463eee1 + its branch 276ddcf): joinery on v13 ran in 1 s; ROCKER_L/R and the three slats came out
+  vertex-identical, every other part changed only at its joints; all 17 parts closed solids; overlay on IMG_1519 checked by eye.
+- Hub's integration: `tools/model.sh --out parts/model_vN` now runs build -> joinery -> assembly check and prints PASS / FAIL
+  through the new `tools/joints_gate.py` (every part a closed solid; each joint pair touching with at least 3 cm2 of contact
+  face and under 0.05 cm3 of overlap; arm / seat, slat / back leg, slat / slat clear by at least 5 mm).
+- FILES (new convention, PLAN rule 8): `parts/model_vN.glb` is the joined chair (what the viewer shows; 17 parts, four of them
+  new: DOMINO_FR, _FL, _BR, _BL). `parts/model_vN_shapes.glb` is the parts as traced, before the joints; compare versions on
+  that file. `_params.json` and `_edges.json` describe the shapes; `_joinery.json` lists every cut with the volume removed;
+  `_joints.json` is the assembly check. No `parts/*.json` format changed.
+- v14: shapes identical to v13 (byte-identical file). Assembly check PASS: 17 joint pairs in contact (contact faces 6.2 to
+  60.6 cm2, largest overlap 0.01 cm3 at the Dominos), 3 clearance pairs clear (28 to 134 mm). Seat loses 14.3 cm3 at each
+  front-leg lap and 56 cm3 at each back-leg butt.
+- Viewer: a 'Dominos' chip and labels added (viewer/app.js, viewer/cloud.js; two lines).
+- One oddity, not chased: the first run of the new model.sh reported 'assembly check failed to run' although the same command
+  passed by hand and on the rerun; the step logs now go to work/logs/ so the next occurrence can be read.
+- Told to the joinery session in a PR #17 comment: its report line 'seat mesh closed with pymeshfix' is now printed although
+  nothing is repaired (the seat is a solid since v13); and the four open points of its PR stay on its list.
+- NEXT (hub): seat underside from IMG_1570/1572/1573/1576; then arm underside and thickness; then the rest of the Now list.

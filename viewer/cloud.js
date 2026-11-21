@@ -11,7 +11,7 @@ const LAYERS = [                                    // key, label, drawn bigger?
 ]
 // diverging: rust (inside) — neutral grey — blue (outside). Midpoint is a mid grey so it still reads on the paper background.
 const C_IN = new THREE.Color('#c2410c'), C_MID = new THREE.Color('#9b968b'), C_OUT = new THREE.Color('#1d5fd6'), C_FAR = new THREE.Color('#cfc8b8')
-const SIDE = { L: 'left', R: 'right', C: 'centre' }
+const SIDE = { L: 'left', R: 'right', C: 'centre', FR: 'front right', FL: 'front left', BR: 'back right', BL: 'back left' }
 
 export function createCloud({ scene, request, $, onChange }) {
   const st = {
@@ -108,7 +108,7 @@ export function createCloud({ scene, request, $, onChange }) {
     return true
   }
   function label(name) {
-    const base = { ROCKER: 'Rocker', FLEG: 'Front leg', BLEG: 'Back leg', SEAT: 'Seat', ARM: 'Arm', CREST: 'Crest', SLAT: 'Slat' }
+    const base = { ROCKER: 'Rocker', FLEG: 'Front leg', BLEG: 'Back leg', SEAT: 'Seat', ARM: 'Arm', CREST: 'Crest', SLAT: 'Slat', DOMINO: 'Domino' }
     const [p, s] = String(name).split('_'); return `${base[p] || p}${s ? ` · ${SIDE[s] || s}` : ''}`
   }
 

@@ -50,11 +50,12 @@ other; **this section, PR descriptions and PR comments are the channel.** Read t
 | Viewer (finished) | `../rocking-chair-viewer` | `viewer/`; it finds the newest `parts/model_vN.glb` on main by itself |
 
 Phase 5b checklist:
-- Joinery session: [x] back leg as one continuous board (PR #14, landed with PR #16, model v12) · [ ] front legs lapped on the
+- Joinery session: [x] back leg as one continuous board (PR #14, landed with PR #16, model v12) · [x] front legs lapped on the
   outside of the seat edge with a through-Domino; back legs butted to the seat's side edge with the Domino across the joint
-  (PR #12 comment, `parts/dominos.json`: 10 mm Domino, 24 x 10 section) · [ ] legs seated on the rocker tops, outer faces flush
-  · [ ] arm / front leg (round tenon or dowel), arm into back leg, crest to back legs, slat mortises · [ ] assembly check
-  (`tools/audit_joints.py`) passing on every build.
+  (PR #17, model v14; `parts/dominos.json`: 10 mm Domino, 24 x 10 section) · [x] legs seated on the rocker tops (PR #17; the
+  feet still sit about 3 mm off the rocker faces in x, open) · [x] arm into back leg, crest to back legs, slat mortises (PR #17,
+  as contact faces or mortises; the hidden fasteners are not modelled) · [ ] arm / front leg round through-tenon or plug
+  (IMG_1528) · [x] assembly check passing on every build (v14 on: `tools/model.sh` runs it and prints PASS / FAIL).
 - Hub: [x] seat front face and bottom edge (PR #15, model v11) · [ ] arm underside and thickness (new file, not
   `parts/arms.json`) · [ ] seat underside from IMG_1570-1576 · [x] SEAT mesh closed (watertight; model v13) · [ ] rocker bottom edge
   traced directly (today it is the top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the
@@ -73,13 +74,18 @@ Rules:
    ask for a plan change: a PR comment, or Joe says so in the hub session.
 5. Before editing a block of `tools/build_model.py` that another session owns: say so first (PR comment, or LEDGER for the
    hub), keep the edit small, and name it in the PR body. Preferred instead: hand over DATA (a parts file) and let the owner
-   read it. Open interface: the cut of the seat's side edge at the back leg. The joinery session supplies the line where the
-   seat edge ends against the leg (plan, chair frame mm, left side; e.g. in `parts/dominos.json` or a new `parts/joints.json`)
-   and the hub applies it in the SEAT code; or it cuts the finished SEAT mesh in a separate, marked block after the seat is
-   built. Its choice, stated in its PR.
+   read it. The seat / leg interface is settled (PR #17): the joinery session cuts the finished parts in its own step AFTER
+   the build, `tools/joinery.py`, so neither session edits the other's block of `tools/build_model.py`.
 6. Existing `parts/*.json` formats stay stable; a format change is called out in the PR body and in LEDGER.md.
 7. Compute: one job at a time through `tools/safe_run.sh`; the lock is shared by every worktree. `work/` is shared scratch
    through symlinks: write only under your own subfolder (`work/audit`, ...), read the rest.
+8. **The build is three steps** (model v14 on), run by the hub as `tools/model.sh --out parts/model_vN`:
+   `tools/build_model.py` (the parts as traced; hub and joinery blocks) -> `parts/model_vN_shapes.glb`, `_params.json`,
+   `_edges.json`; `tools/joinery.py` (joinery session's file: the joints cut in, Domino bodies added) -> `parts/model_vN.glb`,
+   the chair, with `_joinery.json`; `tools/audit_joints.py` + `tools/joints_gate.py` (thresholds, hub's file) ->
+   `_joints.json` and PASS / FAIL. A model number is only issued on PASS. To try one part quickly:
+   `tools/model.sh --shapes-only --out work/<dir>/name`. Compare versions part by part on the `_shapes.glb` files (the joined
+   meshes are re-triangulated by the cuts). New part names in `model_vN.glb`: `DOMINO_FR`, `_FL`, `_BR`, `_BL`.
 
 ## Hand measurements (Joe, 2026-11-20: optional, small list; model work never blocks on them)
 Changed 17:45: Joe wants everything checked before FINAL templates, so the checks M1, M3, M4, M5, M9 and M11 sit in phase 6b,

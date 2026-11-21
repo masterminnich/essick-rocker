@@ -14,6 +14,7 @@ const AX = ['x', 'y', 'z']
 const PARTS = [                                                   // name prefix -> label, colour (no purple)
   ['ROCKER', 'Rockers', '#c2410c'], ['FLEG', 'Front legs', '#2f7d4f'], ['BLEG', 'Back legs', '#0f766e'],
   ['SEAT', 'Seat', '#ca8a04'], ['ARM', 'Arms', '#2563eb'], ['CREST', 'Crest', '#0e7490'], ['SLAT', 'Slats', '#9a3412'],
+  ['DOMINO', 'Dominos', '#d97706'],                                 // joint bodies, in models built with tools/joinery.py (v14 on)
 ]
 const VIEWS = {                                                   // square-on views: camera direction, screen up
   front: { dir: [0, 1, 0], up: [0, 0, 1], axis: 1, label: 'Front', h: ['x', -1], v: ['z', 1] },
