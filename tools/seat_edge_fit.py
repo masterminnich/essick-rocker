@@ -72,6 +72,7 @@ out = {
              "front edge, back edge and the corners outside y 110-400 are still the point cloud's outline",
              "top arris: the right edge solves 3-5 mm lower than the seat session's surface at |x| 251 while the left agrees within about 1 mm; the arris is a round-over, so the traced line sits "
              "at a slightly different place on it per side"]}
+if Path(a.out).exists() and "ends" in json.load(open(a.out)): out["ends"] = json.load(open(a.out))["ends"]   # kept: written by tools/seat_side_ends/write_ends.py
 json.dump(out, open(a.out, "w"), indent=1)
 print("design stations (y, top half-width, top z, bottom half-width, bottom z, edge height, lean under):")
 for s_ in out["design"]["stations"]: print("  ", *[f"{v:7.1f}" for v in s_.values()])
