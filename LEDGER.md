@@ -1112,7 +1112,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   edge's corner (`tools/seat_front_fit.py`); recorded in `ends.open`, not changed.
 - NEXT: register IMG_1588-1593 at half resolution if they add views the model lacks, then the phase 6 critique loop.
 
-## 2026-11-21 00:47 PST critique pass 1 (PR #31); NO model change, main stays model v22
+## 2026-11-21 00:44 PST critique pass 1 (PR #31); NO model change, main stays model v22
 - Hub: Opus 5.5, the calling hub's item 7 (phase 6 pass 1: measure and rank).
 - PART A, IMG_1588-1593 NOT registered: 1588-1592 are far digital-zoom shots (chair a third of the frame, ~1 px/mm vs 2-4 for
   the orbit) from directions the solved orbit already covers (front-left high, front, right-rear, far front); no new view of
