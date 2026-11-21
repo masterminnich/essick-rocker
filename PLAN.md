@@ -80,6 +80,20 @@ session's files. Joinery session: please do not start the same items; the hub ke
    to a round nose across the laminations). The model's rocker ends do not have these shapes. Rockers are the hub's part.
 3. [ ] **Front-leg Domino sits off-centre on the leg** (Joe's viewer screenshot of v15: the slot is to one side of the leg's
    width). Re-measure the slot's position on the leg face against the leg's two edges and centre it if the photos agree.
+4. [ ] **The seat's back edge is not modelled right** (Joe, 19:20: "the top, front and sides are pretty accurate but not the
+   back edge"; no hurry, but it is tied to item 1). Model v16: a straight back edge at y 10.8, 21 mm BEHIND the back legs'
+   rear faces, with a slanted corner that wraps behind each leg. Photos from behind (IMG_1502, 1513, 1578, 1620): the back edge
+   is flush with the leg's rear face where they meet (a Domino end lies flat across both) and bows backward toward the centre
+   line (cloud: rearmost y about 0-10 at the centre, 25-31 at |x| 160-200). Hub's part (`tools/build_model.py` SEAT). Trace the
+   top and bottom arris of the back edge from the behind and above photos; done BEFORE the rear Dominos land (the lower one
+   sits in that seam).
+
+Item 1, what the photos show (hub, 19:25; LEDGER 19:25): each back leg has THREE Domino ends, not two. (a) the one already
+modelled, on the leg's OUTER face at the seat (`DOMINO_BR/BL`, confirmed in IMG_1508); (b) on the leg's REAR face at seat
+height, across the seam between the leg's inner face and the seat's back edge, driven in from behind; (c) on the REAR face at
+arm height, centred on the leg's width: a Domino through the leg into the arm's end. (b) and (c) are the missing ones. All
+four rear ends were measured on photos that are already registered (IMG_1499-1503, 1513, 1578); IMG_1620 itself did not
+register and is not needed.
 
 Rules:
 1. **Model numbers come only from the hub, on main.** No branch commits `parts/model_v*`. After another session's PR lands

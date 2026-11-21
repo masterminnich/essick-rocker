@@ -807,3 +807,37 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   then 2 (rocker ends from the existing rocker face sheets plus IMG_1618/1619 for the shape), then 3 (front-leg Domino
   position against the leg's two edges). Then the 3 mm question, the left-side scoop check, arm underside, rocker bottom
   edge, seat edge behind y 400.
+
+## 19:25 PST back Dominos measured (three ends per back leg); the seat's back edge is wrong; IMG_1618-1620 did not register (branch back-dominos, nothing built yet)
+- JOE, 19:20: "it looks like the back of the seat isn't modeled correctly. The top, front, and sides are pretty accurate but
+  not the back edge (just noting something that you should handle at SOME point)". Added to PLAN.md as item 4 of Joe's list.
+- REGISTRATION: `tools/seat_register.py` (SIFT against the descriptor bank, PnP; no COLMAP) on IMG_1620, 1619, 1618: 0 inliers
+  each, all three FAILED (close-ups against a bank made from whole-chair photos). Not needed for item 1: the registered
+  photos from behind show every Domino end. Item 2 (rocker ends) needs another route.
+- NEW TOOL `tools/rear_ortho.py`: orthophotos of each back leg's REAR face in two windows (seat joint, arm joint), on the
+  plane fitted to the model leg's rear face there (fit 0.34-0.35 mm rms), 10 mm grid; writes the planes. Peak 588 MB, 4 s.
+- WHAT IS THERE (item 1): each back leg shows THREE Domino ends. (a) outer face at the seat: the one modelled (`DOMINO_B*`),
+  confirmed in IMG_1508. (b) REAR face at seat height, across the seam between the leg's inner face and the seat's back
+  edge. (c) REAR face at arm height, centred across the leg: through the leg into the arm's end.
+- (b) rear, at the seat. Visible end 24.5 x 10.5 mm on the left (IMG_1578 close-up and IMG_1501: tips at plane u +7.6/+31.3
+  and +7.5/+31.4, height 10.3-10.5), 24.8-26.8 x 9.9-10.0 on the right (its seat-side tip is dark on dark: soft). Level
+  within about 3 degrees. Leg-side tip, triangulated from 4 photos (left) and 3 (right), ray misses 0.16-0.71 mm:
+  L [-199.6, 33.7, 313.6], R [199.5, 32.9, 313.5]; 1.3 and 0.6 mm in front of the model leg's rear face. Seam (leg's inner
+  face / seat) read at u +22.2 on the left and -21.2 on the right, i.e. 14.5 mm (L) and 13.9 mm (R) of the Domino end is in
+  the leg, about 10 mm in the seat. With a 24 mm Domino: centre |x| 187.55, z 313.55, on the rear face.
+- (c) rear, at the arm. Visible end 23.5 mm (L) and 23.1 mm (R) tip to tip, 9.9-10.4 high: a 10 mm Domino. Tips triangulated
+  from 5-6 photos each (ray misses 0.27-1.17 mm, one 2.18): centres L [-210.6, -1.4, 476.9], R [212.0, 0.2, 476.7]. The model
+  leg's rear face is centred on x 211.2 there: the Domino is centred on the leg's width. Points sit -0.7..+1.7 mm off the
+  model's rear face. A Domino driven in square to that face (17.5 degrees up from level) comes out of the leg's front face at
+  z 492, the middle of the model arm's end (z 480-508 there): consistent with the arm as modelled.
+- LEG NOTE for the joinery session (their part, not changed): at seat height the seam leg / seat sits 3.4 mm (L) and 2.5 mm (R)
+  inboard of the model leg's inner face at the rear.
+- SEAT BACK EDGE (hub's part, WRONG in v16): model back edge straight at y 10.8 (cloud, 1st percentile), 21 mm behind the
+  leg's rear face (y 31.8 at z 322), with a slanted corner (-202.3, 10.8) -> (-210, 31.8) that wraps behind the leg. Photos:
+  the seat's back edge is flush with the leg's rear face at the joint (Domino (b) lies flat across both); cloud: rearmost y
+  about 0-10 near the centre line, 25-31 at |x| 160-200, so the edge bows backward in plan. To be traced (top and bottom
+  arris) before the rear Dominos are cut in.
+- NEXT: (1) seat back edge: rear sheet + plan sheet, tools/curve_tri.py, into `tools/build_model.py` SEAT (own PR);
+  (2) rear Dominos (b) and (c) in `parts/joints.json` + `tools/joinery.py` + the audit's pair list (small named edits; PR);
+  model v17; then items 2 and 3.
+
