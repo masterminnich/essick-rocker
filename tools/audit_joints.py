@@ -11,9 +11,9 @@ for k, g in G.items():
                        "bbox_min": g.bounds[0].round(1).tolist(), "bbox_max": g.bounds[1].round(1).tolist()}
 JOIN = [("ROCKER_R", "FLEG_R"), ("ROCKER_R", "BLEG_R"), ("FLEG_R", "SEAT"), ("BLEG_R", "SEAT"), ("FLEG_R", "ARM_R"), ("BLEG_R", "ARM_R"),
         ("BLEG_R", "CREST"), ("BLEG_L", "CREST"), ("SLAT_C", "SEAT"), ("SLAT_R", "SEAT"), ("SLAT_C", "CREST"), ("SLAT_R", "CREST"), ("SLAT_L", "CREST"),
-        ("ARM_R", "SEAT"), ("SLAT_R", "BLEG_R"), ("SLAT_C", "SLAT_R")]
+        ("ARM_R", "SEAT"), ("SLAT_R", "BLEG_R"), ("SLAT_C", "SLAT_R"), ("DOMINO_FR", "FLEG_R"), ("DOMINO_FR", "SEAT"), ("DOMINO_BR", "BLEG_R"), ("DOMINO_BR", "SEAT")]
 from trimesh.proximity import ProximityQuery
-for a_, b_ in JOIN:
+for a_, b_ in [p for p in JOIN if p[0] in G and p[1] in G]:
     A, B = G[a_], G[b_]; r = {}
     try:
         I = trimesh.boolean.intersection([A, B], engine="manifold"); r["overlap_cm3"] = round(float(abs(I.volume)) / 1000, 2) if len(I.vertices) else 0.0
@@ -21,12 +21,14 @@ for a_, b_ in JOIN:
     except Exception as e: r["overlap_err"] = str(e)[:80]
     # closest distance: sample A's surface, query B
     P, _ = trimesh.sample.sample_surface(A, 3000, seed=1)
+    # unsigned distance from a dense sample of B (KD-tree; light on memory), signed by an inside test when B is closed (+ inside B)
+    from scipy.spatial import cKDTree
+    Q, _ = trimesh.sample.sample_surface_even(B, 300000, radius=0.8, seed=1); d, _ = cKDTree(Q).query(P)
     if B.is_watertight:
-        d = ProximityQuery(B).signed_distance(P)  # + inside B
+        d = np.where(B.contains(P), d, -d)
         r["max_penetration_mm"] = round(float(max(d.max(), 0)), 1); r["min_gap_mm"] = round(float(max(-d.max(), 0)), 1)
-    else:   # open mesh (the seat): unsigned distance only
-        from scipy.spatial import cKDTree
-        Q, _ = trimesh.sample.sample_surface_even(B, 300000, radius=0.8, seed=1); d, _ = cKDTree(Q).query(P); r["min_dist_mm"] = round(float(d.min()), 1); r["note"] = f"{b_} is not watertight"
+    else:
+        r["min_dist_mm"] = round(float(d.min()), 1); r["note"] = f"{b_} is not watertight"
     r["area_within_1mm_cm2"] = round(float((np.abs(d) < 1.5).mean() * A.area / 100), 1)
     out["pairs"][f"{a_}~{b_}"] = r; print(a_, b_, r)
 for k, v in out["parts"].items(): print(k, v["watertight"], v["volume_cm3"], v["bbox_min"], v["bbox_max"])
