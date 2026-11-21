@@ -1241,3 +1241,23 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   1582 L from below reads the other way but mixes width with drop. VERDICT: within spread, L/R asymmetric; no change. M15 added.
 - PLAN: both items ticked with findings; M14, M15 added; NEXT hub fix 6c.
 - next: 6c edge radii: measure the easing / radius of the arrises from the photos where it can be told, as a measurement and a hub parts file, applied to the model only where measured; waiting on Joe: slat turn yes/no, seat front corner reading, M13, M12, M9, M8, M6; joinery-session requests and frozen-file doubts stay as requests
+
+## 2026-11-21 03:27 PST phase 6c edge radii: measured per family, record only, model stays v24 (PR #37)
+- RUN ON Opus 5.5 (hub). PR #37 squash-merged as 9ab044b. `parts/edge_radii.json` (new), `tools/edge_radii/` (rerun:
+  `tools/py.sh tools/edge_radii/run_all.py`, 0.3 GB, 6 s), `figures/edge_radii/`. No build, no critique rerun (no round qualified).
+- SILHOUETTE PAIRS FIRST (all 93 critique photos, pose-free: S = gap_a + gap_b = section misfit + r (k_a + k_b); 10903
+  pairs, 0.4 GB, 10 s): r per member -3.1..+4.1, se 0.6-3.2; the misfit dominates at 2 px/mm. Legs: FLEG 0.8 +-1.5, BLEG
+  0.3 +-1.0, held-out med |res| 0.83/0.87 and 0.86/0.88 with/without r: no gain. Bound only.
+- SINGLE PHOTOS (tape scale, tick.py refined on 2-16 periods; the first version read ~6 % high): tone bands B10 / blur, r in
+  [B10, 2 B10]: crest top rear 0.89 / 0.20 (1555, 15.23 px/mm) -> 0.9-1.8; crest bottom rear 1.08 / 0.26 -> 1.1-2.2; centre
+  slat edge 0.66 / 0.19 (1553, 15.93) -> 0.7-1.3; back leg rear outer 0.73 / 0.28, inner 0.36 / 0.61 (1556, 12.33) -> 0.7-1.5,
+  <= 1.2; front leg 0.57 / 0.53 (1495, 13.11) -> 0.6-1.1. Corners: rocker nose end face top-outer corner (1495, end-on,
+  14.3 +-10 % from the rocker width) R 0.30-0.31 = the blur -> top/outer arris SHARP; right rocker tail tip in plan (1493,
+  21.47) R 2.72-2.93, other corner 3.1-3.6 (soft). Pitfall: one pass had wood and background windows swapped on 4 profiles
+  (background lighting slope read as a 1.5-2 mm band); caught on the crops, rule now = wood is the grain-textured side.
+- EFFECT ON EXISTING VALUES (all below tolerance, no change): PR #32 easing part 0..-0.6 (was -0.8 +-1.6); PR #23 top edge
+  <= 0.3 low; tail tip square-across is 1.2 mm proud on each plan corner's diagonal (templates shaping note); M5 could be the
+  tape read at the flat face (2r = 1.3-2.6) but not proven; M13 unchanged; crest bottom doubt: a round explains <= 0.9 of
+  +2.4..+2.9.
+- PLAN: 6c done; M16 added (arm, rocker tail corners and bottom arris, one leg arris); hub row owns edge_radii; crest doubt note.
+- NEXT: Part 2 of the closing brief (HUB_HANDOFF rewrite, PLAN agreement, accuracy report, closing entry).
