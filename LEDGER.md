@@ -474,9 +474,9 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   - side face leans under by the measured amount; in front of y 400 the bottom line is carried straight on for 60 mm.
   - top surface between the dotted region (|x| 251) and the outline tilted to reach the measured top-arris height (the shifted
     cloud polynomial fell up to 5.7 mm short): model top at the outline minus measured arris +0.3 mean (-0.2..+1.9).
-  - mesh bug fixed (present since v1): the front wall's top edge was ONE straight line from corner to corner, bridging over the
+  - mesh bug fixed (also in v8): the front wall's top edge was ONE straight line from corner to corner, bridging over the
     thigh hollows of the measured surface. Front and back edges now have a point every 10 mm. This is what made the seat
-    outline look wrong from low viewpoints (Joe's question at 16:10); the measured surface itself was never changed.
+    outline look wrong from low viewpoints (Joe asked about it during this step); the measured surface itself was never changed.
   - overall box unchanged: 42.62 in high, 24.86 wide, 43.01 long.
 - CHECKED BY EYE on single photos (figures/seat_edge/):
   - plan traces on the rectified plan sheet: left on 1538, 1518, 1522, 1509; right on 1548, 1480, 1475, 1472: on the edge
@@ -484,12 +484,12 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   - side traces: left 1507, 1505, 1510 good except 1505 bottom at v > 300 (dark on dark); right 1491 and 1475 good; 1472 / 1470
     bottom line partly wood on wood where the far rocker passes behind (v 150-400), cannot be judged there.
   - raw lines and design lines projected into the ORIGINAL photos: IMG_1491 (right) and IMG_1507 (left): the raw lines sit on
-    both arrises; the design lines sit 1-3 mm off, above on the right and below on the left at the bottom arris, as the
-    left/right numbers say.
+    both arrises; the design lines sit a few mm off, above on the right and below on the left at the bottom arris, in the
+    sense the left/right numbers give (half of 2.7..7.1 mm).
   - v8 vs v9 outlines: 1507, 1491: bottom line was through the middle of the edge band, now on its lower edge; 1491, 1472,
     1538, 1548: the outline now follows the front hollows and the horizon of the seat.
 - STILL WRONG / OPEN on the seat: the front corners are square in the model and stick out past the front legs (the real corners
-  are rounded and notched at the leg); the front and back edges are straight in plan (cloud); the section of the edge face
+  are rounded); the front and back edges are straight in plan (cloud); the section of the edge face
   between the arrises is taken straight (its lower 12-17 mm reads darker in low photos, 4 mm in the high photo 1510: a reflection
   that moves with the camera, so the face curves under; not a third arris); underside between the bottom arrises unmeasured.
 - CORRECTION to PLAN.md: "no photo sees the underside" is wrong. IMG_1570, 1572, 1573, 1576 look up at it from close range
