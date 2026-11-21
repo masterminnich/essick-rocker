@@ -1169,7 +1169,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   edge at the slats, then the rocker top at the nose and tail, then the arm underside inner edge; the seat front corner waits
   for a reading; then 6c edge radii.
 
-## 2026-11-21 02:05 PST side slats' turn measured from the photos (PR #33), critique fix 2; NO model change, main stays model v23
+## 2026-11-21 01:56 PST side slats' turn measured from the photos (PR #33), critique fix 2; NO model change, main stays model v23
 - RUN ON Opus 5.5. Squash-merged as a68b60a. Measurement only: `parts/slat_turn.json` `apply_in_build` false, so the build is
   identical to v23 (checked: every part's vertices equal); no model_v24 and no critique_v24 (nothing to rerun).
 - MODELLED (v23): `parts/slats.json` sweeps a flat 10 mm (assumed, M4) rectangle along each back-face profile; edges by
