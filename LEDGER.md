@@ -1022,3 +1022,33 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   inside face at y ~150 and ~400 (the left inner arris, one photo).
 - NEXT: when joinery 5c lands, make `--arm-underside` the default and issue the next model number; then rocker bottom edge
   traced directly for u -330..572, seat side edge behind y 400, register IMG_1588-1593, then phase 6.
+
+## 23:20 PST model v21: the measured arm lands (PR #28); hub one-line edit in joinery 5c
+- Hub: Opus 5.5 (claude-opus-5-5), carrying out the calling hub's decision.
+- EDIT (named, joinery session's file): `tools/joinery.py` 5c `cut(BL, dom, ...)` -> `cut(BL, raw, ...)` for the back leg's rear
+  mortise (the seat / arm cut still uses `dom`). Reasons: 5c is the hub's own addition (PR #22); PLAN allows a small named edit;
+  the joinery worktree idle since 18:41 with nothing open; Joe asked for unattended progress. `tools/build_model.py`: the arm
+  from `parts/arm_underside.json` is the default, `--arm-slab` builds the old slab, `--arm-underside` removed.
+- CHECK (a) one-liner with v20 inputs (`--arm-slab`): `_shapes.glb` byte-identical to v20; joined 21 of 23 parts vertex-identical,
+  BLEG_L/R +0.006 / -0.068 cm3; new leg surface on v20's everywhere (max 0.00 L, 0.30 R at one point); v20's legs had 142 / 119
+  of 30k surface samples (up to 4.9 mm off) inside the rear-Domino footprint: zero-thickness films from the trimmed-body cut, now
+  gone. leg ∩ raw = leg ∩ dom for all four rear Dominos (RAR 9.813 / 9.814, RAL 9.814 / 9.820, RSR 2.402 / 2.334 (v20's 0.068
+  loss), RSL 2.405 / 2.406 cm3; bounds equal to 0.1 mm); raw outside leg ∪ arm only the 2 mm proud end (0.51 cm3, y -3.7..1.5):
+  no break-out. Gate PASS.
+- CHECK (b) measured arm vs v20: `_shapes.glb` only ARM_L/R (704.7 -> 682.4 cm3) and FLEG_L/R (top cut 621.9 -> 625.8, +3.1 to
+  3.2 cm3, z 618-628.7 only) change. Joined: ARM 693.6 -> 667.5 / 667.4, FLEG +3.1, BLEG as in (a), DOMINO_AR +3.40 z -1.64 y
+  -0.2 x, DOMINO_AL +3.35 z -2.05 y 1.9 inboard (sampled contact-face centroid; ASSUMED joint), DOMINO_RAR/RAL same volume to
+  0.001, a few points at the leg/arm seam move up to 1.2 mm; 13 parts vertex-identical. Built arm vs the file: within 0.12
+  (outer) / 0.14 mm (inner) from y 55 forward. Audit, right arm joints (overlap / pen / gap / area1mm): BLEG_R~ARM_R
+  0/1.3/0/12.4 -> 0/1.0/0/16.3; FLEG_R~ARM_R 0/0.5/0/7.8 -> 0/0.0/0/7.1; DOMINO_RAR~BLEG_R 0/2.1/0/32.2 -> 0/1.6/0/29.1;
+  DOMINO_RAR~ARM_R 21.1 -> 21.2; DOMINO_AR pairs unchanged; ARM_R~SEAT gap 140.6 -> 127.4; same 26 pairs, none failing.
+- FIGURES `figures/arm_underside/v21_overlay_R_1471.jpg`, `v21_overlay_L_1522.jpg` (drops read off the built glbs,
+  `tools/arm_underside/glb_drops.py`; `fig_overlay.py` DROPS=), `v21_joint_section.png` (`fig_joint_section.py`: x 211 / 203,
+  v20 shows the stray film line in BLEG_R, v21 clean). On IMG_1522 the left arm's line runs a little below the wood toward y 60:
+  design = L/R mean (left 1.0-1.4 thinner at y 150-250).
+- MODEL v21 = main after #28: `tools/model.sh --out parts/model_v21`, assembly check PASS; glb, _shapes, _params, _edges
+  byte-identical to the branch trial; `_joints.json` differs only in max_penetration_mm of three non-arm pairs (0.5/0.8,
+  1.1/1.3, 0.7/0.8: the audit's surface sampling), overlaps identical.
+- OPEN: M6 tape (arm outer-face thickness at y ~490 and ~70); the left inner arris (one photo); DOMINO_AL/AR differ by 1.7 mm in
+  |x| (joinery's 5b, noted in PLAN).
+- NEXT: rocker bottom edge traced directly for u -330..572, seat side edge behind y 400, register IMG_1588-1593, then phase 6.

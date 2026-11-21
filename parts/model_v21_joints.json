@@ -1,0 +1,748 @@
+{
+ "parts": {
+  "ROCKER_R": {
+   "watertight": true,
+   "volume_cm3": 945.5,
+   "bbox_min": [
+    105.4,
+    -484.8,
+    0.3
+   ],
+   "bbox_max": [
+    300.0,
+    626.2,
+    185.8
+   ]
+  },
+  "ROCKER_L": {
+   "watertight": true,
+   "volume_cm3": 945.5,
+   "bbox_min": [
+    -300.0,
+    -484.8,
+    0.3
+   ],
+   "bbox_max": [
+    -105.4,
+    626.2,
+    185.8
+   ]
+  },
+  "FLEG_R": {
+   "watertight": true,
+   "volume_cm3": 592.4,
+   "bbox_min": [
+    248.6,
+    423.3,
+    83.5
+   ],
+   "bbox_max": [
+    292.7,
+    565.1,
+    628.7
+   ]
+  },
+  "FLEG_L": {
+   "watertight": true,
+   "volume_cm3": 592.4,
+   "bbox_min": [
+    -292.7,
+    423.4,
+    85.1
+   ],
+   "bbox_max": [
+    -248.6,
+    565.1,
+    628.7
+   ]
+  },
+  "BLEG_R": {
+   "watertight": true,
+   "volume_cm3": 1512.4,
+   "bbox_min": [
+    173.3,
+    -177.0,
+    29.3
+   ],
+   "bbox_max": [
+    256.8,
+    84.3,
+    1068.3
+   ]
+  },
+  "BLEG_L": {
+   "watertight": true,
+   "volume_cm3": 1512.4,
+   "bbox_min": [
+    -256.8,
+    -177.0,
+    29.3
+   ],
+   "bbox_max": [
+    -173.3,
+    84.3,
+    1068.3
+   ]
+  },
+  "SEAT": {
+   "watertight": true,
+   "volume_cm3": 8352.0,
+   "bbox_min": [
+    -268.6,
+    -3.7,
+    290.0
+   ],
+   "bbox_max": [
+    268.6,
+    537.0,
+    428.9
+   ]
+  },
+  "ARM_R": {
+   "watertight": true,
+   "volume_cm3": 667.5,
+   "bbox_min": [
+    190.6,
+    40.0,
+    466.4
+   ],
+   "bbox_max": [
+    315.7,
+    503.9,
+    664.8
+   ]
+  },
+  "ARM_L": {
+   "watertight": true,
+   "volume_cm3": 667.4,
+   "bbox_min": [
+    -315.7,
+    40.0,
+    466.4
+   ],
+   "bbox_max": [
+    -190.6,
+    503.9,
+    664.8
+   ]
+  },
+  "CREST": {
+   "watertight": true,
+   "volume_cm3": 961.8,
+   "bbox_min": [
+    -220.4,
+    -198.5,
+    996.9
+   ],
+   "bbox_max": [
+    220.4,
+    -138.6,
+    1082.7
+   ]
+  },
+  "SLAT_C": {
+   "watertight": true,
+   "volume_cm3": 627.2,
+   "bbox_min": [
+    -50.6,
+    -185.0,
+    328.0
+   ],
+   "bbox_max": [
+    50.6,
+    57.8,
+    1025.8
+   ]
+  },
+  "SLAT_R": {
+   "watertight": true,
+   "volume_cm3": 334.7,
+   "bbox_min": [
+    67.0,
+    -181.6,
+    329.7
+   ],
+   "bbox_max": [
+    137.2,
+    64.6,
+    1026.0
+   ]
+  },
+  "SLAT_L": {
+   "watertight": true,
+   "volume_cm3": 334.7,
+   "bbox_min": [
+    -137.2,
+    -181.6,
+    329.7
+   ],
+   "bbox_max": [
+    -67.0,
+    64.6,
+    1026.0
+   ]
+  },
+  "DOMINO_FR": {
+   "watertight": true,
+   "volume_cm3": 11.7,
+   "bbox_min": [
+    230.5,
+    456.4,
+    388.0
+   ],
+   "bbox_max": [
+    285.0,
+    480.0,
+    401.6
+   ]
+  },
+  "DOMINO_BR": {
+   "watertight": true,
+   "volume_cm3": 5.5,
+   "bbox_min": [
+    200.3,
+    64.5,
+    317.2
+   ],
+   "bbox_max": [
+    225.9,
+    88.5,
+    328.4
+   ]
+  },
+  "DOMINO_FL": {
+   "watertight": true,
+   "volume_cm3": 11.7,
+   "bbox_min": [
+    -285.0,
+    456.4,
+    388.0
+   ],
+   "bbox_max": [
+    -230.5,
+    480.0,
+    401.6
+   ]
+  },
+  "DOMINO_BL": {
+   "watertight": true,
+   "volume_cm3": 5.5,
+   "bbox_min": [
+    -225.9,
+    64.5,
+    317.2
+   ],
+   "bbox_max": [
+    -200.3,
+    88.5,
+    328.4
+   ]
+  },
+  "DOMINO_AR": {
+   "watertight": true,
+   "volume_cm3": 8.7,
+   "bbox_min": [
+    262.9,
+    423.5,
+    599.2
+   ],
+   "bbox_max": [
+    273.4,
+    451.8,
+    641.6
+   ]
+  },
+  "DOMINO_AL": {
+   "watertight": true,
+   "volume_cm3": 8.7,
+   "bbox_min": [
+    -271.4,
+    422.7,
+    599.0
+   ],
+   "bbox_max": [
+    -260.8,
+    450.9,
+    641.4
+   ]
+  },
+  "DOMINO_RSR": {
+   "watertight": true,
+   "volume_cm3": 5.3,
+   "bbox_min": [
+    174.8,
+    30.3,
+    308.6
+   ],
+   "bbox_max": [
+    198.8,
+    57.7,
+    321.1
+   ]
+  },
+  "DOMINO_RAR": {
+   "watertight": true,
+   "volume_cm3": 15.3,
+   "bbox_min": [
+    199.2,
+    -1.4,
+    472.1
+   ],
+   "bbox_max": [
+    223.3,
+    68.6,
+    501.8
+   ]
+  },
+  "DOMINO_RSL": {
+   "watertight": true,
+   "volume_cm3": 5.3,
+   "bbox_min": [
+    -198.8,
+    30.4,
+    308.6
+   ],
+   "bbox_max": [
+    -174.8,
+    57.7,
+    321.1
+   ]
+  },
+  "DOMINO_RAL": {
+   "watertight": true,
+   "volume_cm3": 15.3,
+   "bbox_min": [
+    -223.3,
+    -1.4,
+    472.1
+   ],
+   "bbox_max": [
+    -199.2,
+    68.6,
+    501.8
+   ]
+  }
+ },
+ "pairs": {
+  "ROCKER_R~FLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     257.0,
+     532.0,
+     84.0
+    ],
+    [
+     291.0,
+     565.0,
+     99.0
+    ]
+   ],
+   "max_penetration_mm": 1.2,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 11.1
+  },
+  "ROCKER_R~BLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     177.0,
+     27.0,
+     29.0
+    ],
+    [
+     211.0,
+     67.0,
+     43.0
+    ]
+   ],
+   "max_penetration_mm": 0.8,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 15.1
+  },
+  "FLEG_R~SEAT": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     252.0,
+     446.0,
+     368.0
+    ],
+    [
+     268.0,
+     496.0,
+     421.0
+    ]
+   ],
+   "max_penetration_mm": 1.2,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 36.3
+  },
+  "BLEG_R~SEAT": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     187.0,
+     33.0,
+     295.0
+    ],
+    [
+     225.0,
+     83.0,
+     344.0
+    ]
+   ],
+   "max_penetration_mm": 1.3,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 32.0
+  },
+  "FLEG_R~ARM_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     252.0,
+     423.0,
+     621.0
+    ],
+    [
+     284.0,
+     452.0,
+     629.0
+    ]
+   ],
+   "max_penetration_mm": -0.0,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 7.1
+  },
+  "BLEG_R~ARM_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     191.0,
+     40.0,
+     466.0
+    ],
+    [
+     228.0,
+     51.0,
+     499.0
+    ]
+   ],
+   "max_penetration_mm": 1.0,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 16.3
+  },
+  "BLEG_R~CREST": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     216.0,
+     -177.0,
+     997.0
+    ],
+    [
+     220.0,
+     -140.0,
+     1068.0
+    ]
+   ],
+   "max_penetration_mm": 1.0,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 26.4
+  },
+  "BLEG_L~CREST": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     -220.0,
+     -177.0,
+     998.0
+    ],
+    [
+     -216.0,
+     -140.0,
+     1068.0
+    ]
+   ],
+   "max_penetration_mm": 1.2,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 22.4
+  },
+  "SLAT_C~SEAT": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     -38.0,
+     47.0,
+     328.0
+    ],
+    [
+     38.0,
+     58.0,
+     334.0
+    ]
+   ],
+   "max_penetration_mm": 0.7,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 12.8
+  },
+  "SLAT_R~SEAT": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     68.0,
+     53.0,
+     330.0
+    ],
+    [
+     108.0,
+     65.0,
+     338.0
+    ]
+   ],
+   "max_penetration_mm": 0.8,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 8.0
+  },
+  "SLAT_C~CREST": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     -51.0,
+     -179.0,
+     1004.0
+    ],
+    [
+     51.0,
+     -165.0,
+     1015.0
+    ]
+   ],
+   "max_penetration_mm": 1.4,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 60.6
+  },
+  "SLAT_R~CREST": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     84.0,
+     -175.0,
+     1003.0
+    ],
+    [
+     137.0,
+     -161.0,
+     1015.0
+    ]
+   ],
+   "max_penetration_mm": 1.3,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 36.3
+  },
+  "SLAT_L~CREST": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     -137.0,
+     -182.0,
+     1003.0
+    ],
+    [
+     -84.0,
+     -161.0,
+     1026.0
+    ]
+   ],
+   "max_penetration_mm": 1.4,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 35.8
+  },
+  "ARM_R~SEAT": {
+   "overlap_cm3": 0.0,
+   "max_penetration_mm": 0.0,
+   "min_gap_mm": 127.4,
+   "area_within_1mm_cm2": 0.0
+  },
+  "SLAT_R~BLEG_R": {
+   "overlap_cm3": 0.0,
+   "max_penetration_mm": 0.0,
+   "min_gap_mm": 79.2,
+   "area_within_1mm_cm2": 0.0
+  },
+  "SLAT_C~SLAT_R": {
+   "overlap_cm3": 0.0,
+   "max_penetration_mm": 0.0,
+   "min_gap_mm": 28.1,
+   "area_within_1mm_cm2": 0.0
+  },
+  "DOMINO_FR~FLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     254.0,
+     457.0,
+     388.0
+    ],
+    [
+     285.0,
+     480.0,
+     398.0
+    ]
+   ],
+   "max_penetration_mm": 1.6,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 19.1
+  },
+  "DOMINO_FR~SEAT": {
+   "overlap_cm3": 0.0,
+   "max_penetration_mm": 1.0,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 18.0
+  },
+  "DOMINO_BR~BLEG_R": {
+   "overlap_cm3": 0.01,
+   "overlap_bbox": [
+    [
+     200.0,
+     65.0,
+     317.0
+    ],
+    [
+     225.0,
+     81.0,
+     328.0
+    ]
+   ],
+   "max_penetration_mm": 1.5,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 14.5
+  },
+  "DOMINO_BR~SEAT": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     200.0,
+     80.0,
+     318.0
+    ],
+    [
+     226.0,
+     88.0,
+     328.0
+    ]
+   ],
+   "max_penetration_mm": 0.6,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 8.0
+  },
+  "DOMINO_AR~FLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     263.0,
+     425.0,
+     599.0
+    ],
+    [
+     273.0,
+     452.0,
+     628.0
+    ]
+   ],
+   "max_penetration_mm": 1.7,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 17.5
+  },
+  "DOMINO_AR~ARM_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     263.0,
+     424.0,
+     622.0
+    ],
+    [
+     273.0,
+     449.0,
+     642.0
+    ]
+   ],
+   "max_penetration_mm": 1.8,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 11.6
+  },
+  "DOMINO_RSR~BLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     188.0,
+     32.0,
+     309.0
+    ],
+    [
+     199.0,
+     58.0,
+     321.0
+    ]
+   ],
+   "max_penetration_mm": 1.5,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 8.8
+  },
+  "DOMINO_RSR~SEAT": {
+   "overlap_cm3": 0.01,
+   "overlap_bbox": [
+    [
+     175.0,
+     30.0,
+     309.0
+    ],
+    [
+     188.0,
+     58.0,
+     321.0
+    ]
+   ],
+   "max_penetration_mm": 1.6,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 11.3
+  },
+  "DOMINO_RAR~BLEG_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     199.0,
+     -1.0,
+     472.0
+    ],
+    [
+     223.0,
+     45.0,
+     495.0
+    ]
+   ],
+   "max_penetration_mm": 1.6,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 29.1
+  },
+  "DOMINO_RAR~ARM_R": {
+   "overlap_cm3": 0.0,
+   "overlap_bbox": [
+    [
+     199.0,
+     41.0,
+     485.0
+    ],
+    [
+     223.0,
+     69.0,
+     502.0
+    ]
+   ],
+   "max_penetration_mm": 1.9,
+   "min_gap_mm": 0.0,
+   "area_within_1mm_cm2": 21.2
+  }
+ }
+}
