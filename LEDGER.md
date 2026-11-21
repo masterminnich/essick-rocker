@@ -1111,3 +1111,31 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   does not seem to (agrees with PR #25's 1518/1521). The right side did not solve (traces jump at the leg). It is the front
   edge's corner (`tools/seat_front_fit.py`); recorded in `ends.open`, not changed.
 - NEXT: register IMG_1588-1593 at half resolution if they add views the model lacks, then the phase 6 critique loop.
+
+## 2026-11-21 00:47 PST critique pass 1 (PR #31); NO model change, main stays model v22
+- Hub: Opus 5.5, the calling hub's item 7 (phase 6 pass 1: measure and rank).
+- PART A, IMG_1588-1593 NOT registered: 1588-1592 are far digital-zoom shots (chair a third of the frame, ~1 px/mm vs 2-4 for
+  the orbit) from directions the solved orbit already covers (front-left high, front, right-rear, far front); no new view of
+  any part. 1593 is a tape close-up across the seat front: a reading, not a view. Closed in PLAN.
+- METHOD (`tools/critique/`): per solved photo, one decoded at a time, a painter's render of the joined v22 (part id + depth,
+  half res, all 23 parts as occluders); each wooden part's silhouette and visible sharp edges (> 30 deg) every 3 mm, kept where
+  the render is clean (own part inside, background 1.0-5.5 mm outside; not oblique < 25 deg, >= 1.5 px/mm, band not within 4 mm
+  of the table); wood edge along the outward normal in Lab, -5..+5 mm at 0.1 mm, sub-pixel, colour must move away from the
+  part's own wood colour; reject contrast < 10, second peak >= 0.7, band end. Gap + = model outside the wood. 93 photos, 99 s,
+  peak 0.88 GB, 2.25 M candidates, 0.39 M measured. Stats: median over photos per region (member x edge x 50 mm stretch) and
+  side; symmetric (L+R)/2 ranked, antisymmetric reported; tolerance 0.8 joints / 1.6 free; silhouettes only; 15 photos held
+  out (`tools/critique/holdout.json`, fixed). Table rule added after the first run read the rocker contact shadow as -2.
+- SANITY: (1) arm underside outer y 200-350 -0.16..+0.13 (anti +2.1..+2.8, the known lean); rocker bottom outer y -500..50
+  median -0.48; rocker ends +0.3..+0.7 tail, -1.27 nose [held -0.20]; seat side top y 50-400 -1.44..+0.93. (2) shift test:
+  ARM_R +2 z -> 0.995 (sil, 856 pts, residual -0.01 +- 0.05), ROCKER_R +2 x -> 0.980 (6616 pts, -0.03 +- 0.09); LSQ slope
+  0.67-0.82 from 6-16% re-snapped points, hence medians. (3) by eye, six crops at 10 px/mm (native 2.4-4): back-leg foot
+  both edges proud, front leg displaced (one edge +, one -), rocker inner face in shade (pose error visible), crest bottom
+  4 points only; arm underside and rocker bottom within ~0.5.
+- RANKED (sym [held]): back-leg foot +2.1..+4.1 [+2.3..+3.5] joinery; rocker inner face bottom -3.1 [-3.2] / top -2.0
+  [-2.0] hub (rocker ~33-34 thick?); front leg ~2 mm forward z 150-600, back edge -2.7 [-3.5] joinery placement; crest bottom
+  +2.4..+2.9 [+1.0] frozen doubt; side slats inner front +1.7..+2.9 hub; seat front corner (PR #30 lead) -3.3 right only
+  [-1.3], top -1.2: not settled, needs a tape reading; arm top at back leg -2.5 frozen doubt. List with owners in PLAN phase 6.
+- CANNOT SEE: seat front roll from the front (0 of 40,540), seat sides at the legs, joints (feet, leg tops, slat and crest
+  ends, arm ends), crest front face, faces seen flat-on, rocker flat middle, shadowed underside; creases not ranked.
+- NEXT: rocker inner face (hub): read the rocker's thickness across (IMG_1618/1619 end views or calipers); if 33-34 mm, widen
+  the rocker block inward in `tools/build_model.py`, build model v23, rerun `tools/critique/` and compare items 5 and 14.

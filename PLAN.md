@@ -29,6 +29,32 @@
 6. Critique loop: project the model into every photo through the solved cameras; measure the edge gap per part; fix the worst;
    repeat, until every part is inside 1/32" at joints and hard points and 1/16" on free curves. ~15% of photos are held out
    for validation only. Joints are mostly hidden, so they are checked by the assembly audit (`tools/audit_joints.py`), not here.
+   **Pass 1 done (PR #31, model v22, no model change):** `tools/critique/` (rerun: its README), `reports/critique_v22.md` / `.json`,
+   `figures/critique/`; 15 of 93 photos held out (`tools/critique/holdout.json`, fixed); sign + = model outside the wood;
+   shift test recovers a 2 mm move at 0.98-1.0. Ranked fix list from it (symmetric gap; held-out value in brackets):
+   - Hub, in order of size:
+     - [ ] rocker inner face 2-3 mm inside the wood, top and bottom edges (bottom -3.1 [-3.2], top -2.0 [-2.0]; the outer face
+       fits): the rocker is likely 33-34 mm thick, not 31. Check thickness across first (calipers, or the end photos IMG_1618/1619),
+       then widen the rocker block inward in `tools/build_model.py` (`parts/rocker_profile.json` unchanged).
+     - [ ] seat front corner in front of the front leg (PR #30's `ends.open`; outer side y 500-550 -3.3 right only, 7 photos [-1.3];
+       corner top -1.2, within tolerance): not settled by the photos; a tape / profile-gauge reading at y 500-530 decides it.
+     - [ ] side slats' inner front edge +1.7..+2.9 (z 450-1000, worst at the top [+1.3..+3.0]): slats narrower or turned more near
+       the crest than modelled.
+     - [ ] seat roll underside edge -2.2..-2.5 (x 0-50, 200-250 [-3.8]) and seat top back edge at the slats +1.8 [+1.4].
+     - [ ] rocker top at the nose (y 450-650, -2.1) and tail (y -500..-350, +2.0); arm underside inner edge +1.1..+1.4
+       (`parts/arm_underside.json`).
+   - Requests to the joinery session (its files; not fixed by the hub):
+     - [ ] back-leg foot (z 0-100) +2.1..+4.1 on every edge [+2.3..+3.5]: the real foot is about 3 mm narrower than the model
+       (`figures/critique/top_back_leg_foot_IMG_1503.jpg`).
+     - [ ] front leg sits about 2 mm forward of the wood at z 150-600 (back edge -2.7 [-3.5], front edge +1.6..+2.6): leg
+       placement or tilt; if the placement is right, the hub's front-leg outline is next.
+     - [ ] front-leg top at the arm +3.2 (right only) / +1.5; front-leg foot -2.3..-2.9 (right only); back leg z 150-400 +1.9..+2.1.
+   - Doubts on frozen files (fix, if ever, through a new hub file):
+     - [ ] crest bottom edges +2.4..+2.9 [+1.0..+1.1] (`parts/crest.json`; lower edge low, or a larger round on its arrises).
+     - [ ] arm top outer edge at the back leg -2.5 [-2.6] (`parts/arms.json`).
+   - IMG_1588-1593: closed, NOT registered (pass 1). 1588-1592 are far, zoomed shots (~1 px/mm against 2-4 for the orbit),
+     taken from directions the solved orbit already covers, so they add no view of any part; 1593 is a tape close-up across the
+     seat front, a reading rather than a view.
 6b. Tape readings in, as checks on the photo numbers: M1, M3, M4, M5, M9, M11 (below); M7/M8 if Joe takes them.
 6c. Finish detail: radii of the rounded edges (the model has sharp arrises everywhere; the rocker ends of PR #23 are traced on the
    tone edge of eased arrises and extruded square across: the radius there and any rounding of tip and nose in plan view); cross-check against the shop
@@ -43,7 +69,7 @@ other; **this section, PR descriptions and PR comments are the channel.** Read t
 
 | Session | Worktree, branches | Owns (only this session edits) |
 |---|---|---|
-| **Hub** (cc-sessions "rocking-chair"; runs unattended, works to completion. **Joe, 2026-11-20: from model v18 on, all remaining work and the supervision are to run on Opus 5.5.** The hub session cannot start a session itself, so: the remaining items are done by Opus 5.5 workers the hub starts, one at a time, until Joe switches the hub session to Opus 5.5 or starts a new Opus 5.5 hub from `HUB_HANDOFF.md`; same worktree and rules either way) | `rocking-chair/`, main + short topic branches | `PLAN.md`, `LEDGER.md`; the model version numbers `parts/model_vN.*`; in `tools/build_model.py`: SEAT (surface, front, side edges, underside, closing the mesh), arms, rockers, crest, slats, front-leg outline; `parts/seat_*.json`, `parts/arm_underside.json`, `tools/arm_underside/`, `parts/side_frame.json`, `parts/lr_skew.json`, `parts/rocker_profile.json`, `parts/rocker_ends.json`, `tools/rocker_ends/`, `parts/rocker_bottom.json` (new, PR #29: the bottom-edge correction the build reads, see the Templates row), `tools/rocker_bottom/`; `tools/seat_side_ends/` (PR #30); phase 6 onward |
+| **Hub** (cc-sessions "rocking-chair"; runs unattended, works to completion. **Joe, 2026-11-20: from model v18 on, all remaining work and the supervision are to run on Opus 5.5.** The hub session cannot start a session itself, so: the remaining items are done by Opus 5.5 workers the hub starts, one at a time, until Joe switches the hub session to Opus 5.5 or starts a new Opus 5.5 hub from `HUB_HANDOFF.md`; same worktree and rules either way) | `rocking-chair/`, main + short topic branches | `PLAN.md`, `LEDGER.md`; the model version numbers `parts/model_vN.*`; in `tools/build_model.py`: SEAT (surface, front, side edges, underside, closing the mesh), arms, rockers, crest, slats, front-leg outline; `parts/seat_*.json`, `parts/arm_underside.json`, `tools/arm_underside/`, `parts/side_frame.json`, `parts/lr_skew.json`, `parts/rocker_profile.json`, `parts/rocker_ends.json`, `tools/rocker_ends/`, `parts/rocker_bottom.json` (new, PR #29: the bottom-edge correction the build reads, see the Templates row), `tools/rocker_bottom/`; `tools/seat_side_ends/` (PR #30); `tools/critique/` (PR #31); phase 6 onward |
 | **Joinery / audit** (cc-sessions "rocking-chair-seat"; Joe attends it; it did the seat survey first) | `../rocking-chair-audit`, branch `joinery` and successors | in `tools/build_model.py`: the back-leg outline code, the placement of the legs against seat and rockers, every joint body; `tools/audit_*.py`, `tools/domino_ortho.py`; `parts/dominos.json` and any new joinery file; `reports/`; `figures/joinery/`, `figures/model_audit/`. **Hub edit, 2026-11-20 (PR #24, Joe's fix-list item 3): `parts/dominos.json` `joints.front_leg.centre_xyz` moved 1.52 mm forward along the leg face, new key `centre_provenance`; format otherwise unchanged; `tools/joinery.py` not touched. Method and data: `tools/front_domino/`.** |
 | **Templates** | `../rocking-chair-templates`, branch `templates` | `templates/` (its own ledger is `templates/LEDGER.md`); reads `parts/*.json` and `parts/rocker_profile.json`. **From model v18 the rocker's outline is `rocker_profile.json` between u -330 and u 572 PLUS the two ends in `parts/rocker_ends.json` `design` (its `note` says how they join); `rocker_profile.json` alone gives the old square-cut rocker. From model v22 (PR #29) the BOTTOM edge also takes `parts/rocker_bottom.json` `correction` (`u`, `dv_mm`): bottom v = `mean_bot` + dv(u), and the same dv is added to `rocker_ends.json` `design.tail.bot` (dv runs from u -400 to 572 and is 0 outside it, so the nose is untouched); linear between stations, in the left-plane frame before `to_mean`; the top edge is unchanged; `rocker_profile.json` and `rocker_ends.json` themselves are unchanged** **From model v20 (PR #26) the seat's side-edge under-bevel in `parts/seat_scoop.json` `design` is the left/right mean (lens max 23.2 mm, was 24.4; bevel 45.7 degrees, was 46.2; y 83.5-460.7); new blocks `left` and `left_vs_right`, existing keys unchanged in meaning; the seat's plan outline is unchanged.** **PR #30: `parts/seat_edge.json` adds `ends` (a check: the seat's plan outline at both legs agrees with the model within 0.5 mm; nothing to do for templates).** **NEW (PR #27): the arms' thickness and underside are in `parts/arm_underside.json` `design` (`h_outer_mm` / `h_inner_mm` = vertical drop of the outer / inner bottom arris below the arm's OUTER top arris, straight across between them, stations `y`; `parts/arms.json` `thickness` (25, assumed) is superseded; `arms.json` itself unchanged). From model v21 (PR #28) this is what the build uses: `tools/build_model.py` reads `parts/arm_underside.json` by default (`--arm-slab` builds the old 25 mm slab), so the arms in `parts/model_v21*.glb` are the measured ones and the front-leg tops are cut at z 625.8 (was 621.9).** |
 | Seat survey (finished; now the joinery session) | `../rocking-chair-seat`, branch `seat` | `seat/` (frozen: `seat/surface.json`, `seat/dots.csv`). A doubt about it is written in LEDGER.md, not fixed in place |
@@ -184,7 +210,7 @@ Optional:
   glue line (`parts/dominos.json`, fitted + assumed); M11 is a CHECK on that. The Domino's length cannot be seen in any photo.
 - Leg stock thickness across (now +-3 mm; part of M11), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
-(replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (in: IMG_1588-1592). Every dimension that stays
+(replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (IMG_1588-1592: taken, not registered; see phase 6 pass 1). Every dimension that stays
 photo-derived keeps its provenance tag and +- figure, so the accuracy report shows what was never hand-checked.
 
 ## Compute safety (Joe, 2026-11-20; this machine is a shared hub and was crashed twice)
