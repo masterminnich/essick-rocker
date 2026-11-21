@@ -501,3 +501,24 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   (c) left/right skew: compare rocker and leg heights L vs R to decide roll vs real; (d) underside from 1570-1576;
   (e) register IMG_1588-1593 at half resolution only; (f) M1-M8 if Joe sends them (never block). Templates: the templates
   session (branch `templates`), not here.
+
+## 16:30 PST left/right skew: it is the chair's side frames, not a roll of the frame (main)
+- tools/lr_skew.py -> parts/lr_skew.json (NEW file; reads rocker_profile.json, seat_edge.json, arms.json; changes nothing).
+- Both rockers' lowest points are on the table: left 0.1 mm at y 183, right 0.4 mm at y 198 (bottom edge there is the top edge
+  minus the fitted face height, not a direct trace). A roll of the frame of 0.3-0.5 deg would lift one of them 2.5-4 mm. So
+  the frame's vertical is right, and the question "roll of the frame?" from 16:18 is answered: no.
+- Right minus mirrored left HEIGHT, line fit in y (y110 / y250 / y400, pitch):
+  rocker top +1.5 / -0.1 / -1.8, -0.65 deg;  seat top arris (plan) -0.9 / -2.3 / -3.7, -0.55 deg;  seat top (side sheet)
+  -1.7 / -3.7 / -5.9, -0.82 deg;  seat bottom arris -3.6 / -4.6 / -5.6, -0.39 deg;  arm top -0.5 / -2.9 / -5.5, -0.99 deg.
+  Three parts, three methods, same sign: the right side is nose-down against the left by 0.4-1.0 deg.
+- After taking off the rocker's own difference at the same y, the right seat edge is still 2.0-2.8 mm (top, plan) or 4.3-5.5 mm
+  (bottom) lower than the left, and the right arm 2.4-4.4 mm lower: the right seat edge and arm sit lower on their rocker.
+- Behind the seat the rockers differ more: right minus left +7.3 at y -200, +8.8 at y -400 (the tails; noted at the start as
+  "tail tips differ up to 8 mm").
+- READING: the chair as built is slightly racked (or the camera solve is warped by the same amount, which the photos alone cannot
+  rule out). The design stays the left/right mean. On any single side the model then sits 1-3 mm off the wood at seat and arm
+  height; that is expected, not a tracing error.
+- PLAN.md: optional M9 added (table to top of the seat edge behind the front leg, left and right: predicted 3.7-5.9 mm lower on
+  the right). It is the one cheap reading that tells the chair from the solve. Not blocking.
+- NEXT unchanged: (a) seat front corners and front edge in plan; (b) arm underside and thickness (separate file);
+  (d) underside from 1570-1576; (e) register IMG_1588-1593 at half resolution only.

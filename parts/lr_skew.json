@@ -1,0 +1,85 @@
+{
+ "note": "right minus mirrored left height (mm) fitted as a line in y; pitch = slope as an angle (negative = the right side is nose-down against the left); minus_rocker = the same difference after taking off the rocker's own left/right difference at that y",
+ "rockers_lowest_point_above_table_mm": {
+  "left": 0.1,
+  "right": 0.43,
+  "at_y": [
+   183,
+   198
+  ]
+ },
+ "rocker_right_minus_left_top_mm_at_y": {
+  "-400": 8.8,
+  "-300": 8.0,
+  "-200": 7.3,
+  "-100": 3.6,
+  "0": 2.2,
+  "100": 2.0,
+  "200": 0.5,
+  "300": -0.9,
+  "400": -1.2,
+  "500": -1.1
+ },
+ "lines": {
+  "rocker top (y 0-400)": {
+   "at_y110": 1.5,
+   "at_y250": -0.1,
+   "at_y400": -1.8,
+   "pitch_deg": -0.65,
+   "scatter_mm": 0.27,
+   "minus_rocker_at_y110_y250_y400": [
+    -0.3,
+    0.2,
+    -0.6
+   ]
+  },
+  "seat top arris (plan sheet)": {
+   "at_y110": -0.9,
+   "at_y250": -2.3,
+   "at_y400": -3.7,
+   "pitch_deg": -0.55,
+   "scatter_mm": 0.03,
+   "minus_rocker_at_y110_y250_y400": [
+    -2.8,
+    -2.0,
+    -2.5
+   ]
+  },
+  "seat top arris (side sheet)": {
+   "at_y110": -1.7,
+   "at_y250": -3.7,
+   "at_y400": -5.9,
+   "pitch_deg": -0.82,
+   "scatter_mm": 0.96,
+   "minus_rocker_at_y110_y250_y400": [
+    -3.6,
+    -3.4,
+    -4.7
+   ]
+  },
+  "seat bottom arris": {
+   "at_y110": -3.6,
+   "at_y250": -4.6,
+   "at_y400": -5.6,
+   "pitch_deg": -0.39,
+   "scatter_mm": 1.06,
+   "minus_rocker_at_y110_y250_y400": [
+    -5.5,
+    -4.3,
+    -4.4
+   ]
+  },
+  "arm top (y 110-400)": {
+   "at_y110": -0.5,
+   "at_y250": -2.9,
+   "at_y400": -5.5,
+   "pitch_deg": -0.99,
+   "scatter_mm": 0.34,
+   "minus_rocker_at_y110_y250_y400": [
+    -2.4,
+    -2.6,
+    -4.4
+   ]
+  }
+ }
+}

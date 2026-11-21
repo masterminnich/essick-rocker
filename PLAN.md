@@ -40,6 +40,10 @@ Optional:
 - M6 arm thickness at the front end (assumed 25 mm; try the side photos first).
 - M7 table to top of crest at the centre; M8 rocker tip to tip, straight line. The only independent check on the single
   framing-square scale; they make the accuracy report more than self-graded.
+- M9 table to the top of the seat's side edge just behind the front leg, LEFT and RIGHT (two tape readings). The photos say
+  the right side sits 3.7-5.9 mm lower there and the whole right side frame is pitched about 0.5 deg nose-down against the left
+  (parts/lr_skew.json). If the tape shows the same difference, the skew is the chair and the model's left/right mean is right;
+  if the tape shows none, the camera solve is warped by that much and every single-side number is suspect.
 - Leg stock thickness across (now +-3 mm), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
 (replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (in: IMG_1588-1592). Every dimension that stays
