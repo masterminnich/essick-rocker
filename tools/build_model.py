@@ -500,6 +500,10 @@ if edge_rep:
 if front_rep:
     report["seat"]["outline"] = ("sides y %.0f-%.0f: triangulated top arris, L+R mean (+-1.5 mm); front edge: triangulated rolled edge, L+R mean (+-%.0f mm; parts/seat_front.json), scalloped in plan; "
                                  "side from y %.0f to the front corner: straight (hidden in the leg joint); back edge and back corners: cloud, straight in plan") % (_y0, _y1, front_rep["tol_mm"], _y1)
+if edge_rep and "ends" in json.load(open(_ef)):   # report text only: the side outline's two extrapolated ends checked against the photos (PR #30)
+    _en = json.load(open(_ef))["ends"]; edge_rep["ends_check"] = {"provenance": _en["provenance"], "what": _en["what"], "hidden": _en["hidden"]}
+    report["seat"]["outline"] += "; side outline toward the back leg (y 81-110) and toward the front leg (y 400-435): extrapolated, then %s (parts/seat_edge.json ends)" % _en["provenance"]
+if front_rep:
     _o = pts2[-len(outline):]; _fr = np.abs(_o[:, 1] - front_y(_o[:, 0])) < 1e-6; _zf = zt[-len(outline):]
     front_rep["top_z_along_front_edge"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], _zf[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}
     front_rep["front_edge_height_top_to_underside_mm"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], (_zf - zbm[-len(outline):])[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}

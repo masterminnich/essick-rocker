@@ -2392,5 +2392,239 @@
   "the underside between the two bottom arrises is not measured (flat across assumed); IMG_1570, 1572, 1573, 1576 look up at it from close range and could give it",
   "front edge, back edge and the corners outside y 110-400 are still the point cloud's outline",
   "top arris: the right edge solves 3-5 mm lower than the seat session's surface at |x| 251 while the left agrees within about 1 mm; the arris is a round-over, so the traced line sits at a slightly different place on it per side"
- ]
+ ],
+ "ends": {
+  "what": "top arris (plan outline) of the side edge at the two ends of design.y_range: toward the back leg (y 81-110) and toward the front leg (y 400-435); the build (tools/build_model.py) extrapolates the outline there: behind y 110 the point cloud's outline (shift 0.0) faded in over 60 mm, in front of y 400 a straight line to the front corner (268.0 at y 534.2)",
+  "provenance": "traced, agrees within 0.5 mm",
+  "result": "the model v22 outline sits on the wood: left/right mean minus model -0.26..+0.49 mm (worst +0.49 at y 85, at the back leg's face); each side's shape against the model (own offset at y 110 / 400 removed) within 0.6 mm; tolerance 1.6 mm (free curve); no change to the model",
+  "method": "the plan solve of PR #8 (tools/edge_tri.py on work/parts/side{L,R}/sp, the settings of parts/seat_plan_seeds_{L,R}.json) with the seed carried on to each leg (tools/seat_side_ends/tri.sh); inside y 110-400 it reproduces the stored solve (right mean -0.02 / max 0.24 mm, left -0.03 / 0.62); spread = leave-one-photo-out (tools/seat_side_ends/jackknife.sh); each photo's own trace checked by eye at 10-12 px/mm (tools/seat_side_ends/check.py); numbers tools/seat_side_ends/analyse.py, data tools/seat_side_ends/data/stations_v22.json",
+  "right": {
+   "photos": [
+    "1549",
+    "1479",
+    "1548",
+    "1481",
+    "1480",
+    "1547",
+    "1478",
+    "1477",
+    "1476",
+    "1475",
+    "1474",
+    "1472",
+    "1473"
+   ],
+   "residual_rms_mm": 0.63,
+   "y_range": [
+    80.6,
+    439.6
+   ]
+  },
+  "left": {
+   "photos": [
+    "1537",
+    "1539",
+    "1538",
+    "1517",
+    "1522",
+    "1518",
+    "1521",
+    "1510",
+    "1509"
+   ],
+   "residual_rms_mm": 0.67,
+   "y_range": [
+    82.8,
+    434.7
+   ]
+  },
+  "right_minus_left_mm": {
+   "back_y85_110": [
+    1.16,
+    1.45
+   ],
+   "front_y400_430": [
+    3.95,
+    4.36
+   ],
+   "note": "the chair's known left/right lean (parts/lr_skew.json); the model is the mean"
+  },
+  "stations": [
+   {
+    "y": 85.0,
+    "right_half_width": 227.72,
+    "right_se": 0.22,
+    "left_half_width": 226.44,
+    "left_se": 0.48,
+    "mean_half_width": 227.08,
+    "model_v22_half_width": 226.59,
+    "mean_minus_model": 0.49,
+    "shape_vs_model_right": 0.6,
+    "shape_vs_model_left": 0.59,
+    "arris_z_mean_minus_model_top": -1.79
+   },
+   {
+    "y": 90.0,
+    "right_half_width": 228.64,
+    "right_se": 0.22,
+    "left_half_width": 227.36,
+    "left_se": 0.69,
+    "mean_half_width": 228.0,
+    "model_v22_half_width": 227.93,
+    "mean_minus_model": 0.07,
+    "shape_vs_model_right": 0.18,
+    "shape_vs_model_left": 0.17,
+    "arris_z_mean_minus_model_top": -1.62
+   },
+   {
+    "y": 95.0,
+    "right_half_width": 229.71,
+    "right_se": 0.23,
+    "left_half_width": 228.26,
+    "left_se": 0.9,
+    "mean_half_width": 228.98,
+    "model_v22_half_width": 229.24,
+    "mean_minus_model": -0.26,
+    "shape_vs_model_right": -0.06,
+    "shape_vs_model_left": -0.24,
+    "arris_z_mean_minus_model_top": -1.47
+   },
+   {
+    "y": 100.0,
+    "right_half_width": 230.88,
+    "right_se": 0.22,
+    "left_half_width": 229.72,
+    "left_se": 0.69,
+    "mean_half_width": 230.3,
+    "model_v22_half_width": 230.52,
+    "mean_minus_model": -0.22,
+    "shape_vs_model_right": -0.17,
+    "shape_vs_model_left": -0.06,
+    "arris_z_mean_minus_model_top": -1.34
+   },
+   {
+    "y": 105.0,
+    "right_half_width": 232.2,
+    "right_se": 0.23,
+    "left_half_width": 230.81,
+    "left_se": 0.64,
+    "mean_half_width": 231.5,
+    "model_v22_half_width": 231.74,
+    "mean_minus_model": -0.24,
+    "shape_vs_model_right": -0.08,
+    "shape_vs_model_left": -0.2,
+    "arris_z_mean_minus_model_top": -1.21
+   },
+   {
+    "y": 110.0,
+    "right_half_width": 233.43,
+    "right_se": 0.23,
+    "left_half_width": 232.16,
+    "left_se": 1.32,
+    "mean_half_width": 232.8,
+    "model_v22_half_width": 232.9,
+    "mean_minus_model": -0.1,
+    "shape_vs_model_right": 0.0,
+    "shape_vs_model_left": 0.0,
+    "arris_z_mean_minus_model_top": -1.1
+   },
+   {
+    "y": 400.0,
+    "right_half_width": 270.55,
+    "right_se": 0.38,
+    "left_half_width": 266.22,
+    "left_se": 1.07,
+    "mean_half_width": 268.38,
+    "model_v22_half_width": 268.57,
+    "mean_minus_model": -0.19,
+    "shape_vs_model_right": 0.0,
+    "shape_vs_model_left": 0.0,
+    "arris_z_mean_minus_model_top": -0.92
+   },
+   {
+    "y": 405.0,
+    "right_half_width": 270.59,
+    "right_se": 0.32,
+    "left_half_width": 266.41,
+    "left_se": 0.96,
+    "mean_half_width": 268.5,
+    "model_v22_half_width": 268.55,
+    "mean_minus_model": -0.05,
+    "shape_vs_model_right": 0.06,
+    "shape_vs_model_left": 0.21,
+    "arris_z_mean_minus_model_top": -1.19
+   },
+   {
+    "y": 410.0,
+    "right_half_width": 270.64,
+    "right_se": 0.55,
+    "left_half_width": 266.49,
+    "left_se": 1.03,
+    "mean_half_width": 268.56,
+    "model_v22_half_width": 268.53,
+    "mean_minus_model": 0.04,
+    "shape_vs_model_right": 0.13,
+    "shape_vs_model_left": 0.32,
+    "arris_z_mean_minus_model_top": -1.45
+   },
+   {
+    "y": 415.0,
+    "right_half_width": 270.56,
+    "right_se": 0.48,
+    "left_half_width": 266.61,
+    "left_se": 1.02,
+    "mean_half_width": 268.59,
+    "model_v22_half_width": 268.51,
+    "mean_minus_model": 0.08,
+    "shape_vs_model_right": 0.06,
+    "shape_vs_model_left": 0.46,
+    "arris_z_mean_minus_model_top": -1.69
+   },
+   {
+    "y": 420.0,
+    "right_half_width": 270.64,
+    "right_se": 0.49,
+    "left_half_width": 266.62,
+    "left_se": 0.84,
+    "mean_half_width": 268.63,
+    "model_v22_half_width": 268.49,
+    "mean_minus_model": 0.14,
+    "shape_vs_model_right": 0.18,
+    "shape_vs_model_left": 0.49,
+    "arris_z_mean_minus_model_top": -1.9
+   },
+   {
+    "y": 425.0,
+    "right_half_width": 270.68,
+    "right_se": 0.29,
+    "left_half_width": 266.67,
+    "left_se": 0.58,
+    "mean_half_width": 268.68,
+    "model_v22_half_width": 268.47,
+    "mean_minus_model": 0.21,
+    "shape_vs_model_right": 0.24,
+    "shape_vs_model_left": 0.56,
+    "arris_z_mean_minus_model_top": -2.04
+   },
+   {
+    "y": 430.0,
+    "right_half_width": 270.81,
+    "right_se": 0.5,
+    "left_half_width": 266.45,
+    "left_se": 0.52,
+    "mean_half_width": 268.63,
+    "model_v22_half_width": 268.44,
+    "mean_minus_model": 0.19,
+    "shape_vs_model_right": 0.38,
+    "shape_vs_model_left": 0.36,
+    "arris_z_mean_minus_model_top": -2.14
+   }
+  ],
+  "height": "the traced arris sits 1.1-1.8 mm below the model's top at the outline at the back and 0.9-2.1 at the front (1.1 / 0.9 of that already at y 110 / 400, the plan solve's known offset on the round-over, plan_vs_side_check); inside the 2.5 mm tolerance of design.top_z_of_y; no change",
+  "hidden": "y 45-78 (inside the back leg) and about y 446-500 (inside the front leg's lap) cannot be seen in any photo: assumed as built",
+  "back_end_section": "by eye only (IMG_1489 right, IMG_1523 left, 1.3-2.6 px/mm): the hard line of parts/seat_scoop.json runs out into the bottom arris at the back leg as the model has it; the lens tips stay fitted",
+  "open": [
+   "front corner in front of the front leg (y 500-530), LEFT only (9 photos, residual 0.35 mm): half-width 265.1 at y 500 and 264.9 at y 528 against the model's 268.1 / 268.0, and the arris at z 423.4 / 428.4 against 420.0 / 418.8: the model rounds the corner's top down over its last 16 mm, the wood does not seem to; the right side did not solve (its traces jump at the leg); the corner is the front edge's (tools/seat_front_fit.py), so this is left for that item; figure figures/seat_side_ends/L_corner_lead.jpg"
+  ]
+ }
 }
