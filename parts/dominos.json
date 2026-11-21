@@ -1,0 +1,21 @@
+{
+ "_about": "Domino joints at the seat (tools/domino_ortho.py: orthophotos of each leg's outer face at 0.25 mm/px; read by eye on mm grids, figures/joinery/domino_measure.jpg). Chair frame mm; left given, right = mirror.",
+ "visible_end_mm": {
+  "front_leg_left": {"IMG_1519": [25.0, 11.0], "IMG_1520": [25.5, 11.0]},
+  "back_leg_left": {"IMG_1520": [26.0, 11.5], "IMG_1519": [26.0, 11.5]},
+  "front_leg_right": {"IMG_1488": [22.5, 11.5], "note": "low contrast, ends fuzzy"},
+  "reading_tolerance_mm": 1.0,
+  "note": "outline includes a dark glue/stain halo of about 0.5 mm per edge"
+ },
+ "design": {
+  "tenon_section_mm": [24.0, 10.0],
+  "provenance": "fitted+assumed: visible ends 25-26 x 11-11.5 mm = Festool 10 mm Domino (24 x 10 section) plus halo; 8 mm (22 x 8) is too thin, 12+ mm too big",
+  "long_axis_tilt_deg": {"front": 15, "back": 5, "note": "long axis tilted in the face, front end up (front leg ~15 deg, back leg ~5 deg): roughly along the seat edge"},
+  "length_mm": {"value": null, "provenance": "assumed: not visible. Front: through the leg (33) + 25 into the seat edge. Back: 25 deep, see below"}
+ },
+ "joints": {
+  "front_leg": {"centre_xyz": [-284.2, 466.7, 394.8], "kind": "leg lapped on the OUTSIDE of the seat's side edge; Domino runs across (x) through the leg into the seat edge; whole end inside the leg face"},
+  "back_leg": {"centre_xyz": [-225.3, 76.5, 322.8], "kind": "seat side edge BUTTS the leg's front edge with the outer faces flush (photo-consistent across 1504-1522: both halves sharp in the leg-face orthophoto); the Domino end straddles the joint line, ~15 mm in the leg and ~10 mm in the seat, driven in from outside (x)",
+   "correction": "PR #12 said all four legs are lapped; at the BACK legs the seat butts flush, only the front legs are lapped"}
+ }
+}

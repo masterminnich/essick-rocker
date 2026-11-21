@@ -22,11 +22,68 @@
 4. Hard-point skeleton: ~100-150 points marked in several photos each, triangulated, with error estimates.
 5. Parts: each part = planar template outline in its own plane + thickness + shaping, placed in 3D. Edge types tried in
    order: line, single-radius arc, fair spline; keep the simplest within tolerance. Model is generated from a parameters file.
-6. Critique loop: project the model into every photo through the solved cameras; measure edge gaps per part; fix the worst;
-   repeat. ~15% of photos are held out for validation only; Joe's M7/M8 (below) are independent checks if he supplies them.
-7. Deliverables: CAD model, dimensioned drawing, accuracy report, then 1:1 tiled PDF/DXF templates with a print-scale check square.
+   DONE as far as model v11.
+5b. **Known fixes and joinery** (NEW. Joe, 2026-11-20 17:24: "I want everything perfect before we make the templates";
+   flaws we already know are fixed BEFORE the critique loop, so the loop is spent on what we cannot already see. Source: the
+   model audit, PR #12, `reports/model_audit_v9.md`). Checklist with owners in "Sessions and who owns what" below.
+6. Critique loop: project the model into every photo through the solved cameras; measure the edge gap per part; fix the worst;
+   repeat, until every part is inside 1/32" at joints and hard points and 1/16" on free curves. ~15% of photos are held out
+   for validation only. Joints are mostly hidden, so they are checked by the assembly audit (`tools/audit_joints.py`), not here.
+6b. Tape readings in, as checks on the photo numbers: M1, M3, M4, M5, M9, M11 (below); M7/M8 if Joe takes them.
+6c. Finish detail: radii of the rounded edges (the model has sharp arrises everywhere); cross-check against the shop
+   templates hanging in IMG_1507 (flat photos of them, if Joe can take some).
+7. Deliverables: CAD model, dimensioned drawing, accuracy report, then 1:1 tiled PDF/DXF templates with a print-scale check
+   square. FINAL templates only after 5b-6c. The templates session's files before that (rocker, slats: PRs #6, #7) are drafts
+   and are regenerated from the final parts files.
 
-## Hand measurements (Joe, 2026-11-20: optional, small list; never block on them)
+## Sessions and who owns what (2026-11-20 17:45; Joe: split the work, do not clash)
+Several sessions work on this repo at once, each in its own git worktree and on its own branches. They cannot message each
+other; **this section, PR descriptions and PR comments are the channel.** Read this section after every pull of main.
+
+| Session | Worktree, branches | Owns (only this session edits) |
+|---|---|---|
+| **Hub** (cc-sessions "rocking-chair"; runs unattended, works to completion) | `rocking-chair/`, main + short topic branches | `PLAN.md`, `LEDGER.md`; the model version numbers `parts/model_vN.*`; in `tools/build_model.py`: SEAT (surface, front, side edges, underside, closing the mesh), arms, rockers, crest, slats, front-leg outline; `parts/seat_*.json`, `parts/side_frame.json`, `parts/lr_skew.json`, `parts/rocker_profile.json`; phase 6 onward |
+| **Joinery / audit** (cc-sessions "rocking-chair-seat"; Joe attends it; it did the seat survey first) | `../rocking-chair-audit`, branch `joinery` and successors | in `tools/build_model.py`: the back-leg outline code, the placement of the legs against seat and rockers, every joint body; `tools/audit_*.py`, `tools/domino_ortho.py`; `parts/dominos.json` and any new joinery file; `reports/`; `figures/joinery/`, `figures/model_audit/` |
+| **Templates** | `../rocking-chair-templates`, branch `templates` | `templates/` (its own ledger is `templates/LEDGER.md`); reads `parts/*.json` and `parts/rocker_profile.json` |
+| Seat survey (finished; now the joinery session) | `../rocking-chair-seat`, branch `seat` | `seat/` (frozen: `seat/surface.json`, `seat/dots.csv`). A doubt about it is written in LEDGER.md, not fixed in place |
+| Crest and arms (finished) | `../rocking-chair-crest` | `parts/crest.json`, `parts/arms.json` (frozen; additions go in a separate file) |
+| Viewer (finished) | `../rocking-chair-viewer` | `viewer/`; it finds the newest `parts/model_vN.glb` on main by itself |
+
+Phase 5b checklist:
+- Joinery session: [x] back leg as one continuous board (PR #14, landed with PR #16, model v12) · [ ] front legs lapped on the
+  outside of the seat edge with a through-Domino; back legs butted to the seat's side edge with the Domino across the joint
+  (PR #12 comment, `parts/dominos.json`: 10 mm Domino, 24 x 10 section) · [ ] legs seated on the rocker tops, outer faces flush
+  · [ ] arm / front leg (round tenon or dowel), arm into back leg, crest to back legs, slat mortises · [ ] assembly check
+  (`tools/audit_joints.py`) passing on every build.
+- Hub: [x] seat front face and bottom edge (PR #15, model v11) · [ ] arm underside and thickness (new file, not
+  `parts/arms.json`) · [ ] seat underside from IMG_1570-1576 · [ ] SEAT mesh closed (watertight) · [ ] rocker bottom edge
+  traced directly (today it is the top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the
+  back leg (today extrapolated) · [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33).
+
+Rules:
+1. **Model numbers come only from the hub, on main.** No branch commits `parts/model_v*`. After another session's PR lands
+   the hub rebuilds and commits the next number, and the viewer shows it about a minute later. Build to `work/` to test.
+2. **One PR per fix, squash-merged.** Start each new piece from current main: a new branch, or `git merge main` into yours
+   first (all worktrees share the local ref `main`; the hub keeps it at GitHub's main). After a squash, do not stack further
+   work on the old branch without merging main into it; files that were added on both sides otherwise conflict.
+3. Any session may squash-merge its own PR once it is mergeable and holds no model file. The hub merges what is left open
+   at its next turn, after a trial build of main + the branch (parts that should not change must be vertex-identical).
+4. `PLAN.md` and `LEDGER.md` are edited only by the hub. Other sessions keep their notes in their PR bodies and a file of
+   their own (`templates/LEDGER.md`, `joinery/LEDGER.md`); the hub copies a short entry into `LEDGER.md` at each merge. To
+   ask for a plan change: a PR comment, or Joe says so in the hub session.
+5. Before editing a block of `tools/build_model.py` that another session owns: say so first (PR comment, or LEDGER for the
+   hub), keep the edit small, and name it in the PR body. Preferred instead: hand over DATA (a parts file) and let the owner
+   read it. Open interface: the cut of the seat's side edge at the back leg. The joinery session supplies the line where the
+   seat edge ends against the leg (plan, chair frame mm, left side; e.g. in `parts/dominos.json` or a new `parts/joints.json`)
+   and the hub applies it in the SEAT code; or it cuts the finished SEAT mesh in a separate, marked block after the seat is
+   built. Its choice, stated in its PR.
+6. Existing `parts/*.json` formats stay stable; a format change is called out in the PR body and in LEDGER.md.
+7. Compute: one job at a time through `tools/safe_run.sh`; the lock is shared by every worktree. `work/` is shared scratch
+   through symlinks: write only under your own subfolder (`work/audit`, ...), read the rest.
+
+## Hand measurements (Joe, 2026-11-20: optional, small list; model work never blocks on them)
+Changed 17:45: Joe wants everything checked before FINAL templates, so the checks M1, M3, M4, M5, M9 and M11 sit in phase 6b,
+ahead of phase 7. Model work, the critique loop and draft templates never wait for them; only the final template sign-off does.
 The original 35-item caliper sheet (R/F/B/A/C/S/T codes, K1-K6, seat depth grid, far photos) is retired: photogrammetry now
 covers it. Only these remain, because no photo sees them or two sources disagree. Fold them in whenever Joe sends them.
 Required:
@@ -51,7 +108,10 @@ Optional:
   corner; the largest gap between it and the seat's top front edge in the thigh hollow (one reading, either side). The photos
   say 21.3 mm (parts/seat_front.json), but forward depth is the weak direction of that solve: it moves by 2-3 mm when its
   assumptions change, so the front outline is +-2 mm instead of 1/16 in. One reading would pin it.
-- Leg stock thickness across (now +-3 mm), only if Joe wants rough stock sizes; side templates do not depend on it.
+- M11 one Domino end on a leg's outer face, length x thickness, and that leg's thickness across (joinery session). The photos
+  now read the visible ends as 25-26 x 11-11.5 mm on true-scale leg-face views, taken as a 10 mm Domino (24 x 10 section) plus
+  glue line (`parts/dominos.json`, fitted + assumed); M11 is a CHECK on that. The Domino's length cannot be seen in any photo.
+- Leg stock thickness across (now +-3 mm; part of M11), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
 (replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (in: IMG_1588-1592). Every dimension that stays
 photo-derived keeps its provenance tag and +- figure, so the accuracy report shows what was never hand-checked.
