@@ -1,0 +1,64 @@
+{
+ "frame": "chair frame mm (+X right, +Y forward, +Z up, table Z=0)",
+ "filters": {
+  "max_rms_px": 2.0,
+  "min_views": 3,
+  "min_z_mm": 4.0,
+  "box_mm": [
+   [
+    -430.0,
+    -580.0,
+    -5.0
+   ],
+   [
+    430.0,
+    820.0,
+    1310.0
+   ]
+  ]
+ },
+ "layers": {
+  "dense": {
+   "file": "dense.bin",
+   "n": 14045,
+   "fields": [
+    "xyz f32x3",
+    "rms_px f32",
+    "sigma_mm f32",
+    "rgb u8x3",
+    "views u8"
+   ],
+   "desc": "Feature tracks matched across the photos (tools/densify.py), each seen in 3 or more photos",
+   "median_rms_px": 0.895,
+   "median_views": 3.0
+  },
+  "sparse": {
+   "file": "sparse.bin",
+   "n": 4535,
+   "fields": [
+    "xyz f32x3",
+    "rms_px f32",
+    "sigma_mm f32",
+    "rgb u8x3",
+    "views u8"
+   ],
+   "desc": "The camera solve's own points (COLMAP), mapped into the chair frame",
+   "median_rms_px": 1.117,
+   "median_views": 3.0
+  },
+  "dots": {
+   "file": "dots.bin",
+   "n": 110,
+   "fields": [
+    "xyz f32x3",
+    "rms_px f32",
+    "sigma_mm f32",
+    "rgb u8x3",
+    "views u8"
+   ],
+   "desc": "Seat dot targets (seat session, seat/dots.csv): sub-mm, the best-measured points on the chair",
+   "median_rms_px": 1.32,
+   "median_views": 7.5
+  }
+ }
+}
