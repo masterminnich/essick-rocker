@@ -27,16 +27,17 @@ Sessions on this machine get cut off without warning; this file says where thing
 - [x] FIRST MODEL: tools/model.sh --out parts/model_v1 -> parts/model_v1.glb, _params.json (provenance per number), _edges.json.
       Check views: tools/overlay_sil.py (part outlines on photos) -> work/overlay_v1/sil_*.jpg.
 
-## Now (rewritten 18:00 PST, model v14)
+## Now (rewritten 19:05 PST, model v16)
 - Phase 5b, known fixes and joinery, split between two sessions: PLAN.md, "Sessions and who owns what". Read it after every
   pull of main; it is the only channel between the sessions.
-- Model v14 is the first JOINED model: `tools/model.sh` builds the parts, cuts the joints (`tools/joinery.py`, PR #17) and
-  runs the assembly check; a number is issued only on PASS (PLAN rule 8).
-- Hub's open 5b items (this session): [ ] seat underside from IMG_1570-1576 (the photos show it is sculpted, not a plane) ·
-  [ ] arm underside and thickness (new file) · [ ] rocker bottom edge traced directly · [ ] seat side edge behind y 400 ·
-  [ ] 3 mm question at the right front corner of the seat (17:33 entry). Done: seat front face (v11), seat mesh closed (v13).
-- Joinery session's open item: arm / front leg round through-tenon or plug (IMG_1528). The hub does not work on joints; it
-  merges that session's PRs after a trial build and issues the next model number.
+- Model v16 (main). `tools/model.sh` builds the parts, cuts the joints (`tools/joinery.py`) and runs the assembly check; a
+  number is issued only on PASS (PLAN rule 8). v15 = joinery PRs #18, #19; v16 = seat side-edge section (PR #20).
+- NEXT, in this order: **Joe's fix list of 19:00** (PLAN.md: 1 Dominos missing at the back, IMG_1620; 2 rocker ends, IMG_1618
+  and 1619; 3 front-leg Domino off-centre), then the hub's remaining 5b items: [ ] 3 mm question at the right front corner of
+  the seat · [ ] left-side check of the seat scoop · [ ] arm underside and thickness (new file) · [ ] rocker bottom edge traced
+  directly · [ ] seat side edge behind y 400. Done: seat front face (v11), seat mesh closed (v13), seat side-edge section (v16).
+- Joe gave items 1 and 3 of his list to the hub although they touch the joinery session's files; said so in PLAN.md and in a
+  comment on PR #20.
 
 ## Next
 - [ ] Phase 6 critique loop (per-part photo error, ~15% of photos held out) once 5b is done.
@@ -745,3 +746,64 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - Told to the joinery session in a PR #17 comment: its report line 'seat mesh closed with pymeshfix' is now printed although
   nothing is repaired (the seat is a solid since v13); and the four open points of its PR stay on its list.
 - NEXT (hub): seat underside from IMG_1570/1572/1573/1576; then arm underside and thickness; then the rest of the Now list.
+
+## 19:05 PST joinery PRs #18, #19 -> model v15; seat side edge is a square edge over a scooped 46 degree bevel -> model v16 (PR #20)
+- FOUND ON MAIN at 18:47: the joinery session had merged #18 (arm / front leg: the oval on the left arm is not a tenon; hidden
+  10 mm Domino, assumed; `parts/joints.json`, new parts `DOMINO_AR/AL`) and #19 (feet swept along the leg axis and cut flat to
+  the rocker; Joe had spotted the step at the feet in v14) without a model file, as rule 3 allows.
+- v15 (5f81628): shapes vertex-identical to v14; assembly check PASS, 19 pairs touching, 3 clear. The first build DIED in the
+  check: `safe_run: KILLED, memory 3379 MB over 3 GB cap`. Cause: #19's exact-gap step ran `closest_point` on the three pairs
+  that stand well clear (28 to 134 mm), which pulls in much of the other part's triangles per sample. Hub's edit in the joinery
+  session's file `tools/audit_joints.py` (told in a comment on #19): refine only when the KD-tree gap is under 3 mm. Peak is
+  still 2.7 GB of the 3 GB cap. This is probably also the 'assembly check failed to run' oddity of the 18:00 entry.
+- Contact areas in the check are 3000 random samples times the part's area: they move by several cm2 between builds without
+  the joint changing (FLEG_R~SEAT 36.0, 28.8, 33.8 in v14, v15, v16). Not a measure of change; told to the joinery session.
+- SEAT SIDE EDGE (hub item d; PR #20, squash 3c904d8; all numbers RIGHT side, chair frame, mm):
+  - Section between the legs: top arris (eased) -> vertical edge face -> hard line -> flat under-bevel -> bottom arris ->
+    underside. v15 had one straight wall from top arris to bottom arris: 10.4 mm inside the wood at the hard line at y 250,
+    up to 11.3 mm along the edge.
+  - Under-bevel angle 46.2 deg below horizontal (sd 0.44; 45.75 to 47.3 over y 150-410; the two edges solved separately).
+  - Hard line height above the underside: 0 at the tips (back y 89.7, front y 456.4: straight continuation, fitted), 24.4 at
+    y 255 (bevel 23.4 wide there). Table every 5 mm in `parts/seat_scoop.json`.
+  - Edge face vertical: hard line x minus plan-sheet top arris x = +0.39 mean, sd 0.78, -1.38 to +1.16 (y 110-400). Face
+    height 17.8 at mid-length to 37.9 near the legs (soft: eased arris).
+  - Underside along the edge: straight, tilt 10.6 deg, rms 0.24, worst 0.97 (bottom arris y 140-440).
+  - Hard line: 14 photos, camera elevation -30 to +72 deg; rms per photo 0.23-1.69 for 13 photos, IMG_1490 2.83;
+    leave-one-photo-out 0.78 away from the ends, 3.52 at the back end (leans on IMG_1492). Bottom arris: 8 photos, rms
+    0.12-0.85 for 7, IMG_1490 1.50; leave-one-out 1.23 inner, 2.31 at the ends. IMG_1490 is off both the same way: its pose.
+  - New bottom arris against the old one in `parts/seat_edge.json` (right): -1.27 to +1.44 in x over y 150-300; toward the
+    front the old one is up to 15 mm too far in (side photos only; the real arris swings out to close the lens).
+- METHOD (tools/seat_scoop/, four steps): `strip.py` unrolls the edge per photo (column = station y, row = across the edge;
+  `ALT="dx0 dz0 dx1 dz1"` unrolls across a line through the top arris, needed for steep photos that look along the edge
+  face); `snap.py` snaps by-eye seeds to the tone edge; `solve.py` fits x(y), z(y) (Legendre degree 6) to all photos at once;
+  `fit.py` writes `parts/seat_scoop.json`. Check figure: `overlay_edge.py` (model feature edges + measured dots on a photo
+  crop). Inputs (seeds, traces, trusted stretches per photo) in `tools/seat_scoop/inputs/`.
+- LESSONS: (1) low photos alone cannot place an edge in depth (leave-one-out 6-34 mm); the three photos from 31-38 deg above
+  and six steep silhouettes fixed it. (2) The residual's px-per-mm must be taken square to the line of sight; taken along
+  the old wall it made the steep photos look 3-9 mm off when they fit to 0.2-1.7. (3) The close-ups IMG_1570-1576 are
+  registered too badly to measure with; none is used. (4) The 'dark band in IMG_1539 = reflection, not a third arris' note
+  in `parts/seat_edge.json` was a misreading: it is the vertical edge face seen from above. (5) A wall ring that jumps in
+  height between two stations makes a sliver on a tilted plane and a stray edge in the overlays; run it out into the next
+  arris instead.
+- FORMAT NOTE (PLAN rule 9): new file `parts/seat_scoop.json`; `parts/seat_edge.json` unchanged, but its
+  `design.bottom_half_width_of_y` is not used while the new file exists. Outside the lens the seat's side edge is now
+  vertical for the full thickness (it leaned under before), also where it meets the legs.
+- v16 (main): only SEAT differs from v15 in the shapes. Assembly check PASS; every part watertight. SEAT after the joints
+  8342.0 -> 8513.4 cm3. Seat / leg pairs still gap 0, overlap 0 (contact 33.8 and 59.1 cm2).
+- VISIBLE MISFIT, explained, not fixed: on right-side photos the model's seat edge lines sit inboard of the measured dots:
+  hard line within 0.7 mm in x at y 113-155, 2.1 to 3.4 mm inboard at y 195-400, 4.2 at y 438; 1.9 mm high at the back to
+  0.8 low at the front. v15 has the same offset on its lines. The model is the left/right mean; the right side measures
+  wider (half-width 258.9 against 255.2 at y 250) and lower (`parts/lr_skew.json`). Either the seat is 3.7 mm lopsided or it
+  sits off the frame's centre line: that is the '3 mm question', which now has this lead.
+- OPEN on the seat edge: left side assumed mirror (no trace from below); tips of the lens fitted, not traced; top arris
+  radius; underside flat ACROSS by the undistorted reflection in IMG_1492 only; V-shaped creases on the seat top at y 205-230
+  where the taped surface's edge (x 250) runs into the outline (cosmetic, in v15 too).
+- JOE, 19:00: three new photos in Drive (IMG_1618, 1619, 1620; manifest updated, 123 files listed) and a fix list for after
+  v16, copied into PLAN.md: Dominos missing at the back of the chair (IMG_1620 shows two Domino ends on each back leg, at the
+  seat and at the arm); rocker ends not shaped right (IMG_1618 slim rounded tail tip, IMG_1619 round nose at the front);
+  front-leg Domino off-centre on the leg (viewer screenshot). Then the rest of the plan as written.
+- NEXT (hub): Joe's list item 1 (back Dominos: register IMG_1620 at half resolution, read both Domino ends on each back leg
+  on true-scale leg-face views, add the arm / back-leg Domino in `parts/joints.json` + `tools/joinery.py`, small named edit),
+  then 2 (rocker ends from the existing rocker face sheets plus IMG_1618/1619 for the shape), then 3 (front-leg Domino
+  position against the leg's two edges). Then the 3 mm question, the left-side scoop check, arm underside, rocker bottom
+  edge, seat edge behind y 400.

@@ -54,12 +54,32 @@ Phase 5b checklist:
   outside of the seat edge with a through-Domino; back legs butted to the seat's side edge with the Domino across the joint
   (PR #17, model v14; `parts/dominos.json`: 10 mm Domino, 24 x 10 section) · [x] legs seated on the rocker tops (PR #17; the
   feet still sit about 3 mm off the rocker faces in x, open) · [x] arm into back leg, crest to back legs, slat mortises (PR #17,
-  as contact faces or mortises; the hidden fasteners are not modelled) · [ ] arm / front leg round through-tenon or plug
-  (IMG_1528) · [x] assembly check passing on every build (v14 on: `tools/model.sh` runs it and prints PASS / FAIL).
-- Hub: [x] seat front face and bottom edge (PR #15, model v11) · [ ] arm underside and thickness (new file, not
-  `parts/arms.json`) · [ ] seat underside from IMG_1570-1576 · [x] SEAT mesh closed (watertight; model v13) · [ ] rocker bottom edge
-  traced directly (today it is the top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the
-  back leg (today extrapolated) · [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33).
+  as contact faces or mortises; the hidden fasteners are not modelled) · [x] arm / front leg: the oval in IMG_1528 is not a
+  tenon; hidden 10 mm Domino, assumed (PR #18, model v15, `parts/joints.json`) · [x] feet swept along the leg axis and cut
+  flat to the rocker (PR #19, model v15) · [x] assembly check passing on every build (v14 on: `tools/model.sh` runs it and
+  prints PASS / FAIL).
+- Hub: [x] seat front face and bottom edge (PR #15, model v11) · [x] SEAT mesh closed (watertight; model v13) · [x] seat
+  underside along the side edges (PR #20, model v16, `parts/seat_scoop.json`: square edge, hard line, 46 degree under-bevel
+  scooped between the legs; right side measured, left assumed mirror; the close-ups IMG_1570-1576 turned out too badly
+  registered to use; flat ACROSS is by reflection only) · [ ] **Joe's fix list of 19:00, next, in this order** (below) ·
+  [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33; now with a lead: the right side edge measures
+  2-3 mm outboard of the symmetric model along its whole length, LEDGER 19:05) · [ ] left-side check of the seat scoop ·
+  [ ] arm underside and thickness (new file, not `parts/arms.json`) · [ ] rocker bottom edge traced directly (today it is the
+  top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the back leg (today extrapolated).
+
+**Joe's fix list, 2026-11-20 19:00 (said in the hub session; "add this to the plan to fix after v16, then continue with the
+rest of the plan as written"). Joe gave these to the HUB, so the hub does them, including the two that touch the joinery
+session's files. Joinery session: please do not start the same items; the hub keeps its edits to `tools/joinery.py`,
+`parts/dominos.json` and `parts/joints.json` small and names each one in its PR.** New photos for them: IMG_1618, 1619, 1620
+(close-ups, not registered; half-resolution registration only).
+1. [ ] **Dominos missing at the back of the chair** (IMG_1620, from behind): each back leg shows TWO Domino ends on its
+   rear / outer face, one at seat height and one higher, at the arm. The model has only the seat one (`DOMINO_BR/BL`) and an
+   unmodelled "contact face" at arm / back leg. Add the arm / back-leg Domino and check the seat one comes out where the photo
+   shows it.
+2. [ ] **Rocker ends are not shaped right** (IMG_1618: the tail thins to a slim rounded tip; IMG_1619: the front end is cut
+   to a round nose across the laminations). The model's rocker ends do not have these shapes. Rockers are the hub's part.
+3. [ ] **Front-leg Domino sits off-centre on the leg** (Joe's viewer screenshot of v15: the slot is to one side of the leg's
+   width). Re-measure the slot's position on the leg face against the leg's two edges and centre it if the photos agree.
 
 Rules:
 1. **Model numbers come only from the hub, on main.** No branch commits `parts/model_v*`. After another session's PR lands
@@ -85,7 +105,11 @@ Rules:
    the chair, with `_joinery.json`; `tools/audit_joints.py` + `tools/joints_gate.py` (thresholds, hub's file) ->
    `_joints.json` and PASS / FAIL. A model number is only issued on PASS. To try one part quickly:
    `tools/model.sh --shapes-only --out work/<dir>/name`. Compare versions part by part on the `_shapes.glb` files (the joined
-   meshes are re-triangulated by the cuts). New part names in `model_vN.glb`: `DOMINO_FR`, `_FL`, `_BR`, `_BL`.
+   meshes are re-triangulated by the cuts). New part names in `model_vN.glb`: `DOMINO_FR`, `_FL`, `_BR`, `_BL` (v14), `DOMINO_AR`, `_AL` (v15).
+9. **The seat's side edge** (model v16 on): `parts/seat_scoop.json` `design` gives the section between the legs (vertical edge
+   face, hard line at a tabled height above the underside, under-bevel at `bevel_angle_deg`). While that file exists,
+   `parts/seat_edge.json` `design.bottom_half_width_of_y` is NOT used (format unchanged; its top outline, top height and
+   bottom height still are). Templates: the plan outline of the seat is unchanged; the under-bevel is a shaping step.
 
 ## Hand measurements (Joe, 2026-11-20: optional, small list; model work never blocks on them)
 Changed 17:45: Joe wants everything checked before FINAL templates, so the checks M1, M3, M4, M5, M9 and M11 sit in phase 6b,
@@ -97,8 +121,10 @@ Required:
   42.0 mm square to the seat plane, +-3 mm, parts/seat_edge.json. M2 is now a CHECK on that number. Since model v11 the front
   edge is triangulated too: top of the roll to the bottom arris 38 mm beside the pommel tip, 21 mm in the thigh hollows, 39 mm at
   the corners, +-2 mm, parts/seat_front_face.json; M1 is a CHECK on the 38. If Joe takes it: straight up the front face, 10 mm to
-  one side of the pommel tip. The underside between the edges is an assumed plane; IMG_1570, 1572, 1573, 1576 see it but are
-  not used yet.)
+  one side of the pommel tip. Since model v16 the side edge is known as a section: a vertical edge face 18 mm high at
+  mid-length over a 46 degree under-bevel 24 mm high, parts/seat_scoop.json; M2, if taken, is the height of that vertical face
+  half way between the legs. The underside between the edges is a plane along the edge (0.24 mm rms) and flat across by
+  reflection only.)
 - M3 crest rail height at the centre. (Photos 74.7 mm vs tape IMG_1555 77.5: 2.8 mm conflict.)
 - M4 centre slat thickness. (~10 mm from photo consistency, weak; it is the lamination stock / bending-form thickness.)
 - M5 centre slat width just under the crest. (Trace 100.0-100.5 vs tape IMG_1553 98.3: 1.7-2.2 mm conflict.)
