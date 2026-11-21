@@ -1,0 +1,15 @@
+{
+ "note": "Slat ends in the unrolled back-view sheets (v = arc length along the slat back face, mm; sheets work/parts/back/f/sc_*, so_*). Read by eye on 3-4x gridded zooms of IMG_1502 (on-axis primary), 2026-11-20.",
+ "seat": {
+  "provenance": "fitted by eye: visible bottom end of each slat where it disappears into the seat top (seat top seen behind it)",
+  "tol_mm": 2.0,
+  "centre_v": [16.5, 16.5],
+  "outer_v_in_out": [16.0, 18.0]
+ },
+ "crest": {
+  "provenance": "computed: slat back face (parts/slats.json sheets) meets the crest's bottom face, a plane strip between the crest's triangulated bottom arrises (parts/crest.json bottom_rear / bottom_front design). Agrees by eye with the end of the slat highlights under the crest's shadowed bottom face (v 718-727).",
+  "tol_mm": 3.0
+ },
+ "joinery_allowance_mm": 19.05,
+ "joinery_note": "Joinery into the seat and the crest is not seen in any photo: 3/4 in extra length at each end is drawn as an allowance, not a measurement."
+}

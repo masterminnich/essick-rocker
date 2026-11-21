@@ -6,3 +6,5 @@ cd "$(dirname "$0")/.."
 tools/py.sh templates/rocker.py
 mkdir -p figures/templates
 tools/py.sh templates/check_overlay.py --geom templates/out/rocker_geom.json --out figures/templates/rocker_overlay.jpg
+tools/py.sh templates/slats.py
+tools/py.sh templates/check_slat_overlay.py --geom templates/out/slats_geom.json --out figures/templates/slat_overlay.jpg
