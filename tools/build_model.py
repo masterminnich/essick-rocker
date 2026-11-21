@@ -18,6 +18,7 @@ from rocker.sideframe import side_plane, to_plane, from_plane
 
 ap = argparse.ArgumentParser(); ap.add_argument("--out", required=True); ap.add_argument("--params", default=None)
 ap.add_argument("--legacy", action="store_true", help="v3 crest and arms from the cloud instead of parts/crest.json + parts/arms.json")
+ap.add_argument("--arm-underside", action="store_true", help="arm underside from parts/arm_underside.json instead of the assumed 25 mm (OFF until joinery 5c cuts the back leg with the untrimmed Domino: PLAN.md)")
 a = ap.parse_args()
 PRM = {  # sizes not (yet) measured from photos
     "rocker_width_across": (31.0, "tape", "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"),
@@ -621,22 +622,36 @@ else:
     X = np.polyval(pin, Y - 300) + T_ * (np.polyval(pout, Y - 300) - np.polyval(pin, Y - 300))
     Y = np.where(S_ == 1, np.polyval(pf, X), Y)   # front row exactly on the design front line
     Z = np.polyval(pz, Y - 300) + (T_ - 0.5) * np.polyval(pzx, Y - 300)
-    slope = np.arctan(np.polyval(np.polyder(pz), Y - 300)); Zb = Z - th / np.cos(slope)
+    UJ = None
+    if a.arm_underside:
+        # underside from parts/arm_underside.json: drops of the outer and inner bottom arrises below the OUTER top arris, straight across between them
+        UJ = json.load(open(ROOT / "parts/arm_underside.json"))["design"]; uy = np.array(UJ["y"])
+        hu = lambda y, t: np.interp(y, uy, UJ["h_inner_mm"]) + t * (np.interp(y, uy, UJ["h_outer_mm"]) - np.interp(y, uy, UJ["h_inner_mm"]))
+        zb = lambda x, y: np.polyval(pz, y - 300) + 0.5 * np.polyval(pzx, y - 300) - hu(y, (x - np.polyval(pin, y - 300)) / (np.polyval(pout, y - 300) - np.polyval(pin, y - 300)))
+        Zb = np.polyval(pz, Y - 300) + 0.5 * np.polyval(pzx, Y - 300) - hu(Y, T_)      # outer top arris z minus the drop at this point across
+    else:
+        slope = np.arctan(np.polyval(np.polyder(pz), Y - 300)); Zb = Z - th / np.cos(slope)
+        zb = lambda x, y: np.polyval(pz, y - 300) - th / np.cos(np.arctan(np.polyval(np.polyder(pz), y - 300)))
     am = grid_solid(np.dstack([X, Y, Z]), np.dstack([X, Y, Zb]), ns, nt); meshes["ARM_R"] = am; meshes["ARM_L"] = mirror(am)
     # front-leg tops vs the arm underside
     fv = meshes["FLEG_R"].vertices; tp = fv[fv[:, 2] > fv[:, 2].max() - 15]; yc, xc = float(tp[:, 1].mean()), float(tp[:, 0].mean())
-    zu = float(np.polyval(pz, yc - 300) - th / np.cos(np.arctan(np.polyval(np.polyder(pz), yc - 300))))
+    zu = float(zb(xc, yc))
     fl = {"leg_top_z": float(fv[:, 2].max()), "arm_underside_z_at_leg": zu, "leg_top_xy": [round(xc, 1), round(yc, 1)],
           "arm_x_range_at_leg": [float(np.polyval(pin, yc - 300)), float(np.polyval(pout, yc - 300))]}
     if fl["leg_top_z"] > zu:
-        su = np.polyval(np.polyder(pz), yc - 300); n_ = np.array([0, -su, 1.0]); n_ /= np.linalg.norm(n_); p_ = np.array([xc, yc, zu])
+        if UJ: su = float(zb(xc, yc + 1) - zb(xc, yc - 1)) / 2; sx_ = float(zb(xc + 1, yc) - zb(xc - 1, yc)) / 2      # the underside's own slopes at the leg
+        else: su = np.polyval(np.polyder(pz), yc - 300); sx_ = 0.0
+        n_ = np.array([-sx_, -su, 1.0]); n_ /= np.linalg.norm(n_); p_ = np.array([xc, yc, zu])
         for k_, sg in (("FLEG_R", 1), ("FLEG_L", -1)):
             try: meshes[k_] = meshes[k_].slice_plane(p_ * [sg, 1, 1], -n_, cap=True)
             except Exception: meshes[k_] = meshes[k_].slice_plane(p_ * [sg, 1, 1], -n_, cap=False)
         fl["action"] = "cut at the arm underside (it ran through the arm)"
-    else: fl["action"] = f"left as traced: it stops {zu - fl['leg_top_z']:.1f} mm below the arm underside (assumed arm thickness {th} mm)"
+    else: fl["action"] = f"left as traced: it stops {zu - fl['leg_top_z']:.1f} mm below the arm underside" + ("" if UJ else f" (assumed arm thickness {th} mm)")
     report["arm"] = {"source": "parts/arms.json design (triangulated top arrises of both arms, mirrored mean)", "y_range": [float(y_back), float(max(ci_[1], co_[1]))],
-                     "back_extension": f"carried from y {D_['y_back']} back to {y_back} into the back leg (not seen)", "thickness_mm": th, "front_leg_top": fl}
+                     "back_extension": f"carried from y {D_['y_back']} back to {y_back} into the back leg (not seen)", "front_leg_top": fl,
+                     **({"underside": "parts/arm_underside.json design (outer/inner bottom arrises traced on side photos of both arms, left/right mean)",
+                         "thickness_vertical_outer_mm": {str(y): round(float(np.interp(y, uy, UJ["h_outer_mm"])), 1) for y in (40, 100, 200, 300, 400, 500)},
+                         "thickness_vertical_inner_mm": {str(y): round(float(np.interp(y, uy, UJ["h_inner_mm"])), 1) for y in (40, 100, 200, 300, 400, 500)}} if UJ else {"thickness_mm": th})}
     report["crest_arms_source"] = "parts/crest.json + parts/arms.json"
 
 # ---------------------------------------------------------------- export
