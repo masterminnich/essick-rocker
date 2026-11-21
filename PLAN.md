@@ -31,8 +31,11 @@ The original 35-item caliper sheet (R/F/B/A/C/S/T codes, K1-K6, seat depth grid,
 covers it. Only these remain, because no photo sees them or two sources disagree. Fold them in whenever Joe sends them.
 Required:
 - M1 seat edge thickness, front centre. M2 seat edge thickness, middle of one side. (Since PR #8 the side edge is triangulated:
-  42.0 mm square to the seat plane, +-3 mm, parts/seat_edge.json. M2 is now a CHECK on that number; M1, the front edge, is still
-  not measured. The underside between the edges is an assumed plane; IMG_1570, 1572, 1573, 1576 see it but are not used yet.)
+  42.0 mm square to the seat plane, +-3 mm, parts/seat_edge.json. M2 is now a CHECK on that number. Since model v11 the front
+  edge is triangulated too: top of the roll to the bottom arris 38 mm beside the pommel tip, 21 mm in the thigh hollows, 39 mm at
+  the corners, +-2 mm, parts/seat_front_face.json; M1 is a CHECK on the 38. If Joe takes it: straight up the front face, 10 mm to
+  one side of the pommel tip. The underside between the edges is an assumed plane; IMG_1570, 1572, 1573, 1576 see it but are
+  not used yet.)
 - M3 crest rail height at the centre. (Photos 74.7 mm vs tape IMG_1555 77.5: 2.8 mm conflict.)
 - M4 centre slat thickness. (~10 mm from photo consistency, weak; it is the lamination stock / bending-form thickness.)
 - M5 centre slat width just under the crest. (Trace 100.0-100.5 vs tape IMG_1553 98.3: 1.7-2.2 mm conflict.)

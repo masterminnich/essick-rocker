@@ -575,3 +575,98 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - NEXT: (a2) front face of the seat: bottom edge and section from the low front photos (1485, 1496, 1484) and the dark band
   in 1539; (b) arm underside and thickness from the side sheets (separate file, not parts/arms.json); (d) underside from
   1570-1576; (e) register IMG_1588-1593 at half resolution only; M1-M10 if Joe sends them (never block).
+
+## 17:33 PST seat front face: rim height and bottom arris measured; CORRECTION of the 16:55 "front wall" claim (branch seat-front-face, model v11)
+- CORRECTION. The 16:55 entry, PR #11 and the report to Joe said "the model's front wall reaches visibly below the wood
+  (IMG_1485) ... the real seat thins toward the front edge". That was wrong. It came from judging a small preview. Measured
+  now: the bottom arris of the front face is at z 381.6 in the hollows and 385.4 beside the pommel tip (design); v10's wall
+  bottom was at 379.2-383.2, so v10 was 2-3 mm too LOW at the bottom, not hanging far below, and the front edge heights
+  (38 / 21 / 39 mm at pommel flank / hollow / corner) are close to v10's 44 / 20.5 / 41. What v10 really had wrong at the front:
+  the rim 2-2.5 mm too low in the hollows, the bottom 2-3 mm too low, a square box at the corners where the wood is rounded.
+  RULE kept from this: judge an outline on a zoomed view with the measured LINES drawn (tools/seat_front_lines.py), never on
+  a preview; and a silhouette cannot show the bottom arris at all (next point).
+- WHAT THE LEVEL PHOTO SHOWS (figures/seat_front_face/underside_mirror_1558.jpg): the underside is glossy and pitched 10 deg,
+  so the level camera of IMG_1558 sees it as a bright mirror band (it reflects the slats and the shop) under the dark front
+  face. The seat's silhouette therefore runs along the underside further back, well below the arris; the arris is the crease
+  between the dark face and the mirror band in 1558 and 1562, and a silhouette against the floor in the higher photos.
+- RESULT (parts/seat_front_face.json, NEW file; tools/seat_front_face_fit.py; seeds parts/seat_front_face_seeds.json):
+  - top of the rolled edge, height (design = left/right mean): 423.7 at |x| 8, 413.2 at 40, 405.6 at 72, 402.5 at 104,
+    402.3 at 136, 404.9 at 168, 412.2 at 200, 422.1 at 232. Triangulated, +-1.5 mm for |x| 70-250, +-3 on the pommel flanks
+    and at the corner ends.
+  - bottom arris: z 385.4 / 383.5 / 382.3 / 381.6 / 381.7 / 382.3 / 383.3 / 385.6 at the same stations; y 535.8 / 525.5 /
+    518.4 / 513.5 / 513.0 / 515.0 / 520.0 / 528.1. Triangulated, z +-1.5, y +-2. Beyond |x| 240 it rounds up into the horn's
+    end: 398 at |x| 268, read on the 5 mm grid of rectified IMG_1558 (397-400), fitted, +-3.
+  - front edge height (top of roll to bottom arris): 38.4 at |x| 8, least 20.6 at |x| 128, 39.5 at 262; +-2.
+  - lean: bottom arris y minus top outline y, |x| < 240: mean 0.0, sd 1.3, -1.7..+2.6. Inside the tolerance of the two
+    lines: the face stays VERTICAL in the model. Beyond 240 the bottom reads 2-4 mm forward (rounded corner, both lines weak).
+  - plan outline of the top edge from the combined solve minus parts/seat_front.json: mean -0.25, -0.9..+0.7. Inside its
+    +-2, so parts/seat_front.json is unchanged (only two notes in it were rewritten).
+  - the bottom arris stands 2.2-4.1 mm (mean 2.7, |x| < 240) ABOVE the plane through the two side bottom arrises carried forward.
+- METHOD. tools/tube_tri.py can now take photos on several rectified sheets in one solve ("sheets" per photo), with new keys
+  y_guess, outward, init, init_top_z, r_bounds (docstring). Regression on the PR #11 seeds: same outline within 0.12 mm.
+  - TOP: the 8 overhead photos on the plan sheet plus 6 front photos on a vertical sheet through y 525 (1558 at +4 deg, 1562
+    at -7 deg square on; 1531, 1530, 1523, 1524 from the left at -2..-13 deg). The front photos see the top of the roll as a
+    horizon, which is exactly the height the overhead-only solve could not fix. Radius 8 given. Rms right 0.80, left 0.82
+    (per photo 0.17-1.48).
+  - BOTTOM: a line (tube of radius 1) in 9 front photos between -7 and +34 deg: 1558, 1559, 1496, 1562 square on, 1533, 1534,
+    1525 from the left, 1485, 1484 from the right. Rms right 0.44, left 0.33 (per photo 0.09-0.86).
+  - all traces checked by eye on single rectified photos, both halves (figures/seat_front_face/trace_*.jpg).
+- DEAD ENDS AND CUTS:
+  - first bottom solve landed on the TOP edge (spine z 400 instead of 383): the start put the spine r0 = 12 mm behind the seed
+    while the radius was fixed at 1, and a 7 mm band on a face only 21 mm high reached the roll. Fixed with r0 = 1, band 5.
+  - 1526, 1527 (bottom): traces on the wood, but 1.2-2.0 mm below the line the other nine photos agree on, same sign on both
+    halves, while 1525 from the same direction fits: camera pose. Left out (variant with them: z moves -0.3..+0.1).
+  - 1486, 1487 (top): 2-2.5 mm systematic misfit; they look at the roll from 40 deg below and 55 deg to the side, where a
+    circular section is the wrong model. Left out (variant with them: top z moves 0..+0.3, rms 1.0).
+  - radius solved freely: wanders 2-12 mm on the right, 3-21 on the left, rms 0.76 / 0.81 against 0.80 / 0.82. Not observable;
+    stays 8, ASSUMED. Radius 4 / 12: top z moves by under 1.3 mm, plan outline -1.3 / +1.4 at most.
+  - left corner top traced 4-6 mm above the wood on 1558 at first: the start (overhead-only solve) was 8 mm too high there and
+    the snap followed the background. Fixed by starting the height from grid readings on 1558 (init_top_z) and band 5.
+  - my own overlay crops showed a zigzag "silhouette": cv2.fillPoly on a list of triangles fills by the even-odd rule;
+    tools/overlay_sil.py is not hurt (it only draws the outer contour), tools/seat_front_lines.py fills one by one.
+- VARIANTS (design lines, |x| 8-262): top z: without 1558 -0.7..+1.7 (|x| > 70: -0.4..+1.7), front photos 1558+1562 only
+  -2.2..+0.9, side cameras only -0.6..+2.4, without overhead 1545/1544 -0.5..+0.2. Bottom z: -0.5..+0.6 in every variant
+  with radius 1; bottom y: -1.1..+2.6. Hence the tolerances above.
+- LEFT/RIGHT: right minus mirrored left: top z -5.4..+2.1 (the outer left is 3-5 mm higher from |x| 200 out), bottom z
+  0.0 at the pommel falling to -2.9 from |x| 100 out. Same sense and size as parts/lr_skew.json. Design = mean, so on each
+  side alone the design lines sit 1-3 mm off the wood toward the corners; the figures draw both (yellow design, cyan as
+  triangulated).
+- CHECKS against the seat session's tape dots (not used): the six dots on the right front face all lie between the bottom
+  arris and the top (2.9-20.0 mm above the arris); dot y against the right top outline -1.1..+1.8 (107 on the horn: 5.1).
+  Thirteen dots on the roll itself: up to x 218 they sit 1.1 mm below the radius-8 tube on average (-2.0..+0.9; a softer
+  roll would do that), from x 228 to the corner 2.1-4.0 mm ABOVE the right-hand tube. See OPEN.
+- MODEL v11 (tools/build_model.py reads parts/seat_front_face.json; --legacy skips it):
+  - the front edge is rolled: three rows of points (top of the roll one radius behind the outline, 45 deg, the plan outline =
+    top of the vertical face). Top of the roll at the measured height: 425.6 / 413.2 / 404.5 / 402.2 / 407.1 / 421.5 / 428.9 at
+    x 0 / 40 / 80 / 130 / 180 / 230 / 260 (the surface the model had on that line: 426.2 / 411.8 / 402.6 / 400.3 / 405.6 /
+    421.8 / 423.5; moved by +1.4 mean, -0.7..+5.3, the +5.3 at the corner). The correction fades out over 30 mm behind.
+  - bottom of the front face at the measured arris: 385.4 / 383.5 / 382.1 / 381.6 / 382.5 / 385.4 / 389.4; the underside is
+    raised by 2.1-4.7 mm at the front, fading out over 60 mm (ASSUMED shape); bottom corners rounded up beyond |x| 240
+    (11.7 mm at the corner, fading over 25 mm, ASSUMED). Front edge height 40.2 / 29.7 / 22.4 / 20.6 / 24.6 / 36.1 / 39.5.
+  - least wood under the scoop 17.0 mm (was 20.0: the raised underside near the front). Overall box unchanged.
+- CHECKED BY EYE on zoomed crops with the lines drawn (figures/seat_front_face/lines_*.jpg, v10_v11_*.jpg): 1558, 1562:
+  bottom line on the crease, top line on the rim in the hollows, both halves; toward the corners the design sits above the
+  wood on the right and below it on the left by 2-3 mm (the skew). Side view 1507 and 1491: the front end is now rounded like
+  the wood instead of a box.
+- OPEN, visible in the figures:
+  - in 1558 the MODEL silhouette (white) stands 2-3 mm above the wood at x 180-230 on the chair's right. It is not the rim:
+    it is the model's seat surface 30-50 mm behind the edge (vertices near (210, 481) and (180, 491)), i.e. seat/surface.json,
+    and v10 shows the same. Together with the dots at x 228-245 sitting 2-4 mm above the right-hand rim: either the dots'
+    heights or the right-hand rim are off by about 3 mm near the right front corner. Not resolved (the seat surface is the
+    seat session's file). A tape reading table-to-rim at one front corner would settle it; not asked for yet.
+  - the dark band in IMG_1539 outside the top edge on the right pommel flank (16:55) is NOT explained: the bottom arris is only
+    0-2.5 mm forward there and that camera looks along the face (2 deg behind edge-on).
+  - roll radius assumed; pommel tip |x| < 8 and corner ends |x| > 262 not traced; underside itself unmeasured.
+- FORMATS: no existing parts file changed format. parts/seat_front.json: two note strings only. NEW: parts/seat_front_face.json
+  (design.top_of_roll_z_of_abs_x, design.bottom_arris_y_of_abs_x, design.bottom_arris_z_of_abs_x: [[|x|, value], ...] every
+  2 mm, |x| 8-262; design.bottom_arris_z_of_abs_x_with_corner adds |x| 268), parts/seat_front_face_seeds.json,
+  parts/model_v11.*. Templates session: the seat blank's front outline is still parts/seat_front.json; the blank must be at
+  least 40 mm thick at the front (38.4 measured beside the tip, 40.2 in the model at the tip); the bottom arris is under the
+  top edge within 2 mm, so one outline serves both faces. The first top solve's start file (work/parts/seatF/tube/front*.json)
+  is the gitignored output of the PR #11 solve: run that first to reproduce.
+- TOOLS: tools/seat_front_lines.py (measured lines on an original photo), tools/seat_front_face_plot.py,
+  tools/before_after.py --stack (one above the other, nothing shrunk).
+- NEXT: (b) arm underside and thickness from the side sheets (separate file, not parts/arms.json); (c) the 3 mm question at
+  the right front corner: seat surface near (180-230, 480-500) against the level photos 1558 / 1562 / 1559 (horizon check),
+  report to the seat session; (d) underside from 1570-1576; (e) register IMG_1588-1593 at half resolution only; M1-M10 if
+  Joe sends them (never block).
