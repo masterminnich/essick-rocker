@@ -6,9 +6,12 @@ so tools/audit_joints.py should find no accidental overlaps and no floating part
 
 Joints (chair frame mm, right side; left = mirror):
   front leg / seat   leg lapped on the OUTSIDE of the seat's side edge; seat edge trimmed to the leg's inner face; through-Domino
-  back leg / seat    seat side edge BUTTS the leg's front edge, outer faces flush; seat cut to the leg; Domino across the joint line
+  back leg / seat    seat side edge BUTTS the leg's front edge, outer faces flush; seat cut to the leg; Domino across the joint line;
+                     a second Domino driven in from BEHIND across the seam between the leg's inner face and the seat's back edge
+                     (seen from behind: parts/joints.json back_leg_rear)
   legs / rockers     feet carried down onto the rocker top and cut to its curve (hidden fastener not modelled: not seen)
-  arm / back leg     arm end coped to the leg (hidden tenon not modelled: not seen)
+  arm / back leg     arm end coped to the leg; a Domino driven in from BEHIND through the leg into the arm's end (its end shows on
+                     the leg's rear face: parts/joints.json back_leg_rear; how far it goes into the arm is ASSUMED)
   arm / front leg    leg top cut to the arm underside by build_model.py; a hidden vertical 10 mm Domino along the leg axis, from the
                      leg top into the arm (ASSUMED: parts/joints.json; the oval on the left arm top is not over the leg, see there)
   crest / back legs  crest ends coped to the legs (hidden joint not modelled)
@@ -116,7 +119,7 @@ for side, S in ((1, "R"), (-1, "L")):
         cut(L, wide, f"{L} foot cut to the rocker's top surface across the full width (contact face; the fastener is hidden and NOT modelled)")
         rep["joints"][f"{L}_foot"] = {"leg_axis": a.round(3).tolist(), "method": "swept along the leg axis, cut by the widened rocker"}
     # 4 arm coped to the back leg
-    cut(AR, M[BL], f"{AR} end coped to {BL} (it ran 4 mm into the leg; the arm's hidden joint into the leg is NOT modelled)")
+    cut(AR, M[BL], f"{AR} end coped to {BL} (it ran 4 mm into the leg; the Domino through the leg into the arm's end is added in 5c)")
     cut(AR, M[FL], f"{AR} underside vs {FL} top: contact face")
     # 5 Dominos
     for L, key, base_depth in ((FL, "front_leg", None), (BL, "back_leg", 25.0)):
@@ -146,13 +149,46 @@ for side, S in ((1, "R"), (-1, "L")):
     rep["joints"][name] = {"centre_xyz": c.round(1).tolist(), "axis": w.round(3).tolist(), "section_mm": J["section_mm"],
                            "depth_mm": [J["depth_in_leg_mm"], J["depth_in_arm_mm"]],
                            "provenance": "ASSUMED, hidden joint (parts/joints.json arm_front_leg)"}
+# 5c back leg, REAR face (hub, Joe's fix list item 1; parts/joints.json back_leg_rear): two Domino ends per back leg show from behind.
+#    Each is placed ON the leg's rear face (plane fitted to the face around the Domino's height, as tools/rear_ortho.py does) at the
+#    measured x and z, long axis level (along x), driven in square to that face. 'seat': across the seam leg / seat back edge, blind.
+#    'arm': centred on the leg's width, through the leg and on into the arm's end.
+def rear_face(leg, zc):
+    L0 = sc.geometry[leg]; S_, fi = trimesh.sample.sample_surface(L0, 80000, seed=1); nr = L0.face_normals[fi]   # the leg as traced: by now M[leg] has mortise walls that also look backward
+    P = S_[(nr[:, 1] < -0.8) & (np.abs(S_[:, 2] - zc) < 45)]; o = P.mean(0); _, _, vt = np.linalg.svd(P - o); nn = vt[2] * np.sign(-vt[2][1])
+    return o, nn, float(np.sqrt(np.mean(((P - o) @ nn) ** 2)))                                          # point on the face, unit normal pointing backward, fit rms
+
+
+JR = json.load(open(ROOT / "parts/joints.json"))["back_leg_rear"]["design"]
+for side, S in ((1, "R"), (-1, "L")):
+    BL = f"BLEG_{S}"
+    for key, other, tag in (("seat", "SEAT", "RS"), ("arm", f"ARM_{S}", "RA")):
+        d = JR[key]; z = d["centre_z"]; x = side * d["centre_abs_x"]; o, nn, rms = rear_face(BL, z)
+        c = np.array([x, o[1] - (nn[0] * (x - o[0]) + nn[2] * (z - o[2])) / nn[1], z]); w = -nn      # centre of the visible end, on the rear face; w points into the leg
+        if key == "arm":
+            t = np.arange(0.5, 90.0, 0.25); ins = M[BL].contains(c + np.outer(t, w)); through = float(t[ins].max()) + 0.25   # the leg's thickness along the Domino's axis
+            depth = through + d["depth_in_arm_mm"]
+        else: through = None; depth = d["depth_mm"]
+        raw = domino_along(c, w, [1, 0, 0], d["section_mm"][0], d["section_mm"][1], 2.0, depth)        # 2 mm proud of the rear face, trimmed flush below
+        dom = trimesh.boolean.intersection([raw, trimesh.boolean.union([M[BL], M[other]], engine="manifold")], engine="manifold")
+        in_leg = vol(trimesh.boolean.intersection([dom, M[BL]], engine="manifold")); in_other = vol(trimesh.boolean.intersection([dom, M[other]], engine="manifold"))
+        xs = np.arange(-d["section_mm"][0] / 2 + 0.05, d["section_mm"][0] / 2, 0.1); end_in_leg = 0.1 * int(M[BL].contains(c + w * 3.0 + np.outer(xs, [1.0, 0, 0])).sum())   # along the end's long axis, 3 mm in
+        name = f"DOMINO_{tag}{S}"; M[name] = dom
+        cut(BL, dom, f"mortise for {name} in the rear face of {BL}"); cut(other, dom, f"mortise for {name} in " + ("the seat's back edge" if key == "seat" else f"the end of {other}"))
+        rep["joints"][name] = {"centre_xyz": c.round(1).tolist(), "axis": w.round(4).tolist(), "long_axis": "level, along x", "section_mm": d["section_mm"],
+                               "depth_mm": round(depth, 1), "through_the_leg_mm": None if through is None else round(through, 1),
+                               "rear_face_fit_rms_mm": round(rms, 2), "volume_cm3": round(vol(dom), 2), "in_leg_cm3": round(in_leg, 2), f"in_{other.split('_')[0].lower()}_cm3": round(in_other, 2),
+                               "bodies": int(len(dom.split(only_watertight=False))), "mm_of_the_end_in_the_leg": round(end_in_leg, 1),
+                               "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"}
 # 6 crest coped to the back legs; slats into mortises in the seat and the crest
 for L in ("BLEG_R", "BLEG_L"): cut("CREST", M[L], f"crest end coped to {L} (the crest's joint into the leg is hidden and NOT modelled)")
 for s_ in ("SLAT_C", "SLAT_R", "SLAT_L"):
     cut("SEAT", M[s_], f"mortise for {s_} in the seat (depth = how far the traced slat runs in; NOT measured)")
     cut("CREST", M[s_], f"mortise for {s_} in the crest (depth = how far the traced slat runs in; NOT measured)")
 rep["open"] = ["arm / front leg: hidden; modelled as an ASSUMED vertical 10 mm Domino (the oval on the left arm top is not over the leg)",
-               "legs / rockers, arm / back leg, crest / back legs: the joints are hidden; contact faces only",
+               "legs / rockers, crest / back legs: the joints are hidden; contact faces only",
+               "arm / back leg: a Domino end shows on the leg's rear face; how far it runs into the arm's end is ASSUMED (25 mm)",
+               "back leg / seat from behind: at the rear the real seam sits 2.5-3.4 mm inboard of the model leg's inner face, so the model's rear Domino at the seat has less of its end in the leg than the photos show (photos: 14.2 of 24 mm; model: 'mm_of_the_end_in_the_leg' of DOMINO_RS*); leg placement, not changed",
                "Domino depth not visible; slat mortise depth not measured",
                "leg feet sit about 3 mm off the rocker faces in x (rocker width is a tape value, 31 mm); not changed"]
 out = trimesh.Scene()

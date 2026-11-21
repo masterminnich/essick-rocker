@@ -12,7 +12,8 @@ for k, g in G.items():
 JOIN = [("ROCKER_R", "FLEG_R"), ("ROCKER_R", "BLEG_R"), ("FLEG_R", "SEAT"), ("BLEG_R", "SEAT"), ("FLEG_R", "ARM_R"), ("BLEG_R", "ARM_R"),
         ("BLEG_R", "CREST"), ("BLEG_L", "CREST"), ("SLAT_C", "SEAT"), ("SLAT_R", "SEAT"), ("SLAT_C", "CREST"), ("SLAT_R", "CREST"), ("SLAT_L", "CREST"),
         ("ARM_R", "SEAT"), ("SLAT_R", "BLEG_R"), ("SLAT_C", "SLAT_R"), ("DOMINO_FR", "FLEG_R"), ("DOMINO_FR", "SEAT"), ("DOMINO_BR", "BLEG_R"), ("DOMINO_BR", "SEAT"),
-        ("DOMINO_AR", "FLEG_R"), ("DOMINO_AR", "ARM_R")]
+        ("DOMINO_AR", "FLEG_R"), ("DOMINO_AR", "ARM_R"),
+        ("DOMINO_RSR", "BLEG_R"), ("DOMINO_RSR", "SEAT"), ("DOMINO_RAR", "BLEG_R"), ("DOMINO_RAR", "ARM_R")]     # hub: the two Dominos driven in from behind (parts/joints.json back_leg_rear)
 from trimesh.proximity import ProximityQuery
 for a_, b_ in [p for p in JOIN if p[0] in G and p[1] in G]:
     A, B = G[a_], G[b_]; r = {}
@@ -26,7 +27,9 @@ for a_, b_ in [p for p in JOIN if p[0] in G and p[1] in G]:
     from scipy.spatial import cKDTree
     Q, _ = trimesh.sample.sample_surface_even(B, 300000, radius=0.8, seed=1); d, _ = cKDTree(Q).query(P)
     if B.is_watertight:
-        d = np.where(B.contains(P), d, -d)
+        # (hub, rear Dominos: the inside test in slices of 250 points. In one call every ray carries 800-1900 candidate triangles of a long
+        #  part like the back leg, 5-6 million pairs for 3000 points, and DOMINO_RSR~BLEG_R went over the 3 GB cap; same answer, a sixth of the memory)
+        inside = np.concatenate([B.contains(P[i:i + 250]) for i in range(0, len(P), 250)]); d = np.where(inside, d, -d)
         if -3.0 < d.max() <= 0:             # no sample inside B and the parts are close: refine the gap with exact closest points for the nearest 400 samples
             # (hub, v15 build: only when the KD-tree gap is under 3 mm. On pairs that stand well clear, e.g. ARM_R~SEAT at 134 mm, closest_point
             #  pulls in a large share of B's triangles for every sample and the job went over the 3 GB cap; those pairs do not need it)
