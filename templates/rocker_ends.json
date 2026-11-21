@@ -1,0 +1,23 @@
+{
+ "note": "Rocker end shapes, fitted by eye on 10/5 mm gridded zooms of the rectified single photos IMG_1507 (left rocker sheet work/parts/rockerL) and IMG_1472 (right, work/parts/rockerR, shifted onto the left with parts/rocker_profile.json right_vs_left). Frame: left rocker sheet u/v mm. Checked by templates/check_overlay.py.",
+ "provenance": "fitted (by eye)",
+ "rear": {
+  "tip": [
+   -484.5,
+   170.0
+  ],
+  "tip_handle": 3.0,
+  "blend_top_u": -462.0,
+  "blend_bot_u": -466.0,
+  "tol_mm": 3.0
+ },
+ "front": {
+  "end_u": 630.0,
+  "end": "plumb (vertical in the sheet, i.e. square to the floor)",
+  "bot_corner_r": 15.0,
+  "tol_mm": 2.0
+ },
+ "history": [
+  "v1: front end 628, r 10, tip -485.5: overlay showed the wood 2-3 mm past the end on all four photos and a larger lower round; front corner read at u 629.5-630 (L 1506/1507), 630-632 (R 1471/1472 moved to the L frame); nose tip ~1-3 mm proud on R 1472"
+ ]
+}
