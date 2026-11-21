@@ -310,7 +310,23 @@ if _fc.exists() and front_rep and not a.legacy:
     _FD = json.load(open(_fc))["design"]; _rr = float(_FD["roll_radius_mm"]["value"]); _tz = np.array(_FD["top_of_roll_z_of_abs_x"]); _bzc = np.array(_FD["bottom_arris_z_of_abs_x_with_corner"])
     _q = _rr * (1 - np.sin(np.pi / 4)); roll_pts = np.r_[np.c_[_xf, front_y(_xf) - _q], np.c_[_xf, front_y(_xf) - _rr]]
     face_rep = {"source": "parts/seat_front_face.json (top of the rolled edge: 8 overhead + 6 level/low front photos in one tube solve; bottom arris: 9 front photos; symmetric mean)", "roll_radius_mm": _rr, "roll_radius_provenance": "assumed"}
-outline = np.r_[np.c_[half, ys], front_pts, np.c_[-half[::-1], ys[::-1]], np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]]
+# back edge: measured (parts/seat_back.json, tools/seat_back/). In plan a bow between the two back legs (furthest back on the centre line, meeting each leg flush with its rear face);
+# in section the top arris, a flat back face leaning forward going down, the hard line, a flat 45 degree under-bevel (a lens: deepest on the centre line), the bottom arris.
+# The side outline now stops at y 45, INSIDE the back leg's footprint, and runs straight to the end of the bow at |x| 192 (inside the leg's inner face at 187.3-188.3): that
+# corner lies wholly inside the leg, which cuts it away (joinery.py), so nothing of the seat is left behind or outboard of the leg. Before: one straight vertical edge at the cloud's 1st percentile, running on behind the legs
+back_rep = None; _bkf = ROOT / "parts/seat_back.json"; back_pts = np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]; y_grid0 = y_back
+if _bkf.exists() and edge_rep and not a.legacy:
+    _BK = json.load(open(_bkf))["design"]; _bx = np.array(_BK["abs_x"]); _bt = lambda k, c: (lambda v: (lambda x: np.interp(np.abs(x), _bx, v)))(np.array(_BK[k][c]))
+    b_yT, b_zT, b_yH, b_zH, b_yB = _bt("top_arris", "y"), _bt("top_arris", "z"), _bt("hard_line", "y"), _bt("hard_line", "z"), _bt("bottom_arris", "y"); _xtip = float(_BK["lens_tip_abs_x"]); _xj, _ys0 = 192.0, 45.0
+    _k = ys > _ys0 + 2.0; _half_back_cloud = float(half[0]); half = np.r_[np.interp(_ys0, ys, half), half[_k]]; ys = np.r_[_ys0, ys[_k]]
+    _xb = np.linspace(-_xj, _xj, 2 * int(_xj // 8) + 1); back_pts = np.c_[_xb, b_yT(_xb)]
+    y_grid0 = y_back - 20.0                                   # the 10 mm grid keeps its old phase (the surface in front of the back edge is triangulated as before)
+    back_rep = {"source": "parts/seat_back.json (top arris, hard line and bottom arris of the back edge triangulated in 11, 7 and 10 photos from behind; symmetric solves)",
+                "was": "straight vertical edge at y %.1f (1st percentile of the cloud), half-width %.1f, running on behind the back legs" % (y_back, _half_back_cloud),
+                "top_arris_y": {f"x{int(x)}": float(b_yT(x)) for x in (0, 60, 120, 150, 180)}, "top_arris_minus_old_straight_edge_mm": {f"x{int(x)}": float(b_yT(x) - y_back) for x in (0, 60, 120, 150, 180)},
+                "corner": "side outline stops at y %.0f inside the back leg and runs straight to the end of the bow at |x| %.0f (inside the leg); the leg cuts the corner" % (_ys0, _xj), "lens_tip_abs_x": _xtip}
+    y_back = float(b_yT(0.0))
+outline = np.r_[np.c_[half, ys], front_pts, np.c_[-half[::-1], ys[::-1]], back_pts]
 # top surface (mirrored cloud), smooth bivariate spline on (|x|, y)
 St = S[S[:, 2] > seat_z(S[:, 1]) - 16]
 both = St
@@ -325,7 +341,7 @@ class _S:
     @staticmethod
     def ev(x, y): return feats(np.abs(np.asarray(x, float)), np.asarray(y, float)) @ coef
 spl = _S
-pg = Polygon(outline); gx, gy = np.meshgrid(np.arange(-290, 291, 10), np.arange(y_back, y_front + 1, 10))
+pg = Polygon(outline); gx, gy = np.meshgrid(np.arange(-290, 291, 10), np.arange(y_grid0, y_front + 1, 10))
 from shapely.geometry import Point
 ins = np.array([pg.contains(Point(p)) for p in np.c_[gx.ravel(), gy.ravel()]])
 if face_rep: ins &= (front_y(gx.ravel()) - gy.ravel()) > _rr + 5          # no grid points inside the roll
@@ -376,6 +392,18 @@ if face_rep:
     zt[_sd[_cm]] -= _rr * (1 - _cd[_cm] / 16.0)
     face_rep["top_of_roll_moved_mm"] = {"note": "measured top of the roll minus the surface the model had on that line (seat/surface.json carried to the edge)", "mean": float(_dzin.mean()), "min": float(_dzin.min()), "max": float(_dzin.max()),
                                         "at_x": {f"x{int(round(x))}": float(_dzx(x)) for x in (8, 40, 80, 130, 180, 230, 260)}, "fades_out_over_mm_behind_the_roll": 30}
+if back_rep:
+    # top of the back edge = the measured top arris. Behind the dotted region (seat/surface.json starts at y 64) the surface was the cloud polynomial carried back, which climbed
+    # 16 mm toward the back edge on the centre line (the slats' feet stand there and pulled the fit up). Now: STRAIGHT in y from the measured surface at the dots' limit to the
+    # measured top arris (a ruled strip between two measured lines; nothing changes inside the dotted region)
+    _ib = len(pts2) - len(back_pts) + np.arange(len(_xb)); _zb0 = zt[_ib].copy(); _r = _xb >= 0; _dzb = lambda x: np.interp(np.minimum(np.abs(x), _xj), _xb[_r], (b_zT(_xb) - _zb0)[_r])
+    _ax = np.minimum(np.abs(pts2[:, 0]), _xj); _py_ = pts2[:, 1]
+    if seat_src:
+        _m = _py_ < my0; _zl = tps(np.clip(pts2[_m, 0], mx0, mx1), np.full(int(_m.sum()), my0)); zt[_m] = b_zT(_ax[_m]) + (_zl - b_zT(_ax[_m])) * np.clip((_py_[_m] - b_yT(_ax[_m])) / (my0 - b_yT(_ax[_m])), 0, 1)
+    else: zt = zt + np.clip(1 - (_py_ - b_yT(_ax)) / 60.0, 0, 1) * _dzb(pts2[:, 0])
+    back_rep["top_behind_dots"] = {"note": "top surface between the back edge and the dotted region (y %.0f): straight in y from the measured top arris to the measured surface at the dots' limit (fitted: no dots there). "
+                                           "moved_at_edge_mm = measured top arris z minus the old cloud polynomial read ON THE NEW EDGE LINE (the old surface was an extrapolation there, pulled up by the slats' feet)" % (my0 if seat_src else 0.0), "moved_at_edge_mm": {f"x{int(x)}": float(_dzb(np.array([float(x)]))[0]) for x in (0, 60, 120, 150, 180)},
+                                   "slope_in_y": {f"x{int(x)}": float((tps(np.array([float(x)]), np.array([my0]))[0] - b_zT(x)) / (my0 - b_yT(x))) for x in (0, 60, 120, 150, 180)} if seat_src else None}
 scoop_rep = None; scoop_h = None; _sf = ROOT / "parts/seat_scoop.json"
 zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")     # underside: NOT measured; this plane matched the lower edge in side photo 1507 by eye
 xbm = pts2[:, 0].copy()
@@ -415,7 +443,14 @@ if edge_rep:
     edge_rep["min_thickness_mm"] = float((zt - zbm).min()); _o = pts2[-len(outline):]; _s = (_o[:, 1] >= _y0) & (_o[:, 1] <= _y1)
     edge_rep["model_top_at_outline_minus_measured_top_arris_z_mm"] = {"mean": float(np.mean((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "min": float(np.min((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "max": float(np.max((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s]))}
     _r = _o[:, 0] > 0; _k = np.argsort(_o[_r, 1]); edge_rep["top_at_outline_by_y"] = {f"y{int(y)}": {"model_z": float(np.interp(y, _o[_r, 1][_k], zt[-len(outline):][_r][_k])), "measured_arris_z": float(_pv("top_z_of_y", y)), "half_width": float(_pv("top_half_width_of_y", y))} for y in (110, 160, 210, 260, 310, 360, 400)}
-nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, pts2[:, 1], zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
+ybm = pts2[:, 1].copy()
+if back_rep:
+    # underside at the back: the bottom arris sits IN FRONT of the top arris (back face leaning forward + the under-bevel: 19.2 mm on the centre line). The underside's points are moved
+    # forward by that much at the edge, fading out over 60 mm (40 mm at the legs), and stay on the underside plane (the measured bottom arris is on that plane within 0.5 mm)
+    _ax = np.minimum(np.abs(pts2[:, 0]), _xj); _sh = (b_yB(_ax) - b_yT(_ax)) * np.clip(1 - (pts2[:, 1] - b_yT(_ax)) / np.interp(_ax, [150.0, _xj], [60.0, 40.0]), 0, 1); ybm = pts2[:, 1] + _sh
+    _pzb = _E["bottom_z_of_y"]["poly_in_(y-250)"]; zbm = zbm + np.polyval(_pzb, ybm - 250.0) - np.polyval(_pzb, pts2[:, 1] - 250.0)
+    back_rep["underside_edge_in_front_of_top_arris_mm"] = {f"x{int(x)}": float(b_yB(x) - b_yT(x)) for x in (0, 60, 120, 150, 180)}
+nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, ybm, zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
 nb = len(outline); base = nP - nb
 # walls: top ring -> middle ring -> bottom ring. The middle ring is the hard line along the two sides (plan outline x, underside z + lens height). Beyond the tips of the lens it
 # stays on the wall 0.3 mm above the bottom arris (the hard line runs out INTO the bottom arris; a middle ring that jumped to half height there made one long sliver triangle on the
@@ -426,6 +461,14 @@ if scoop_rep:
     _zb_ = V[base + nP:2 * nP, 2]; _zt_ = V[base:nP, 2]; _k = _side & (_hh > 0.3); Vm[_k] = np.c_[outline[_k, 0], outline[_k, 1], _zb_[_k] + np.minimum(_hh[_k], 0.8 * (_zt_ - _zb_)[_k])]
     _n = _side & ~_k; _Vt, _Vb = V[base:nP], V[base + nP:2 * nP]; Vm[_n] = _Vb[_n] + (_Vt[_n] - _Vb[_n]) * (0.3 / np.maximum(_zt_ - _zb_, 1.0))[_n, None]
     scoop_rep["wall_points_on_the_hard_line"] = int(_k.sum()); scoop_rep["edge_face_height_mm"] = {f"y{int(y)}": float(np.interp(y, outline[:len(half), 1], (_zt_ - Vm[:, 2])[:len(half)])) for y in (110, 150, 200, 250, 300, 350, 400)}
+if back_rep:
+    # back edge: the middle ring is the measured hard line inside the lens; beyond its tips 0.3 mm above the bottom arris, as on the sides
+    _bi = nb - len(back_pts) + np.arange(len(back_pts)); _x = outline[_bi, 0]; _Vt, _Vb = V[base:nP][_bi], V[base + nP:2 * nP][_bi]; _lens = (np.abs(_x) < _xtip) & (b_zH(_x) - _Vb[:, 2] > 0.3)
+    Vm[_bi] = np.where(_lens[:, None], np.c_[_x, b_yH(_x), b_zH(_x)], _Vb + (_Vt - _Vb) * (0.3 / np.maximum(_Vt[:, 2] - _Vb[:, 2], 1.0))[:, None])
+    _c = int(np.argmin(np.abs(_x) + 1e3 * ~_lens)); _f = _Vt[_c] - Vm[_bi][_c]; _g = Vm[_bi][_c] - _Vb[_c]
+    back_rep["section_on_centre_line"] = {"top_arris_yz": _Vt[_c, 1:].tolist(), "hard_line_yz": Vm[_bi][_c, 1:].tolist(), "bottom_arris_yz": _Vb[_c, 1:].tolist(), "back_face_lean_deg": float(np.degrees(np.arctan2(-_f[1], _f[2]))), "back_face_height_mm": float(np.hypot(_f[1], _f[2])),
+                                          "bevel_angle_deg": float(np.degrees(np.arctan2(_g[2], -_g[1]))), "bevel_width_mm": float(np.hypot(_g[1], _g[2]))}
+    back_rep["wall_points_on_the_hard_line"] = int(_lens.sum()); back_rep["model_top_at_edge_minus_measured_top_arris_z_mm"] = float(np.abs(_Vt[:, 2] - b_zT(_x)).max())
 V = np.r_[V, Vm]; mid0 = 2 * nP
 for i in range(nb):
     j = (i + 1) % nb; p, q, pm, qm = base + i, base + j, mid0 + i, mid0 + j; F += [[p, q, qm], [p, qm, pm], [pm, qm, q + nP], [pm, q + nP, p + nP]]
@@ -464,6 +507,8 @@ if edge_rep:
     report["seat"]["side_edge"] = edge_rep
     if scoop_rep:
         report["seat"]["side_edge_scoop"] = scoop_rep
+    if back_rep:
+        report["seat"]["outline"] = report["seat"]["outline"].replace("back edge and back corners: cloud, straight in plan", "back edge: triangulated bow between the back legs, L+R mean (+-1.6 mm; parts/seat_back.json); behind |x| 192 the outline closes inside the legs").replace("front, back and corners: cloud", "back edge: triangulated bow (parts/seat_back.json); front and corners: cloud"); report["seat"]["back_edge"] = back_rep; report["seat"]["depth_y_mm"] = [y_back, y_front]
         report["seat"]["underside"] = "plane through the triangulated bottom arrises of the side edge (+-2.5 mm at the edge); flat across: not measured, but it mirrors the room without distortion in IMG_1492"
 
 # ---------------------------------------------------------------- arms (plank from the cloud)
