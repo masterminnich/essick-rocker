@@ -880,3 +880,38 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   if those are not enough), then item 3 (front-leg Domino centring on the leg face, `tools/domino_ortho.py`), then the 3 mm
   question at the seat's right front corner, left-side scoop check, arm underside (new file), rocker bottom edge, seat side
   edge behind y 400.
+
+## 21:19 PST rocker ends (PR #23) merged; MODEL v18 on main
+- ROCKER ENDS (Joe's item 2; PR #23, `parts/rocker_ends.json`, `tools/rocker_ends/`: ortho -> trace -> fit -> trace with the
+  first fit -> fit). v17 cut both ends square (u -480, face 19.9 mm high; u 620). Measured, design = left and right averaged:
+  tail tip at u -488.17 (face 22.8 mm high 80 mm from the tip, 19.7 at 40, 14.2 at 20, 9.6 at 10, 6.6 at 5); nose top corner
+  at u 626.65, the end 4.05 mm proud of it (u 630.70), one large rounded lower corner. Tip to nose top corner 1115.7 mm,
+  overall 1118.4. Only ROCKER_L / ROCKER_R changed against v17 (945.5 cm3 each, closed); assembly check PASS.
+- PER END (photos used; slide between photos sd along / across, largest; rms per photo after its slide; spread between photos
+  median, p90): left tail 12 of 12; 5.44 / 2.46, 10.07; 0.18-0.55; 0.30, 0.66. Right tail 11 of 11; 2.66 / 1.05, 4.83;
+  0.19-0.52; 0.30, 0.59. Left nose 18 of 18; 3.59 / 2.38, 7.79; 0.19-0.58; 0.34, 0.61. Right nose 12 of 14; 1.52 / 1.49,
+  3.51; 0.15-0.59; 0.20, 0.42 (32 mm of its outline bridged by hand over a white scuff and a worn arris). A further round
+  moves the outlines, after a common slide <= 0.6 mm, by 0.06-0.10 median, 0.12-0.22 p90, 0.26-1.04 max (left tail tip).
+- METHOD THAT HELD: coarse slide of the seed onto each photo (photos sit up to 10 mm apart at the chair's ends: pose error,
+  not parallax), seed for the final round from the all-photo median of "unlike the face" cut at level 5 of 8, points
+  dropped where a camera looks onto the neighbouring surface, weights that make a tail say where it is ALONG the rocker.
+- DEAD ENDS: iterating the fit's own outline as the next seed (tip wears away, or bumps grow to 4 mm loops); snapping
+  without the colour-gradient step (0.2-0.6 mm inward); median level 3.5 (wanders through the pale eased arris under the
+  right tail); two-number registration of an end to the old profile (ill-conditioned; one number square to the top edge).
+- DESIGN: each side's end slid square to its top edge onto `mean_top` (left tail -0.06 / -0.27, right tail 0.38 / 1.73,
+  left nose -0.28 / 0.63, right nose 1.06 / -2.35 mm), averaged, faired over 12 mm (<= 0.18 mm), blended into the old profile
+  over u -330..-400 and 572..590. Nose meets the old profile within 0.4 mm.
+- OPEN: (1) left rocker 1118.6 mm tip to nose top corner, right 1112.3 (each about +-2): tail tips differ 5.89 mm along u
+  in the right_vs_left frame, nose corners 0.82; design = mean, so 2.9 mm off either tail tip. Tape check M8 per rocker
+  would settle it. (2) Tail face height at u -320: traced 26.4 left / 26.0 right, old profile 27.7 (fitted height); traced
+  bottom 0.8-1.5 mm above the old one across the blend zone. Belongs to "rocker bottom edge traced directly". (3) Shape gap
+  left / right away from the tips: tail top 0.89 mean / 2.76 max, bottom 0.83 / 1.74; nose top 0.25 / 1.10, bottom
+  0.69 / 2.53. (4) Eased arrises (tone edge traced; radius not measured), ends square across, photos slid not turned.
+- TEMPLATES SESSION: `parts/rocker_profile.json` alone is now the OLD square-cut rocker; add `parts/rocker_ends.json`
+  `design` (PLAN ownership table).
+- MODEL v18 = main after #23: `tools/model.sh --out parts/model_v18`, identical to the trial build of the branch.
+- HUB HAND-OVER (Joe, this evening: "after it lands continue working unsupervised but do all the remaining work including
+  supervision in opus 5.5"): from here the hub role moves to a new session on Opus 5.5 (PLAN "Sessions and who owns what").
+- NEXT: Joe's item 3 (front-leg Domino centring on the leg face, `tools/domino_ortho.py`; `parts/dominos.json` is the
+  joinery session's: small named edit), then the 3 mm question at the seat's right front corner, left-side scoop check, arm
+  underside and thickness (new file), rocker bottom edge u -330..572, seat side edge behind y 400.

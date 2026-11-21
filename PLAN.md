@@ -30,7 +30,8 @@
    repeat, until every part is inside 1/32" at joints and hard points and 1/16" on free curves. ~15% of photos are held out
    for validation only. Joints are mostly hidden, so they are checked by the assembly audit (`tools/audit_joints.py`), not here.
 6b. Tape readings in, as checks on the photo numbers: M1, M3, M4, M5, M9, M11 (below); M7/M8 if Joe takes them.
-6c. Finish detail: radii of the rounded edges (the model has sharp arrises everywhere); cross-check against the shop
+6c. Finish detail: radii of the rounded edges (the model has sharp arrises everywhere; the rocker ends of PR #23 are traced on the
+   tone edge of eased arrises and extruded square across: the radius there and any rounding of tip and nose in plan view); cross-check against the shop
    templates hanging in IMG_1507 (flat photos of them, if Joe can take some).
 7. Deliverables: CAD model, dimensioned drawing, accuracy report, then 1:1 tiled PDF/DXF templates with a print-scale check
    square. FINAL templates only after 5b-6c. The templates session's files before that (rocker, slats: PRs #6, #7) are drafts
@@ -42,9 +43,9 @@ other; **this section, PR descriptions and PR comments are the channel.** Read t
 
 | Session | Worktree, branches | Owns (only this session edits) |
 |---|---|---|
-| **Hub** (cc-sessions "rocking-chair"; runs unattended, works to completion) | `rocking-chair/`, main + short topic branches | `PLAN.md`, `LEDGER.md`; the model version numbers `parts/model_vN.*`; in `tools/build_model.py`: SEAT (surface, front, side edges, underside, closing the mesh), arms, rockers, crest, slats, front-leg outline; `parts/seat_*.json`, `parts/side_frame.json`, `parts/lr_skew.json`, `parts/rocker_profile.json`; phase 6 onward |
+| **Hub** (until model v18: cc-sessions "rocking-chair"; **from 2026-11-20 21:20 a new session on Opus 5.5, "Rocking chair HUB (Opus 5.5)", same worktree, at Joe's request: all remaining work and the supervision run there**; runs unattended, works to completion) | `rocking-chair/`, main + short topic branches | `PLAN.md`, `LEDGER.md`; the model version numbers `parts/model_vN.*`; in `tools/build_model.py`: SEAT (surface, front, side edges, underside, closing the mesh), arms, rockers, crest, slats, front-leg outline; `parts/seat_*.json`, `parts/side_frame.json`, `parts/lr_skew.json`, `parts/rocker_profile.json`, `parts/rocker_ends.json`, `tools/rocker_ends/`; phase 6 onward |
 | **Joinery / audit** (cc-sessions "rocking-chair-seat"; Joe attends it; it did the seat survey first) | `../rocking-chair-audit`, branch `joinery` and successors | in `tools/build_model.py`: the back-leg outline code, the placement of the legs against seat and rockers, every joint body; `tools/audit_*.py`, `tools/domino_ortho.py`; `parts/dominos.json` and any new joinery file; `reports/`; `figures/joinery/`, `figures/model_audit/` |
-| **Templates** | `../rocking-chair-templates`, branch `templates` | `templates/` (its own ledger is `templates/LEDGER.md`); reads `parts/*.json` and `parts/rocker_profile.json` |
+| **Templates** | `../rocking-chair-templates`, branch `templates` | `templates/` (its own ledger is `templates/LEDGER.md`); reads `parts/*.json` and `parts/rocker_profile.json`. **From model v18 the rocker's outline is `rocker_profile.json` between u -330 and u 572 PLUS the two ends in `parts/rocker_ends.json` `design` (its `note` says how they join); `rocker_profile.json` alone gives the old square-cut rocker** |
 | Seat survey (finished; now the joinery session) | `../rocking-chair-seat`, branch `seat` | `seat/` (frozen: `seat/surface.json`, `seat/dots.csv`). A doubt about it is written in LEDGER.md, not fixed in place |
 | Crest and arms (finished) | `../rocking-chair-crest` | `parts/crest.json`, `parts/arms.json` (frozen; additions go in a separate file) |
 | Viewer (finished) | `../rocking-chair-viewer` | `viewer/`; it finds the newest `parts/model_vN.glb` on main by itself |
@@ -65,7 +66,9 @@ Phase 5b checklist:
   [ ] the 3 mm question at the right front corner of the seat (LEDGER 17:33; now with a lead: the right side edge measures
   2-3 mm outboard of the symmetric model along its whole length, LEDGER 19:05) · [ ] left-side check of the seat scoop ·
   [ ] arm underside and thickness (new file, not `parts/arms.json`) · [ ] rocker bottom edge traced directly (today it is the
-  top edge minus a fitted face height) · [ ] seat side edge behind y 400, where it meets the back leg (today extrapolated).
+  top edge minus a fitted face height; lead from PR #23: at u -320 the directly traced side face is 26.4 mm high on the left and
+  26.0 on the right where the profile says 27.7, while at the nose old and new agree; the ends in `parts/rocker_ends.json` are
+  already traced directly, so this item is the stretch u -330..572) · [ ] seat side edge behind y 400, where it meets the back leg (today extrapolated).
 
 **Joe's fix list, 2026-11-20 19:00 (said in the hub session; "add this to the plan to fix after v16, then continue with the
 rest of the plan as written"). Joe gave these to the HUB, so the hub does them, including the two that touch the joinery
@@ -76,7 +79,7 @@ session's files. Joinery session: please do not start the same items; the hub ke
    rear / outer face, one at seat height and one higher, at the arm. The model has only the seat one (`DOMINO_BR/BL`) and an
    unmodelled "contact face" at arm / back leg. Add the arm / back-leg Domino and check the seat one comes out where the photo
    shows it.
-2. [ ] **Rocker ends are not shaped right** (IMG_1618: the tail thins to a slim rounded tip; IMG_1619: the front end is cut
+2. [x] (PR #23, model v18; `parts/rocker_ends.json`, `tools/rocker_ends/`: tail tip at u -488.2, nose top corner at u 626.6 with the end 4.1 mm proud of it; open: left rocker 6.3 mm longer than the right in the photos, design = mean) **Rocker ends are not shaped right** (IMG_1618: the tail thins to a slim rounded tip; IMG_1619: the front end is cut
    to a round nose across the laminations). The model's rocker ends do not have these shapes. Rockers are the hub's part.
 3. [ ] **Front-leg Domino sits off-centre on the leg** (Joe's viewer screenshot of v15: the slot is to one side of the leg's
    width). Re-measure the slot's position on the leg face against the leg's two edges and centre it if the photos agree.
@@ -155,7 +158,7 @@ Required:
 - M5 centre slat width just under the crest. (Trace 100.0-100.5 vs tape IMG_1553 98.3: 1.7-2.2 mm conflict.)
 Optional:
 - M6 arm thickness at the front end (assumed 25 mm; try the side photos first).
-- M7 table to top of crest at the centre; M8 rocker tip to tip, straight line. The only independent check on the single
+- M7 table to top of crest at the centre; M8 rocker tip to tip, straight line (from PR #23 better PER ROCKER: tail tip to the top corner of the nose; the photos say 1118.6 mm left, 1112.3 right, each about +-2; the model has 1115.7). The only independent check on the single
   framing-square scale; they make the accuracy report more than self-graded.
 - M9 table to the top of the seat's side edge just behind the front leg, LEFT and RIGHT (two tape readings). The photos say
   the right side sits 3.7-5.9 mm lower there and the whole right side frame is pitched about 0.5 deg nose-down against the left
