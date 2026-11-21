@@ -65,10 +65,19 @@
        px/mm, both halves); the tracing direction (behind-above, IMG_1540) and the critique's tone line from behind read 0..+0.5.
        A round of r 4-5 mm or more, or a top that rolls off before the edge, fits; reading M13 decides (then a 6c radius or a
        seat_back.json change).
-     - [ ] rocker top at the nose (v24 #20: top/outer y 300-650 -2.27 [-3.1..+0.1]; y 600-650 -2.0 [-0.1]) and tail (y -500..-450
-       +2.0 [+2.1]); arm underside inner edge (v24 #17: bottom/inner y 50-100 +1.43 [+1.67], `parts/arm_underside.json`).
-     - NEXT hub fix: the rocker's top at the nose and the tail, then the arm underside's inner edge. Ranked list: v24
-       (`reports/critique_v24.md`); the seat front corner waits for a reading; the slat turn waits for Joe's yes/no; then 6c.
+     - [x] rocker top at the nose (v24 #20: top/outer y 300-650 -2.27 [-3.1..+0.1]) and tail (y -500..-450 +2.0 [+2.1]).
+       MEASURED, PR #36, NO model change: asymmetry and pose, not shape. In single photos (PR #29 ribbons, 17 L / 14 R, 1.4-3.9
+       px/mm, up to 6.1 at one end) each side's top keeps its own traced shape within 1.2 mm (rms 0.5-0.6) once the photo's own
+       shift and tilt are removed; what is left in the critique is the rocker's tilt in 3D: per photo, left -3.8 mm/m (ranking
+       -4.4, held -2.2), right -0.6, scatter 3-4 mm/m (IMG_1492: top AND bottom edges 3.5 mm high together). Reading M14 settles it
+       (placement: the joinery side's call).
+     - [x] arm underside inner edge (v24 #17: bottom/inner y 50-100 +1.43 [+1.67]; y 400-450 +1.08). MEASURED, PR #36, NO change
+       to `h_inner`: within spread, L/R asymmetric. Pose-free per photo against the same photo's outer top arris
+       (`tools/arm_underside/critique_inner.py`, 1.6-2.3 px/mm, best 7.2): left -0.59 (20 photos), right +0.81 (18 photos),
+       spread 1-2.5 mm per stretch; right +3.4 at y 50-100 (3 photos) and +2.4 at y 400-450 (6); left held-out disagrees with
+       its ranking photos; all within `tolerance_inner`. PR #27's inner-face caliper reading settles it (M15).
+     - NEXT hub fix: 6c edge radii. Ranked list: v24 (`reports/critique_v24.md`); every hub item of it is now measured; the seat
+       front corner waits for a reading; the slat turn waits for Joe's yes/no.
    - Requests to the joinery session (its files; not fixed by the hub):
      - [ ] back-leg foot (z 0-100) +2.1..+4.1 on every edge [+2.3..+3.5]: the real foot is about 3 mm narrower than the model
        (`figures/critique/top_back_leg_foot_IMG_1503.jpg`).
@@ -250,6 +259,11 @@ Optional:
   outline 2-3 mm inside the model's top arris from the front, from overhead and from behind-below, but on it from behind-above,
   where the arris was traced; a round of r 4-5 mm or more, or a roll-off of the top, would each do that, and the photos cannot
   tell which. Decides the critique item seat top/back (+1.8 [+1.4]) and that edge's 6c radius.
+- M14 rocker tilt (PR #36): with the chair on the flat bench, table to the rocker's TOP edge at the nose top corner and about
+  50 mm in from the tail tip, on both rockers (4 tape readings). Each rocker's top shape matches the photos within 1.2 mm; the
+  photos cannot pin its tilt in 3D better than 3-4 mm/m, which is the critique's -2 at the nose / +2 at the tail (left mostly).
+- M15 arm thickness on the INSIDE face (PR #27 open, PR #36): vertical, at y about 150 and about 400, both arms. The photos read
+  the right arm's inner bottom arris 1-3 mm higher than the design (the mean) and the left 0-3 lower; settles `h_inner`.
 - Leg stock thickness across (now +-3 mm; part of M11), only if Joe wants rough stock sizes; side templates do not depend on it.
 Dropped as covered by photos: R1-R5, F1-F3, B1-B4, A1-A3 widths, C2-C4, S2/S3 (except M5), K2, K4-K6, the seat depth grid
 (replaced by the tape-dot survey, leave-one-out 1.18 mm), the far photos (IMG_1588-1592: taken, not registered; see phase 6 pass 1). Every dimension that stays

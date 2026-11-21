@@ -1221,3 +1221,23 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - PLAN: critique fix 3 ticked (both edges), pass 3 noted, hub/Templates rows call out `design.bottom_arris.from_tube`, 6c lists
   the two seat-edge radii.
 - NEXT: rocker top at the nose and tail; arm underside inner edge; the seat front corner waits for a reading; the slat turn waits for Joe's yes/no; then 6c edge radii.
+
+## 2026-11-21 03:00 PST rocker top at nose and tail, arm underside inner edge: measured, no model change (PR #36)
+- RUN ON Opus 5.5 (hub). PR #36 squash-merged as 1b4833f (measurement only; model v24 stays; no build, no critique rerun).
+- ROCKER TOP (v24 #20 -2.27 [-3.1..+0.1] nose, +2.0 [+2.1] tail). MODELLED: `rocker_profile.json` mean_top (L/R mean via
+  right_vs_left 0.85 deg) + `rocker_ends.json` ends. CRITIQUE SPLIT: L nose -2.0..-3.5 (9-18 ranking photos; held 1474 -3.9,
+  1471 -3.7, 1499 -1.6, 1558 (6.2 px/mm) -0.2); R nose in two groups (1525-1536 +1.3..+3.0, 1486-1508/1519 -1.6..-3.4; held
+  +1.4..+2.4, 1520 -1.4); bottom edges read the opposite sense = a tilt. Per-photo line fit (`tools/rocker_top/pitch.py`): L
+  -4.4 mm/m (14) [held -2.2, 3], R -0.6 (32) [-0.7, 5], scatter 2.9-3.8 mm/m. DIRECT, pose-free (`tools/rocker_top/ribtop.py`
+  on PR #29 ribbons, 1.4-3.9 px/mm, 5.1-6.1 at one end): each side's top within 1.12 (L, 17 photos) / 1.22 (R, 14) of its
+  own traced top, rms 0.48 / 0.57; L nose +1.1 and R tail -0.6..-0.95 are the shape's share (same sense, half size). By eye
+  at 10 px/mm: 1492 R tail top and bottom edges both 3.5 high (pose); 1487 R nose top -3 / front +2.6 (rigid shift); 1558 held
+  L nose on the wood; 1578 (10.3 px/mm) out of focus, says nothing. The two 3D placements (profile frames vs critique poses)
+  disagree by 3-6 mm at the tail. VERDICT: asymmetry + pose, model is the mean, no change. Reading M14 added (placement).
+- ARM INNER EDGE (v24 #17 +1.43 [+1.67]; y 400-450 +1.08). MODELLED: `arm_underside.json` h_inner, L/R mean, R 3 photos, L 1.
+  DIRECT (`tools/arm_underside/critique_inner.py`: bottom/inner offset + same photo's outer top offset, vertical, |m_z| > 0.5;
+  1.6-2.3 px/mm, best 7.2): L -0.59 (54 readings, 20 photos), R +0.81 (48, 18); per stretch spread 1-2.5; R +3.4 at y 50-100
+  (3), +2.4 at 400-450 (6); L held-out disagrees with ranking. By eye: 1490 R all three arm lines 3-4 mm low in the model;
+  1582 L from below reads the other way but mixes width with drop. VERDICT: within spread, L/R asymmetric; no change. M15 added.
+- PLAN: both items ticked with findings; M14, M15 added; NEXT hub fix 6c.
+- next: 6c edge radii: measure the easing / radius of the arrises from the photos where it can be told, as a measurement and a hub parts file, applied to the model only where measured; waiting on Joe: slat turn yes/no, seat front corner reading, M13, M12, M9, M8, M6; joinery-session requests and frozen-file doubts stay as requests
