@@ -1,0 +1,104 @@
+{
+ "what": "Phase 6c: radii of the eased (rounded) edges of the ESSICK rocker, per edge family. RECORD ONLY: the model (v24) keeps sharp arrises everywhere; nothing here is read by tools/build_model.py. For templates: a shaping note (round the arrises by about these radii), not an outline change, except where 'templates' says otherwise.",
+ "units": "mm",
+ "method": {
+  "tone_band": "tools/edge_radii/prof.py + band.py, single photos at the best scale available (tape in the same photo, tools/edge_radii/tick.py). A profile of L* is taken square to the edge, averaged along 100-1600 px of it. Seen square to one face, a round of radius r shows its whole curve as a band r wide between the face's tangent line and the silhouette; the band's tone only departs visibly some way into the curve, so r >= B10 (band width to 10 % of its extreme) and r <= 2 B10 if the tone departs within 30 deg of the face. Each line was drawn and each result checked by eye on the photo (figures/edge_radii/bands.png). Resolution = the blur (FWHM of the silhouette step), 0.2-0.6 mm.",
+  "corner": "tools/edge_radii/cornerfit.py: radius of a corner seen square-on (outline by Otsu threshold, smoothed 2 px; R = arc length over the middle 70 % of the turn / (0.7 x turn)), at three arm lengths; checked on its overlay (figures/edge_radii/corners.png).",
+  "silhouette_pairs": "tools/edge_radii/pairs.py + fit_pairs.py over the critique's 93 photos (about 2 px/mm): opposite silhouettes of one member at one station, S = gap_a + gap_b = section misfit + r (k_a + k_b), k = the critique's ease factor. Not resolved: r per member -3.1 to +4.1 mm, bootstrap se 0.6-3.2 mm, and the members with a negative r show that the section-shape misfit, not the easing, dominates the pairs. Legs only: FLEG 0.8 +-1.5, BLEG 0.3 +-1.0 (90 % -1.4..1.6); held-out median |residual| 0.83/0.87 (FLEG) and 0.86/0.88 (BLEG) with/without r, i.e. no measurable gain. Kept as the upper bound r < about 2-3.5 mm on the legs, nothing finer.",
+  "inputs": "tools/edge_radii/edges.json; rerun: tools/py.sh tools/edge_radii/run_all.py (writes work/edge_radii/results.json), figures: tools/py.sh tools/edge_radii/fig.py"
+ },
+ "families": {
+  "rocker_top_bottom_arris": {
+   "label": "rocker top/outer arris (nose end)", "status": "upper bound", "radius_mm": 0.3, "tol_mm": 0.3, "edge_type": "sharp (blur-limited)",
+   "photos": ["IMG_1495 (front rocker nose end face seen nearly end-on, 14.3 px/mm from the 30.5 mm rocker width +-10 %)"],
+   "method": "corner: the top-outer corner of the nose's end face IS the section of the top/outer arris; R 0.30-0.31 mm at arms 40/60/90 px (turn 93-95 deg), equal to the blur. The top/end arris shows a pale highlight about 0.3 mm wide. Bottom arrises not measured (the right tail's bottom arris shows a pale band 1-2 mm wide in PR #23's orthophotos: possibly eased there or worn finish).",
+   "short": "r <= 0.3 at the nose (1 photo)",
+   "tone_edge_bias_mm": "0 to -0.3 per traced top edge"
+  },
+  "rocker_ends_in_plan": {
+   "label": "rocker tail tip corners in plan", "status": "measured", "radius_mm": 2.8, "tol_mm": 0.6, "edge_type": "true radius (rounded vertical end/side arris)",
+   "photos": ["IMG_1493 (right rocker rear tip from above, tape across it, 21.47 px/mm)"],
+   "method": "corner: one plan corner R 2.72-2.93 mm (arms 80/120/160 px, turn 72-83 deg); the other 3.10-3.57 (turn 70-112 deg; partly against the tape and its arc sits on the end just past the corner, so a soft upper bound). Nose corners in plan not seen square-on in any photo.",
+   "short": "R 2.7-2.9 (3.1-3.6 soft), tail tip, 1 photo",
+   "tone_edge_bias_mm": "none on the side-view traces of PR #23 (the end's silhouette seen square to the side is the end plane); in plan the square-across extrusion is 0.41 x 2.8 = 1.2 mm proud on each tip corner's diagonal"
+  },
+  "leg_arris_front": {
+   "label": "front leg arrises", "status": "measured", "radius_mm": 0.85, "tol_mm": 0.45, "edge_type": "soft arris (eased)",
+   "photos": ["IMG_1495 (front face, right-hand arris, 13.11 px/mm)"],
+   "method": "tone band: B10 0.57 mm, B50 0.27, blur 0.53 (highlight), so r 0.6-1.1 and close to the blur. Silhouette pairs: 0.8 +-1.5 (not resolved).",
+   "short": "r 0.6-1.1 (1 photo, near the blur)",
+   "tone_edge_bias_mm": "-0.3 (B50) per edge, at most -1.1"
+  },
+  "leg_arris_back": {
+   "label": "back leg arrises", "status": "measured", "radius_mm": 1.0, "tol_mm": 0.5, "edge_type": "soft arris (eased)",
+   "photos": ["IMG_1556 (rear face, both arrises, 12.33 px/mm)"],
+   "method": "tone band: outer arris B10 0.73, B50 0.45, blur 0.28 (r 0.7-1.5); inner arris B10 0.36, blur 0.61 (blur-limited, r <= 1.2). Silhouette pairs: 0.3 +-1.0 (not resolved).",
+   "short": "r 0.7-1.5 outer, <= 1.2 inner (1 photo)",
+   "tone_edge_bias_mm": "-0.45 (B50) per edge, at most -1.5"
+  },
+  "arm": {
+   "label": "arm top/bottom arrises, front end", "status": "not measured", "edge_type": "unknown",
+   "photos": [], "method": "no close-up of an arm; at the orbit's 2 px/mm the silhouette pairs give -2.6 +-1.0 (the section misfit dominates). PR #36: the arm's inner top edge sits on the tone edge within the tolerance. Reading M16.",
+   "short": "not measured (M16)"
+  },
+  "crest_top": {
+   "label": "crest top, rear arris", "status": "measured", "radius_mm": 1.35, "tol_mm": 0.5, "edge_type": "soft arris (eased)",
+   "photos": ["IMG_1555 (from behind, 15.23 px/mm)"],
+   "method": "tone band (highlight): B10 0.89, B50 0.43, blur 0.20; r 0.9-1.8.",
+   "short": "r 0.9-1.8 (1 photo)",
+   "tone_edge_bias_mm": "-0.4 (B50) per edge, at most -1.8; on M3 (crest height, photos 74.7 vs tape 77.5) the photo traces would read short only if they sat on the band (about 0.4 + 0.8 = 1.2 at B50, at most 1.8 + 2.2 = 4.0 on the tangent lines), so the easing may explain part of the 2.8 conflict but is not measured on the traces themselves; M3 stays"
+  },
+  "crest_bottom": {
+   "label": "crest bottom, rear arris", "status": "measured", "radius_mm": 1.6, "tol_mm": 0.55, "edge_type": "soft arris (eased)",
+   "photos": ["IMG_1555 (from behind, over the gap between slats, 15.23 px/mm)"],
+   "method": "tone band (shade): B10 1.08, B50 0.79, blur 0.26; r 1.1-2.2.",
+   "short": "r 1.1-2.2 (1 photo)",
+   "tone_edge_bias_mm": "-0.8 (B50) per edge, at most -2.2"
+  },
+  "slat_edges": {
+   "label": "slat edges", "status": "measured", "radius_mm": 1.0, "tol_mm": 0.35, "edge_type": "soft arris (eased)",
+   "photos": ["IMG_1553 (centre slat left edge just under the crest, from behind, 15.93 px/mm)"],
+   "method": "tone band (shade): B10 0.66, B50 0.44, blur 0.19; r 0.7-1.3. Silhouette pairs (side slats +4.1 +-1.9, centre -3.1 +-1.9) not resolved.",
+   "short": "r 0.7-1.3 (1 photo)",
+   "tone_edge_bias_mm": "-0.45 (B50) per edge, at most -1.3"
+  },
+  "seat_front_roll": {
+   "label": "seat top front roll", "status": "assumed", "radius_mm": 8.0, "edge_type": "rolled over (no arris)",
+   "photos": [], "method": "parts/seat_front.json roll_radius_mm (assumed 8): the 8 overhead photos cannot tell 4 from 16 mm (same residual) and the plan outline moves by under 1 mm over that range. Not remeasured here; the tape close-up across the seat front (IMG_1593) is not registered and looks along the roll, not across it.",
+   "short": "8 assumed; 4-16 moves the outline < 1 mm"
+  },
+  "seat_front_bottom_arris": {
+   "label": "seat front bottom arris", "status": "not measured", "edge_type": "probably eased",
+   "photos": [], "method": "PR #34: its crease reads 0.4 mm more outside in low views, consistent with an easing of 1-2 mm; no close-up.",
+   "short": "eased 1-2 likely (PR #34), not measured"
+  },
+  "seat_side_edge": {
+   "label": "seat side edge (top)", "status": "not measured", "edge_type": "square, hard line (PR #20)",
+   "photos": [], "method": "PR #20: a square vertical edge face with a hard line at the top arris in every close photo; not remeasured.",
+   "short": "square, hard line (PR #20)"
+  },
+  "seat_top_back_edge": {
+   "label": "seat top back edge", "status": "lower bound", "radius_mm": 4.0, "edge_type": "round of r >= 4-5 OR a roll-off of the top (cannot tell)",
+   "photos": ["PR #35: IMG_1551 at 14 px/mm shows no edge"], "method": "PR #35: the outline sits 1.8-3.4 mm inside the model's top arris from the front, overhead and behind-below; a round needs r >= 4-5 mm to do that. Every other arris measured here is 0.3-2 mm, so a 4-5 mm round would be unlike the rest of the chair; a roll-off of the top is at least as likely. Reading M13.",
+   "short": "r >= 4-5 or roll-off; M13"
+  },
+  "seat_underside_bevel": {
+   "label": "seat underside bevel arrises", "status": "not measured", "edge_type": "unknown",
+   "photos": [], "method": "no close-up; the bevel (parts/seat_scoop.json) is traced on its outline, which an easing of about 1 mm moves by under 0.5 mm.",
+   "short": "not measured"
+  }
+ },
+ "bias_for_existing_values": {
+  "rule": "A tone-edge trace of a face's edge lies between the face's tangent line (-r) and the silhouette (0); measured bands put it at about -B50 per edge. A silhouette seen square to the neighbouring face carries no bias; seen obliquely it reads +k r outside the sharp model (critique ease factor k, 0 to 0.41). With r about 1 mm that is at most 0.4 mm: below the 1.6 mm free-curve and 0.8 mm hard-point tolerances, so the sharp model is not biased beyond its tolerance by the easing except where noted.",
+  "rocker_thickness_PR32": "PR #32 assumed an easing bias of -0.8 +-1.6 on the tape IMG_1493 reading (30.5). Measured top/outer arris r <= 0.3 (nose): the easing part is 0 to -0.6 over both edges, inside the +-1.6 and smaller than it; no change to parts/rocker_section.json (the correction, <= 0.6, is below the 1.6 tolerance). M12 still pins it.",
+  "rocker_ends_PR23": "Top edges traced on the tone edge between top and side faces: low by <= 0.3 mm (r <= 0.3), below tolerance, no change. Ends extruded square across: the tail tip's plan corners are rounded R about 2.8, so the model's tip is 1.2 mm proud on each corner's diagonal (2.8 mm along each face): a shaping detail for the templates (round the tip's corners in plan, about 3 mm), not a template outline change. The nose's plan corners are not seen square-on.",
+  "slat_width_M5": "Centre slat: photo trace 100.0-100.5 vs tape IMG_1553 98.3 (1.7-2.2 conflict). Edges r 0.7-1.3: if the tape was read at the end of the flat face (the tangent lines) rather than the silhouette, it reads 2r = 1.3-2.6 short, the size of the conflict; read at the silhouette, the easing changes nothing. So the easing can explain M5 but does not prove it; the model keeps the trace and M5 stays.",
+  "seat_back_edge_PR35_M13": "Needs r >= 4-5 mm; nothing here measures that edge; the chair's other arrises are 0.3-2 mm. M13 stays, unchanged."
+ },
+ "model": {
+  "version": "v24 (unchanged)",
+  "why_no_rounds": "No round passes every condition: the crest, slat and leg easings (about 1-1.6 mm) shift a silhouette by at most 0.41 r = 0.7 mm and a tone trace by at most r, both under the 1.6 mm free-curve tolerance, and at the critique's 2 px/mm they are below its resolution (the silhouette-pair fit gains nothing on the held-out photos); the rocker arris is sharp; the only round that reaches 1.2 mm (the tail tip's plan corners) is measured on one photo, lies at a tip the critique samples with a handful of points at 2 px/mm, and would need the rocker-end geometry rebuilt across; the seat's back edge (M13) and front roll are not measured. So the model stays sharp (the preferred outcome) and the radii are recorded here."
+ },
+ "readings": "M16 (PLAN): radius gauge, coin or a fingertip judgement on the arm (top outer arris and the front end in plan), the rocker tail tip corners in plan (photo 2.7-3.6), the rocker's bottom arris near the tail, and one leg arris (photo 0.6-1.5). M13 covers the seat's back edge. Never blocking.",
+ "provenance": "measured (single photos, tape scale) where status = measured / upper bound; otherwise as stated per family. Phase 6c, 2026-11-21."
+}
