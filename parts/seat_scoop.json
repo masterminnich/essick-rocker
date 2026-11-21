@@ -1657,7 +1657,7 @@
    ],
    "provenance": "triangulated",
    "tol_mm": 1.5,
-   "provenance_ends": "fitted: outside y 105-440 the measured curve is carried on as a straight line to zero (back tip y 90, front tip y 456); the tips are inside or at the leg joints"
+   "provenance_ends": "fitted: outside y 105-440 the measured curve is carried on as a straight line to zero (back tip y 90, front tip y 456); where the tips sit against the leg joints has not been checked"
   },
   "bevel_angle_deg": {
    "value": 46.2,
@@ -1704,7 +1704,8 @@
   "left side: assumed mirror (no trace from below yet)",
   "IMG_1490 (the lowest photo, 30 degrees below) sits 2.8 mm off the hard line and 1.5 mm off the bottom arris, same sign: its pose, not the edge (the other 13 photos fit within 1.7 mm)",
   "the top arris is eased; its radius is not measured",
-  "the tips of the scoop (behind y 105, in front of y 440) are a straight continuation, hidden in or beside the leg joints",
+  "on right-side photos the symmetric model sits about 2.5-3.4 mm inboard of these right-side curves (and up to 1.9 mm high at the back): the design is the left/right mean and this chair's right side measures wider (parts/seat_edge.json, parts/lr_skew.json); the section itself (height of the hard line above the underside, bevel angle) is carried over unchanged",
+  "the tips of the scoop (behind y 105, in front of y 440) are a straight continuation (not traced; they run toward the leg joints)",
   "the underside is flat ACROSS by the undistorted reflection in IMG_1492 only; the close-ups IMG_1570-1576 are registered too badly to measure it"
  ]
 }

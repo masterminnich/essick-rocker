@@ -417,12 +417,14 @@ if edge_rep:
     _r = _o[:, 0] > 0; _k = np.argsort(_o[_r, 1]); edge_rep["top_at_outline_by_y"] = {f"y{int(y)}": {"model_z": float(np.interp(y, _o[_r, 1][_k], zt[-len(outline):][_r][_k])), "measured_arris_z": float(_pv("top_z_of_y", y)), "half_width": float(_pv("top_half_width_of_y", y))} for y in (110, 160, 210, 260, 310, 360, 400)}
 nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, pts2[:, 1], zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
 nb = len(outline); base = nP - nb
-# walls: top ring -> middle ring -> bottom ring. The middle ring is the hard line along the two sides (plan outline x, underside z + lens height); elsewhere, and where the lens is
-# under 0.3 mm, it is simply halfway down the wall (which is then one flat face as before)
+# walls: top ring -> middle ring -> bottom ring. The middle ring is the hard line along the two sides (plan outline x, underside z + lens height). Beyond the tips of the lens it
+# stays on the wall 0.3 mm above the bottom arris (the hard line runs out INTO the bottom arris; a middle ring that jumped to half height there made one long sliver triangle on the
+# 46 degree plane at each tip, drawn as a stray edge on the overlays). On the front and back edges it is halfway down the wall (one flat face as before)
 Vm = 0.5 * (V[base:nP] + V[base + nP:2 * nP])
 if scoop_rep:
     _oi = np.arange(nb); _side = (_oi < len(half)) | ((_oi >= len(half) + len(front_pts)) & (_oi < 2 * len(half) + len(front_pts))); _hh = scoop_h(outline[:, 1])
     _zb_ = V[base + nP:2 * nP, 2]; _zt_ = V[base:nP, 2]; _k = _side & (_hh > 0.3); Vm[_k] = np.c_[outline[_k, 0], outline[_k, 1], _zb_[_k] + np.minimum(_hh[_k], 0.8 * (_zt_ - _zb_)[_k])]
+    _n = _side & ~_k; _Vt, _Vb = V[base:nP], V[base + nP:2 * nP]; Vm[_n] = _Vb[_n] + (_Vt[_n] - _Vb[_n]) * (0.3 / np.maximum(_zt_ - _zb_, 1.0))[_n, None]
     scoop_rep["wall_points_on_the_hard_line"] = int(_k.sum()); scoop_rep["edge_face_height_mm"] = {f"y{int(y)}": float(np.interp(y, outline[:len(half), 1], (_zt_ - Vm[:, 2])[:len(half)])) for y in (110, 150, 200, 250, 300, 350, 400)}
 V = np.r_[V, Vm]; mid0 = 2 * nP
 for i in range(nb):

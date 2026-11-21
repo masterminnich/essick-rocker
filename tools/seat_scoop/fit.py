@@ -57,7 +57,7 @@ out = {
           "the under-bevel runs from the hard line inward and down at 'bevel_angle_deg' to the underside. Outside 'y_range' the height is 0: vertical edge face, full thickness.",
   "y_range": [round(tb, 1), round(tf, 1)],
   "hard_line_height_above_underside_of_y": {"y": ytab.round(2).tolist(), "height_mm": gtab.round(2).tolist(), "provenance": "triangulated", "tol_mm": 1.5,
-      "provenance_ends": "fitted: outside y %d-%d the measured curve is carried on as a straight line to zero (back tip y %.0f, front tip y %.0f); the tips are inside or at the leg joints" % (C[0, 1], C[-1, 1], tb, tf)},
+      "provenance_ends": "fitted: outside y %d-%d the measured curve is carried on as a straight line to zero (back tip y %.0f, front tip y %.0f); where the tips sit against the leg joints has not been checked" % (C[0, 1], C[-1, 1], tb, tf)},
   "bevel_angle_deg": {"value": round(angle, 1), "provenance": "triangulated", "tol_deg": 1.5},
   "edge_face": {"lean_mm": 0.0, "provenance": "fitted", "note": "vertical; measured %.1f mm (sd %.1f) outboard at the hard line, inside the 1.5 mm tolerance of the outline" % (float(np.mean(lean)), float(np.std(lean)))},
   "left": {"provenance": "assumed", "note": "mirror of the right; the left side has not been traced from below yet"}},
@@ -70,7 +70,7 @@ out = {
   "bottom_arris_vs_seat_edge_json_right": {"x_mm": st(B[:, 0] - ip(R["bottom_arris_xyz"], yb, 0)), "z_mm": st(B[:, 2] - ip(R["bottom_arris_xyz"], yb, 2)), "x_mm_y150_300": st((B[:, 0] - ip(R["bottom_arris_xyz"], yb, 0))[(yb >= 150) & (yb <= 300)]),
       "note": "this file minus the old side-sheet bottom arris: they agree at mid-length; toward the front the old line (side photos only, depth weak) stays up to %.0f mm too far in, because the real arris swings out to close the scoop at the front leg" % float(np.max(B[:, 0] - ip(R["bottom_arris_xyz"], yb, 0)))}},
  "open": ["left side: assumed mirror (no trace from below yet)", "IMG_1490 (the lowest photo, 30 degrees below) sits 2.8 mm off the hard line and 1.5 mm off the bottom arris, same sign: its pose, not the edge (the other 13 photos fit within 1.7 mm)",
-          "the top arris is eased; its radius is not measured", "the tips of the scoop (behind y %d, in front of y %d) are a straight continuation, hidden in or beside the leg joints" % (C[0, 1], C[-1, 1]),
+          "the top arris is eased; its radius is not measured", "on right-side photos the symmetric model sits about 2.5-3.4 mm inboard of these right-side curves (and up to 1.9 mm high at the back): the design is the left/right mean and this chair's right side measures wider (parts/seat_edge.json, parts/lr_skew.json); the section itself (height of the hard line above the underside, bevel angle) is carried over unchanged", "the tips of the scoop (behind y %d, in front of y %d) are a straight continuation (not traced; they run toward the leg joints)" % (C[0, 1], C[-1, 1]),
           "the underside is flat ACROSS by the undistorted reflection in IMG_1492 only; the close-ups IMG_1570-1576 are registered too badly to measure it"]}
 json.dump(out, open(outf, "w"), indent=1)
 print("wrote", outf)
