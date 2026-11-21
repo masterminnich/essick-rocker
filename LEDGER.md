@@ -1089,3 +1089,25 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   left as fitted (the face/shadow boundary). Joinery: the foot cut and 5b's sampled Domino centre move with re-triangulation (an
   exact-input-only determinism); the joinery session may want them pinned.
 - NEXT: seat side edge behind y 400 where it meets the back leg, register IMG_1588-1593 at half resolution, then phase 6 critique loop.
+
+## 2026-11-21 00:14 PST seat side edge at both legs traced (PR #30); NO model change, main stays model v22
+- Hub: Opus 5.5, the calling hub's item 6.
+- WHAT WAS EXTRAPOLATED: `parts/seat_edge.json` `design` covers y 110-400. `tools/build_model.py` makes up the plan outline (top
+  arris) outside it: behind y 110 the cloud outline shifted +0.0 and faded over 60 mm, in front of y 400 a straight line to the
+  front corner (268.0 at y 534.2). Visible: back leg face (y ~78-81) to 110, and 400 to the front leg's rear face (~440-446);
+  hidden in the joints y 45-78 and ~446-500. Both stretches measured.
+- METHOD (`tools/seat_side_ends/`): PR #8's plan solve re-run with the seed carried to each leg (`tri.sh`); reproduces the stored
+  solve inside 110-400 (R -0.02 / max 0.24, L -0.03 / 0.62). R 13 photos rms 0.63 y 80.6-439.6; L 9 photos rms 0.67 y 82.8-434.7;
+  jackknife (`jackknife.sh`) se R 0.2-0.6, L 0.5-1.3; every trace checked by eye on single photos at 10-12 px/mm (`check.py`).
+- RESULT: L/R mean minus v22 -0.26..+0.49 (worst +0.49 at y 85); each side's shape (own offset at 110 / 400 removed) within 0.6;
+  R-L +1.2..+1.4 back, +4.0..+4.4 front (the known lean). Arris z 1.1-1.8 below the model's top at the back, 0.9-2.1 at the
+  front (1.1 / 0.9 already at the range ends; tol 2.5). All inside tolerance: no change. Back-end section by eye (IMG_1489, 1523):
+  the hard line runs out into the bottom arris at the leg as modelled.
+- CHANGE: `parts/seat_edge.json` new block `ends` (provenance "traced, agrees within 0.5 mm"; stations, photos, se; existing keys
+  unchanged); `tools/build_model.py` report text only (params `seat.outline`, `seat.side_edge.ends_check`; a shapes-only build
+  gives byte-identical edges); `tools/seat_edge_fit.py` keeps `ends` on a rewrite. Figures `figures/seat_side_ends/`.
+- OPEN: front corner in front of the front leg, LEFT only (9 photos rms 0.35): half-width 265.1 / 264.9 at y 500 / 528 vs model
+  268.1 / 268.0, arris z 423.4 / 428.4 vs 420.0 / 418.8: the model rounds the corner's top down over its last 16 mm, the wood
+  does not seem to (agrees with PR #25's 1518/1521). The right side did not solve (traces jump at the leg). It is the front
+  edge's corner (`tools/seat_front_fit.py`); recorded in `ends.open`, not changed.
+- NEXT: register IMG_1588-1593 at half resolution if they add views the model lacks, then the phase 6 critique loop.
