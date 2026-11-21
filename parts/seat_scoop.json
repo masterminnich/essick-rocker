@@ -1,0 +1,1711 @@
+{
+ "frame": "chair frame, mm: +X chair's right, +Y forward, +Z up, table top Z=0",
+ "method": "The seat's right side edge unrolled in each photo (tools/seat_scoop/strip.py: column = station y, row = position across the edge), two edges seeded by eye and snapped to the tone edge (snap.py), each triangulated as one smooth 3D curve x(y), z(y) from all photos at once (solve.py: Legendre degree 6, residual = distance in the photo in mm at the edge, soft-L1 0.5 mm). The hard line is seen from 30 degrees below to 72 degrees above: from below as the top of the dark under-bevel, from 31-38 degrees above as the top of a grey sliver, from 43-72 degrees above as the seat's outer silhouette. Inputs: tools/seat_scoop/inputs/ (seeds, snapped traces, trusted ranges).",
+ "section": {
+  "is": "top arris (eased) -> edge face, vertical -> HARD LINE -> under-bevel, flat, constant angle -> BOTTOM ARRIS -> underside (a plane). The under-bevel is a scoop between the legs: deepest at mid-length and running out to nothing at each leg, where the edge face is the full thickness of the seat.",
+  "replaces": "parts/seat_edge.json 'design.bottom_half_width_of_y' and its note that the whole edge face leans under in one straight line from top arris to bottom arris (that line was a chord across the corner at the hard line: up to 11.3 mm inside the wood at mid-length)",
+  "bevel_angle_deg": {
+   "mean": 46.27,
+   "sd": 0.44,
+   "min": 45.75,
+   "max": 47.3,
+   "median": 46.17,
+   "y_range": [
+    150,
+    410
+   ],
+   "provenance": "triangulated",
+   "note": "angle below horizontal of the line from the hard line to the bottom arris, the two edges solved separately; 45 was probably the maker's setting"
+  },
+  "edge_face": {
+   "hard_line_x_minus_top_arris_x_mm": {
+    "mean": 0.39,
+    "sd": 0.78,
+    "min": -1.38,
+    "max": 1.16
+   },
+   "height_top_arris_to_hard_line_mm": {
+    "mean": 23.69,
+    "sd": 5.46,
+    "min": 17.79,
+    "max": 37.91
+   },
+   "y_range": [
+    110.0,
+    400.0
+   ],
+   "provenance": "triangulated",
+   "note": "top arris = right plan-sheet solve of parts/seat_edge.json. The hard line sits under the top arris: the face is vertical (sawn square). Its height is soft: the top arris is eased (radius not measured)"
+  },
+  "underside_along_edge": {
+   "z_at_y250": 331.18,
+   "slope": 0.18711,
+   "tilt_deg": 10.6,
+   "straightness_rms_mm": 0.24,
+   "max_mm": 0.97,
+   "note": "bottom arris z against a straight line: the underside is a plane along the edge (right side, y 140-440). In IMG_1492 the underside mirrors the room without distortion: flat across too (not measured)"
+  }
+ },
+ "right": {
+  "hard_line_xyz": [
+   [
+    231.33,
+    105.0,
+    307.62
+   ],
+   [
+    232.29,
+    110.0,
+    309.7
+   ],
+   [
+    233.32,
+    115.0,
+    311.81
+   ],
+   [
+    234.4,
+    120.0,
+    313.92
+   ],
+   [
+    235.52,
+    125.0,
+    316.02
+   ],
+   [
+    236.67,
+    130.0,
+    318.12
+   ],
+   [
+    237.84,
+    135.0,
+    320.2
+   ],
+   [
+    239.01,
+    140.0,
+    322.25
+   ],
+   [
+    240.19,
+    145.0,
+    324.28
+   ],
+   [
+    241.35,
+    150.0,
+    326.26
+   ],
+   [
+    242.51,
+    155.0,
+    328.21
+   ],
+   [
+    243.64,
+    160.0,
+    330.11
+   ],
+   [
+    244.76,
+    165.0,
+    331.97
+   ],
+   [
+    245.85,
+    170.0,
+    333.77
+   ],
+   [
+    246.91,
+    175.0,
+    335.53
+   ],
+   [
+    247.95,
+    180.0,
+    337.23
+   ],
+   [
+    248.95,
+    185.0,
+    338.88
+   ],
+   [
+    249.93,
+    190.0,
+    340.47
+   ],
+   [
+    250.87,
+    195.0,
+    342.01
+   ],
+   [
+    251.79,
+    200.0,
+    343.5
+   ],
+   [
+    252.68,
+    205.0,
+    344.93
+   ],
+   [
+    253.54,
+    210.0,
+    346.31
+   ],
+   [
+    254.37,
+    215.0,
+    347.64
+   ],
+   [
+    255.18,
+    220.0,
+    348.92
+   ],
+   [
+    255.96,
+    225.0,
+    350.15
+   ],
+   [
+    256.72,
+    230.0,
+    351.32
+   ],
+   [
+    257.46,
+    235.0,
+    352.45
+   ],
+   [
+    258.18,
+    240.0,
+    353.54
+   ],
+   [
+    258.87,
+    245.0,
+    354.58
+   ],
+   [
+    259.55,
+    250.0,
+    355.58
+   ],
+   [
+    260.22,
+    255.0,
+    356.53
+   ],
+   [
+    260.86,
+    260.0,
+    357.45
+   ],
+   [
+    261.49,
+    265.0,
+    358.32
+   ],
+   [
+    262.11,
+    270.0,
+    359.16
+   ],
+   [
+    262.71,
+    275.0,
+    359.96
+   ],
+   [
+    263.3,
+    280.0,
+    360.73
+   ],
+   [
+    263.87,
+    285.0,
+    361.46
+   ],
+   [
+    264.44,
+    290.0,
+    362.16
+   ],
+   [
+    264.98,
+    295.0,
+    362.82
+   ],
+   [
+    265.51,
+    300.0,
+    363.46
+   ],
+   [
+    266.03,
+    305.0,
+    364.06
+   ],
+   [
+    266.53,
+    310.0,
+    364.63
+   ],
+   [
+    267.01,
+    315.0,
+    365.17
+   ],
+   [
+    267.47,
+    320.0,
+    365.69
+   ],
+   [
+    267.92,
+    325.0,
+    366.17
+   ],
+   [
+    268.34,
+    330.0,
+    366.62
+   ],
+   [
+    268.74,
+    335.0,
+    367.05
+   ],
+   [
+    269.12,
+    340.0,
+    367.44
+   ],
+   [
+    269.48,
+    345.0,
+    367.81
+   ],
+   [
+    269.81,
+    350.0,
+    368.15
+   ],
+   [
+    270.11,
+    355.0,
+    368.46
+   ],
+   [
+    270.39,
+    360.0,
+    368.74
+   ],
+   [
+    270.64,
+    365.0,
+    368.99
+   ],
+   [
+    270.87,
+    370.0,
+    369.22
+   ],
+   [
+    271.07,
+    375.0,
+    369.41
+   ],
+   [
+    271.24,
+    380.0,
+    369.58
+   ],
+   [
+    271.39,
+    385.0,
+    369.72
+   ],
+   [
+    271.52,
+    390.0,
+    369.84
+   ],
+   [
+    271.63,
+    395.0,
+    369.93
+   ],
+   [
+    271.73,
+    400.0,
+    369.99
+   ],
+   [
+    271.81,
+    405.0,
+    370.03
+   ],
+   [
+    271.89,
+    410.0,
+    370.06
+   ],
+   [
+    271.96,
+    415.0,
+    370.06
+   ],
+   [
+    272.05,
+    420.0,
+    370.04
+   ],
+   [
+    272.15,
+    425.0,
+    370.01
+   ],
+   [
+    272.28,
+    430.0,
+    369.98
+   ],
+   [
+    272.44,
+    435.0,
+    369.93
+   ],
+   [
+    272.66,
+    440.0,
+    369.89
+   ]
+  ],
+  "bottom_arris_xyz": [
+   [
+    226.89,
+    140.0,
+    309.63
+   ],
+   [
+    227.46,
+    145.0,
+    310.87
+   ],
+   [
+    227.96,
+    150.0,
+    312.04
+   ],
+   [
+    228.4,
+    155.0,
+    313.15
+   ],
+   [
+    228.79,
+    160.0,
+    314.2
+   ],
+   [
+    229.14,
+    165.0,
+    315.22
+   ],
+   [
+    229.47,
+    170.0,
+    316.21
+   ],
+   [
+    229.79,
+    175.0,
+    317.17
+   ],
+   [
+    230.1,
+    180.0,
+    318.13
+   ],
+   [
+    230.41,
+    185.0,
+    319.07
+   ],
+   [
+    230.72,
+    190.0,
+    320.01
+   ],
+   [
+    231.05,
+    195.0,
+    320.95
+   ],
+   [
+    231.4,
+    200.0,
+    321.89
+   ],
+   [
+    231.76,
+    205.0,
+    322.83
+   ],
+   [
+    232.15,
+    210.0,
+    323.78
+   ],
+   [
+    232.56,
+    215.0,
+    324.73
+   ],
+   [
+    233.0,
+    220.0,
+    325.68
+   ],
+   [
+    233.47,
+    225.0,
+    326.64
+   ],
+   [
+    233.96,
+    230.0,
+    327.6
+   ],
+   [
+    234.48,
+    235.0,
+    328.56
+   ],
+   [
+    235.03,
+    240.0,
+    329.52
+   ],
+   [
+    235.61,
+    245.0,
+    330.48
+   ],
+   [
+    236.21,
+    250.0,
+    331.44
+   ],
+   [
+    236.83,
+    255.0,
+    332.39
+   ],
+   [
+    237.48,
+    260.0,
+    333.34
+   ],
+   [
+    238.15,
+    265.0,
+    334.29
+   ],
+   [
+    238.84,
+    270.0,
+    335.23
+   ],
+   [
+    239.55,
+    275.0,
+    336.16
+   ],
+   [
+    240.29,
+    280.0,
+    337.08
+   ],
+   [
+    241.03,
+    285.0,
+    338.0
+   ],
+   [
+    241.8,
+    290.0,
+    338.91
+   ],
+   [
+    242.57,
+    295.0,
+    339.81
+   ],
+   [
+    243.36,
+    300.0,
+    340.71
+   ],
+   [
+    244.17,
+    305.0,
+    341.6
+   ],
+   [
+    244.99,
+    310.0,
+    342.48
+   ],
+   [
+    245.81,
+    315.0,
+    343.37
+   ],
+   [
+    246.65,
+    320.0,
+    344.25
+   ],
+   [
+    247.5,
+    325.0,
+    345.13
+   ],
+   [
+    248.36,
+    330.0,
+    346.01
+   ],
+   [
+    249.23,
+    335.0,
+    346.9
+   ],
+   [
+    250.11,
+    340.0,
+    347.79
+   ],
+   [
+    251.0,
+    345.0,
+    348.68
+   ],
+   [
+    251.91,
+    350.0,
+    349.59
+   ],
+   [
+    252.82,
+    355.0,
+    350.5
+   ],
+   [
+    253.75,
+    360.0,
+    351.43
+   ],
+   [
+    254.68,
+    365.0,
+    352.37
+   ],
+   [
+    255.64,
+    370.0,
+    353.32
+   ],
+   [
+    256.6,
+    375.0,
+    354.28
+   ],
+   [
+    257.58,
+    380.0,
+    355.26
+   ],
+   [
+    258.58,
+    385.0,
+    356.25
+   ],
+   [
+    259.59,
+    390.0,
+    357.25
+   ],
+   [
+    260.61,
+    395.0,
+    358.25
+   ],
+   [
+    261.65,
+    400.0,
+    359.26
+   ],
+   [
+    262.7,
+    405.0,
+    360.26
+   ],
+   [
+    263.77,
+    410.0,
+    361.26
+   ],
+   [
+    264.85,
+    415.0,
+    362.24
+   ],
+   [
+    265.94,
+    420.0,
+    363.19
+   ],
+   [
+    267.04,
+    425.0,
+    364.11
+   ],
+   [
+    268.15,
+    430.0,
+    364.97
+   ],
+   [
+    269.26,
+    435.0,
+    365.77
+   ],
+   [
+    270.38,
+    440.0,
+    366.49
+   ]
+  ],
+  "height_of_hard_line_above_underside_mm": [
+   [
+    105.0,
+    3.57
+   ],
+   [
+    110.0,
+    4.72
+   ],
+   [
+    115.0,
+    5.89
+   ],
+   [
+    120.0,
+    7.06
+   ],
+   [
+    125.0,
+    8.23
+   ],
+   [
+    130.0,
+    9.39
+   ],
+   [
+    135.0,
+    10.54
+   ],
+   [
+    140.0,
+    11.65
+   ],
+   [
+    145.0,
+    12.75
+   ],
+   [
+    150.0,
+    13.79
+   ],
+   [
+    155.0,
+    14.81
+   ],
+   [
+    160.0,
+    15.77
+   ],
+   [
+    165.0,
+    16.69
+   ],
+   [
+    170.0,
+    17.56
+   ],
+   [
+    175.0,
+    18.38
+   ],
+   [
+    180.0,
+    19.15
+   ],
+   [
+    185.0,
+    19.86
+   ],
+   [
+    190.0,
+    20.52
+   ],
+   [
+    195.0,
+    21.12
+   ],
+   [
+    200.0,
+    21.68
+   ],
+   [
+    205.0,
+    22.17
+   ],
+   [
+    210.0,
+    22.61
+   ],
+   [
+    215.0,
+    23.01
+   ],
+   [
+    220.0,
+    23.35
+   ],
+   [
+    225.0,
+    23.65
+   ],
+   [
+    230.0,
+    23.88
+   ],
+   [
+    235.0,
+    24.08
+   ],
+   [
+    240.0,
+    24.23
+   ],
+   [
+    245.0,
+    24.34
+   ],
+   [
+    250.0,
+    24.4
+   ],
+   [
+    255.0,
+    24.41
+   ],
+   [
+    260.0,
+    24.4
+   ],
+   [
+    265.0,
+    24.33
+   ],
+   [
+    270.0,
+    24.24
+   ],
+   [
+    275.0,
+    24.1
+   ],
+   [
+    280.0,
+    23.94
+   ],
+   [
+    285.0,
+    23.73
+   ],
+   [
+    290.0,
+    23.5
+   ],
+   [
+    295.0,
+    23.22
+   ],
+   [
+    300.0,
+    22.93
+   ],
+   [
+    305.0,
+    22.59
+   ],
+   [
+    310.0,
+    22.22
+   ],
+   [
+    315.0,
+    21.83
+   ],
+   [
+    320.0,
+    21.41
+   ],
+   [
+    325.0,
+    20.96
+   ],
+   [
+    330.0,
+    20.47
+   ],
+   [
+    335.0,
+    19.97
+   ],
+   [
+    340.0,
+    19.42
+   ],
+   [
+    345.0,
+    18.86
+   ],
+   [
+    350.0,
+    18.26
+   ],
+   [
+    355.0,
+    17.63
+   ],
+   [
+    360.0,
+    16.98
+   ],
+   [
+    365.0,
+    16.29
+   ],
+   [
+    370.0,
+    15.59
+   ],
+   [
+    375.0,
+    14.84
+   ],
+   [
+    380.0,
+    14.08
+   ],
+   [
+    385.0,
+    13.28
+   ],
+   [
+    390.0,
+    12.47
+   ],
+   [
+    395.0,
+    11.62
+   ],
+   [
+    400.0,
+    10.74
+   ],
+   [
+    405.0,
+    9.85
+   ],
+   [
+    410.0,
+    8.94
+   ],
+   [
+    415.0,
+    8.01
+   ],
+   [
+    420.0,
+    7.05
+   ],
+   [
+    425.0,
+    6.09
+   ],
+   [
+    430.0,
+    5.12
+   ],
+   [
+    435.0,
+    4.14
+   ],
+   [
+    440.0,
+    3.16
+   ]
+  ],
+  "bevel_run_drop_angle": [
+   [
+    140.0,
+    12.12,
+    12.62,
+    46.16
+   ],
+   [
+    150.0,
+    13.39,
+    14.22,
+    46.72
+   ],
+   [
+    160.0,
+    14.85,
+    15.91,
+    46.97
+   ],
+   [
+    170.0,
+    16.38,
+    17.56,
+    46.99
+   ],
+   [
+    180.0,
+    17.85,
+    19.1,
+    46.94
+   ],
+   [
+    190.0,
+    19.21,
+    20.46,
+    46.8
+   ],
+   [
+    200.0,
+    20.39,
+    21.61,
+    46.66
+   ],
+   [
+    210.0,
+    21.39,
+    22.53,
+    46.49
+   ],
+   [
+    220.0,
+    22.18,
+    23.24,
+    46.34
+   ],
+   [
+    230.0,
+    22.76,
+    23.72,
+    46.18
+   ],
+   [
+    240.0,
+    23.15,
+    24.02,
+    46.06
+   ],
+   [
+    250.0,
+    23.34,
+    24.14,
+    45.97
+   ],
+   [
+    260.0,
+    23.38,
+    24.11,
+    45.88
+   ],
+   [
+    270.0,
+    23.27,
+    23.93,
+    45.8
+   ],
+   [
+    280.0,
+    23.01,
+    23.65,
+    45.79
+   ],
+   [
+    290.0,
+    22.64,
+    23.25,
+    45.76
+   ],
+   [
+    300.0,
+    22.15,
+    22.75,
+    45.77
+   ],
+   [
+    310.0,
+    21.54,
+    22.15,
+    45.8
+   ],
+   [
+    320.0,
+    20.82,
+    21.44,
+    45.84
+   ],
+   [
+    330.0,
+    19.98,
+    20.61,
+    45.89
+   ],
+   [
+    340.0,
+    19.01,
+    19.65,
+    45.95
+   ],
+   [
+    350.0,
+    17.9,
+    18.56,
+    46.04
+   ],
+   [
+    360.0,
+    16.64,
+    17.31,
+    46.13
+   ],
+   [
+    370.0,
+    15.23,
+    15.9,
+    46.23
+   ],
+   [
+    380.0,
+    13.66,
+    14.32,
+    46.35
+   ],
+   [
+    390.0,
+    11.93,
+    12.59,
+    46.54
+   ],
+   [
+    400.0,
+    10.08,
+    10.73,
+    46.79
+   ],
+   [
+    410.0,
+    8.12,
+    8.8,
+    47.3
+   ],
+   [
+    420.0,
+    6.11,
+    6.85,
+    48.27
+   ],
+   [
+    430.0,
+    4.13,
+    5.01,
+    50.5
+   ],
+   [
+    440.0,
+    2.28,
+    3.4,
+    56.15
+   ]
+  ],
+  "solve": {
+   "crescent": {
+    "photos": {
+     "1487": {
+      "rms_mm": 1.19,
+      "mean_mm": -1.04,
+      "samples": 65,
+      "y": [
+       105.0,
+       425.0
+      ],
+      "camera_elevation_deg": -24.6
+     },
+     "1488": {
+      "rms_mm": 0.57,
+      "mean_mm": 0.28,
+      "samples": 53,
+      "y": [
+       175.0,
+       435.0
+      ],
+      "camera_elevation_deg": -17.1
+     },
+     "1489": {
+      "rms_mm": 1.47,
+      "mean_mm": 1.06,
+      "samples": 68,
+      "y": [
+       105.0,
+       440.0
+      ],
+      "camera_elevation_deg": -23.8
+     },
+     "1490": {
+      "rms_mm": 2.83,
+      "mean_mm": 2.79,
+      "samples": 52,
+      "y": [
+       175.0,
+       430.0
+      ],
+      "camera_elevation_deg": -29.8
+     },
+     "1492": {
+      "rms_mm": 0.57,
+      "mean_mm": -0.18,
+      "samples": 66,
+      "y": [
+       105.0,
+       435.0
+      ],
+      "camera_elevation_deg": -17.0
+     },
+     "1474": {
+      "rms_mm": 0.72,
+      "mean_mm": -0.66,
+      "samples": 48,
+      "y": [
+       155.0,
+       390.0
+      ],
+      "camera_elevation_deg": 31.5
+     },
+     "1475": {
+      "rms_mm": 0.33,
+      "mean_mm": -0.29,
+      "samples": 39,
+      "y": [
+       175.0,
+       365.0
+      ],
+      "camera_elevation_deg": 38.1
+     },
+     "1476": {
+      "rms_mm": 0.33,
+      "mean_mm": -0.13,
+      "samples": 35,
+      "y": [
+       200.0,
+       370.0
+      ],
+      "camera_elevation_deg": 37.8
+     },
+     "1539": {
+      "rms_mm": 0.98,
+      "mean_mm": 0.83,
+      "samples": 52,
+      "y": [
+       115.0,
+       420.0
+      ],
+      "camera_elevation_deg": 72.0
+     },
+     "1538": {
+      "rms_mm": 1.69,
+      "mean_mm": 1.63,
+      "samples": 58,
+      "y": [
+       120.0,
+       425.0
+      ],
+      "camera_elevation_deg": 69.6
+     },
+     "1537": {
+      "rms_mm": 0.72,
+      "mean_mm": 0.67,
+      "samples": 55,
+      "y": [
+       125.0,
+       430.0
+      ],
+      "camera_elevation_deg": 66.1
+     },
+     "1481": {
+      "rms_mm": 1.3,
+      "mean_mm": -1.26,
+      "samples": 65,
+      "y": [
+       110.0,
+       430.0
+      ],
+      "camera_elevation_deg": 54.2
+     },
+     "1480": {
+      "rms_mm": 0.73,
+      "mean_mm": -0.67,
+      "samples": 55,
+      "y": [
+       120.0,
+       425.0
+      ],
+      "camera_elevation_deg": 47.3
+     },
+     "1479": {
+      "rms_mm": 0.23,
+      "mean_mm": 0.1,
+      "samples": 54,
+      "y": [
+       125.0,
+       420.0
+      ],
+      "camera_elevation_deg": 43.1
+     }
+    },
+    "leave_one_photo_out_moves_curve_mm": {
+     "1487": {
+      "inner": 0.78,
+      "whole": 0.8
+     },
+     "1488": {
+      "inner": 0.2,
+      "whole": 0.76
+     },
+     "1489": {
+      "inner": 0.71,
+      "whole": 0.74
+     },
+     "1490": {
+      "inner": 0.37,
+      "whole": 0.38
+     },
+     "1492": {
+      "inner": 0.59,
+      "whole": 3.52
+     },
+     "1474": {
+      "inner": 0.33,
+      "whole": 0.5
+     },
+     "1475": {
+      "inner": 0.14,
+      "whole": 0.28
+     },
+     "1476": {
+      "inner": 0.11,
+      "whole": 0.22
+     },
+     "1539": {
+      "inner": 0.33,
+      "whole": 0.49
+     },
+     "1538": {
+      "inner": 0.31,
+      "whole": 0.49
+     },
+     "1537": {
+      "inner": 0.3,
+      "whole": 1.85
+     },
+     "1481": {
+      "inner": 0.37,
+      "whole": 0.44
+     },
+     "1480": {
+      "inner": 0.4,
+      "whole": 0.81
+     },
+     "1479": {
+      "inner": 0.26,
+      "whole": 0.44
+     }
+    },
+    "degree": 6,
+    "y_range": [
+     105.0,
+     440.0
+    ]
+   },
+   "bottom": {
+    "photos": {
+     "1487": {
+      "rms_mm": 0.54,
+      "mean_mm": -0.46,
+      "samples": 33,
+      "y": [
+       140.0,
+       300.0
+      ],
+      "camera_elevation_deg": -23.5
+     },
+     "1488": {
+      "rms_mm": 0.46,
+      "mean_mm": 0.07,
+      "samples": 57,
+      "y": [
+       155.0,
+       435.0
+      ],
+      "camera_elevation_deg": -15.6
+     },
+     "1489": {
+      "rms_mm": 0.79,
+      "mean_mm": 0.49,
+      "samples": 34,
+      "y": [
+       155.0,
+       320.0
+      ],
+      "camera_elevation_deg": -22.3
+     },
+     "1490": {
+      "rms_mm": 1.5,
+      "mean_mm": 1.45,
+      "samples": 37,
+      "y": [
+       255.0,
+       435.0
+      ],
+      "camera_elevation_deg": -27.8
+     },
+     "1492": {
+      "rms_mm": 0.85,
+      "mean_mm": -0.7,
+      "samples": 60,
+      "y": [
+       140.0,
+       435.0
+      ],
+      "camera_elevation_deg": -15.8
+     },
+     "1475": {
+      "rms_mm": 0.12,
+      "mean_mm": 0.05,
+      "samples": 54,
+      "y": [
+       160.0,
+       425.0
+      ],
+      "camera_elevation_deg": 38.2
+     },
+     "1476": {
+      "rms_mm": 0.21,
+      "mean_mm": -0.14,
+      "samples": 57,
+      "y": [
+       140.0,
+       420.0
+      ],
+      "camera_elevation_deg": 37.8
+     },
+     "1474": {
+      "rms_mm": 0.32,
+      "mean_mm": 0.31,
+      "samples": 25,
+      "y": [
+       190.0,
+       310.0
+      ],
+      "camera_elevation_deg": 31.9
+     }
+    },
+    "leave_one_photo_out_moves_curve_mm": {
+     "1487": {
+      "inner": 0.61,
+      "whole": 0.62
+     },
+     "1488": {
+      "inner": 1.23,
+      "whole": 1.23
+     },
+     "1489": {
+      "inner": 0.38,
+      "whole": 0.38
+     },
+     "1490": {
+      "inner": 0.95,
+      "whole": 1.41
+     },
+     "1492": {
+      "inner": 1.16,
+      "whole": 1.16
+     },
+     "1475": {
+      "inner": 0.19,
+      "whole": 2.31
+     },
+     "1476": {
+      "inner": 0.21,
+      "whole": 1.03
+     },
+     "1474": {
+      "inner": 0.16,
+      "whole": 0.16
+     }
+    },
+    "degree": 6,
+    "y_range": [
+     140.0,
+     440.0
+    ]
+   }
+  },
+  "note": "crescent = the hard line. 'inner' = more than 40 mm from the ends of the solved range"
+ },
+ "design": {
+  "note": "symmetric design version. Along each side between the legs: the edge face drops vertically from the plan outline to the hard line; the hard line is 'height' above the underside; the under-bevel runs from the hard line inward and down at 'bevel_angle_deg' to the underside. Outside 'y_range' the height is 0: vertical edge face, full thickness.",
+  "y_range": [
+   89.7,
+   456.4
+  ],
+  "hard_line_height_above_underside_of_y": {
+   "y": [
+    89.74,
+    90.0,
+    95.0,
+    100.0,
+    105.0,
+    110.0,
+    115.0,
+    120.0,
+    125.0,
+    130.0,
+    135.0,
+    140.0,
+    145.0,
+    150.0,
+    155.0,
+    160.0,
+    165.0,
+    170.0,
+    175.0,
+    180.0,
+    185.0,
+    190.0,
+    195.0,
+    200.0,
+    205.0,
+    210.0,
+    215.0,
+    220.0,
+    225.0,
+    230.0,
+    235.0,
+    240.0,
+    245.0,
+    250.0,
+    255.0,
+    260.0,
+    265.0,
+    270.0,
+    275.0,
+    280.0,
+    285.0,
+    290.0,
+    295.0,
+    300.0,
+    305.0,
+    310.0,
+    315.0,
+    320.0,
+    325.0,
+    330.0,
+    335.0,
+    340.0,
+    345.0,
+    350.0,
+    355.0,
+    360.0,
+    365.0,
+    370.0,
+    375.0,
+    380.0,
+    385.0,
+    390.0,
+    395.0,
+    400.0,
+    405.0,
+    410.0,
+    415.0,
+    420.0,
+    425.0,
+    430.0,
+    435.0,
+    440.0,
+    445.0,
+    450.0,
+    455.0,
+    456.44
+   ],
+   "height_mm": [
+    0.0,
+    0.06,
+    1.23,
+    2.39,
+    3.57,
+    4.72,
+    5.89,
+    7.06,
+    8.23,
+    9.39,
+    10.54,
+    11.65,
+    12.75,
+    13.79,
+    14.81,
+    15.77,
+    16.69,
+    17.56,
+    18.38,
+    19.15,
+    19.86,
+    20.52,
+    21.12,
+    21.68,
+    22.17,
+    22.61,
+    23.01,
+    23.35,
+    23.65,
+    23.88,
+    24.08,
+    24.23,
+    24.34,
+    24.4,
+    24.41,
+    24.4,
+    24.33,
+    24.24,
+    24.1,
+    23.94,
+    23.73,
+    23.5,
+    23.22,
+    22.93,
+    22.59,
+    22.22,
+    21.83,
+    21.41,
+    20.96,
+    20.47,
+    19.97,
+    19.42,
+    18.86,
+    18.26,
+    17.63,
+    16.98,
+    16.29,
+    15.59,
+    14.84,
+    14.08,
+    13.28,
+    12.47,
+    11.62,
+    10.74,
+    9.85,
+    8.94,
+    8.01,
+    7.05,
+    6.09,
+    5.12,
+    4.14,
+    3.16,
+    2.21,
+    1.24,
+    0.28,
+    0.0
+   ],
+   "provenance": "triangulated",
+   "tol_mm": 1.5,
+   "provenance_ends": "fitted: outside y 105-440 the measured curve is carried on as a straight line to zero (back tip y 90, front tip y 456); where the tips sit against the leg joints has not been checked"
+  },
+  "bevel_angle_deg": {
+   "value": 46.2,
+   "provenance": "triangulated",
+   "tol_deg": 1.5
+  },
+  "edge_face": {
+   "lean_mm": 0.0,
+   "provenance": "fitted",
+   "note": "vertical; measured 0.4 mm (sd 0.8) outboard at the hard line, inside the 1.5 mm tolerance of the outline"
+  },
+  "left": {
+   "provenance": "assumed",
+   "note": "mirror of the right; the left side has not been traced from below yet"
+  }
+ },
+ "checks": {
+  "tolerance": "free curve: 1.6 mm",
+  "hard_line": "14 photos; rms in the photo 0.23-2.83 mm; leave-one-photo-out moves the curve by at most 0.78 mm away from the ends (3.52 mm at the ends)",
+  "bottom_arris": "8 photos; rms in the photo 0.12-1.50 mm; leave-one-photo-out at most 1.23 mm away from the ends (2.31 mm at the ends)",
+  "bottom_arris_vs_seat_edge_json_right": {
+   "x_mm": {
+    "mean": 2.71,
+    "sd": 4.12,
+    "min": -1.27,
+    "max": 15.08
+   },
+   "z_mm": {
+    "mean": 2.2,
+    "sd": 2.66,
+    "min": -0.51,
+    "max": 10.19
+   },
+   "x_mm_y150_300": {
+    "mean": -0.3,
+    "sd": 0.82,
+    "min": -1.27,
+    "max": 1.44
+   },
+   "note": "this file minus the old side-sheet bottom arris: they agree at mid-length; toward the front the old line (side photos only, depth weak) stays up to 15 mm too far in, because the real arris swings out to close the scoop at the front leg"
+  }
+ },
+ "open": [
+  "left side: assumed mirror (no trace from below yet)",
+  "IMG_1490 (the lowest photo, 30 degrees below) sits 2.8 mm off the hard line and 1.5 mm off the bottom arris, same sign: its pose, not the edge (the other 13 photos fit within 1.7 mm)",
+  "the top arris is eased; its radius is not measured",
+  "on right-side photos the symmetric model sits about 2.5-3.4 mm inboard of these right-side curves (and up to 1.9 mm high at the back): the design is the left/right mean and this chair's right side measures wider (parts/seat_edge.json, parts/lr_skew.json); the section itself (height of the hard line above the underside, bevel angle) is carried over unchanged",
+  "the tips of the scoop (behind y 105, in front of y 440) are a straight continuation (not traced; they run toward the leg joints)",
+  "the underside is flat ACROSS by the undistorted reflection in IMG_1492 only; the close-ups IMG_1570-1576 are registered too badly to measure it"
+ ]
+}

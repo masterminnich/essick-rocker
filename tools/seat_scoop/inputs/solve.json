@@ -1,0 +1,187 @@
+{
+ "traces": [
+  "tools/seat_scoop/inputs/traces_low_px.json",
+  "tools/seat_scoop/inputs/traces_above_px.json",
+  "tools/seat_scoop/inputs/traces_steep_px.json",
+  "tools/seat_scoop/inputs/traces_low_back_ends_px.json"
+ ],
+ "y": {
+  "crescent": [
+   105,
+   440
+  ],
+  "bottom": [
+   140,
+   440
+  ]
+ },
+ "use": {
+  "crescent": {
+   "1487": [
+    [
+     85,
+     418
+    ]
+   ],
+   "1488": [
+    [
+     170,
+     440
+    ]
+   ],
+   "1489": [
+    [
+     100,
+     440
+    ]
+   ],
+   "1490": [
+    [
+     175,
+     440
+    ]
+   ],
+   "1492": [
+    [
+     100,
+     450
+    ]
+   ],
+   "1474": [
+    [
+     150,
+     390
+    ]
+   ],
+   "1475": [
+    [
+     170,
+     370
+    ]
+   ],
+   "1476": [
+    [
+     200,
+     380
+    ]
+   ],
+   "1539": [
+    [
+     120,
+     225
+    ],
+    [
+     275,
+     420
+    ]
+   ],
+   "1538": [
+    [
+     120,
+     295
+    ],
+    [
+     315,
+     420
+    ]
+   ],
+   "1537": [
+    [
+     120,
+     228
+    ],
+    [
+     262,
+     420
+    ]
+   ],
+   "1481": [
+    [
+     100,
+     410
+    ]
+   ],
+   "1480": [
+    [
+     100,
+     350
+    ],
+    [
+     378,
+     400
+    ]
+   ],
+   "1479": [
+    [
+     100,
+     300
+    ],
+    [
+     325,
+     388
+    ]
+   ]
+  },
+  "bottom": {
+   "1487": [
+    [
+     135,
+     300
+    ]
+   ],
+   "1488": [
+    [
+     150,
+     440
+    ]
+   ],
+   "1489": [
+    [
+     150,
+     320
+    ]
+   ],
+   "1490": [
+    [
+     250,
+     445
+    ]
+   ],
+   "1492": [
+    [
+     100,
+     450
+    ]
+   ],
+   "1475": [
+    [
+     155,
+     430
+    ]
+   ],
+   "1476": [
+    [
+     120,
+     430
+    ]
+   ],
+   "1474": [
+    [
+     190,
+     310
+    ]
+   ]
+  }
+ },
+ "init": {
+  "crescent": [
+   "tools/seat_scoop/inputs/start.json",
+   "crescent"
+  ],
+  "bottom": [
+   "tools/seat_scoop/inputs/start.json",
+   "bottom"
+  ]
+ },
+ "note": "Trusted station ranges per photo, checked by eye on the unrolled strips. crescent = the hard line (low photos 1487-1492 see it from below, 1474-1476 from 31-38 degrees above as the top of the grey sliver, 1479-1481 and 1537-1539 as the seat's outer silhouette from 44-72 degrees above); bottom = the arris between the under-bevel and the underside. IMG_1486 is motion-blurred and left out. Gaps: a ruler crosses the silhouette in 1479 and 1480; the floor is as dark as the edge in part of 1537-1539."
+}

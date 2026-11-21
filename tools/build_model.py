@@ -376,6 +376,7 @@ if face_rep:
     zt[_sd[_cm]] -= _rr * (1 - _cd[_cm] / 16.0)
     face_rep["top_of_roll_moved_mm"] = {"note": "measured top of the roll minus the surface the model had on that line (seat/surface.json carried to the edge)", "mean": float(_dzin.mean()), "min": float(_dzin.min()), "max": float(_dzin.max()),
                                         "at_x": {f"x{int(round(x))}": float(_dzx(x)) for x in (8, 40, 80, 130, 180, 230, 260)}, "fades_out_over_mm_behind_the_roll": 30}
+scoop_rep = None; scoop_h = None; _sf = ROOT / "parts/seat_scoop.json"
 zbm = seat_z(pts2[:, 1]) + 4 - P("seat_edge_thickness")     # underside: NOT measured; this plane matched the lower edge in side photo 1507 by eye
 xbm = pts2[:, 0].copy()
 if edge_rep:
@@ -386,6 +387,17 @@ if edge_rep:
     # straight on to the front leg), never closer than 2 mm to the top outline; behind the range the ratio at its end is held
     _bh = np.where(pts2[:, 1] > _y1, np.minimum(np.polyval(_E["bottom_half_width_of_y"]["poly_in_(y-250)"], np.minimum(pts2[:, 1], _y1 + 60) - 250.0), _top - 2.0),
                    _top * _pv("bottom_half_width_of_y", pts2[:, 1]) / _pv("top_half_width_of_y", pts2[:, 1]))
+    # under-bevel of the side edge (parts/seat_scoop.json, tools/seat_scoop/): the edge face is VERTICAL from the plan outline down to the hard line; from there a flat bevel
+    # runs in and down to the underside. The hard line's height above the underside is a lens: most at mid-length, nothing at the legs (there the edge face is the full thickness).
+    # This replaces the single straight wall from top arris to bottom arris above (a chord across the corner at the hard line)
+    if _sf.exists():
+        _SD = json.load(open(_sf))["design"]; _gt = _SD["hard_line_height_above_underside_of_y"]; _gy, _gh = np.array(_gt["y"]), np.array(_gt["height_mm"]); _bev = np.radians(_SD["bevel_angle_deg"]["value"])
+        scoop_h = lambda y: np.interp(y, _gy, _gh, left=0.0, right=0.0); _bh_old = _bh.copy(); _bh = _top - scoop_h(pts2[:, 1]) / np.tan(_bev)
+        _so_ = np.arange(len(pts2) - len(outline), len(pts2))[:len(half)]; _yy_ = pts2[_so_, 1]; _m_ = (_yy_ >= _y0) & (_yy_ <= _y1)
+        scoop_rep = {"source": "parts/seat_scoop.json (hard line and bottom arris of the right side edge triangulated in 14 and 8 photos; left = mirror, assumed)", "y_range": [float(_gy[0]), float(_gy[-1])],
+                     "max_height_of_hard_line_above_underside_mm": float(_gh.max()), "bevel_angle_deg": float(np.degrees(_bev)), "max_bevel_run_mm": float(_gh.max() / np.tan(_bev)), "edge_face": "vertical from the plan outline to the hard line",
+                     "bottom_half_width_minus_old_straight_wall_mm": {f"y{int(y)}": float(np.interp(y, _yy_, (_bh - _bh_old)[_so_])) for y in (110, 150, 200, 250, 300, 350, 400)},
+                     "outside_y_range": "edge face vertical for the full thickness (was: leaning under at the ratio found at the end of the measured range)"}
     _ratio = _bh / _top
     if front_y is not None:      # the front face is vertical (tape dots on it sit on the plan outline within about 1 mm): the side lean fades out over the last 40 mm before the front edge
         _ratio = 1 + (_ratio - 1) * np.clip((front_y(pts2[:, 0]) - pts2[:, 1]) / 40.0, 0, 1)
@@ -405,8 +417,18 @@ if edge_rep:
     _r = _o[:, 0] > 0; _k = np.argsort(_o[_r, 1]); edge_rep["top_at_outline_by_y"] = {f"y{int(y)}": {"model_z": float(np.interp(y, _o[_r, 1][_k], zt[-len(outline):][_r][_k])), "measured_arris_z": float(_pv("top_z_of_y", y)), "half_width": float(_pv("top_half_width_of_y", y))} for y in (110, 160, 210, 260, 310, 360, 400)}
 nP = len(pts2); V = np.r_[np.c_[pts2, zt], np.c_[xbm, pts2[:, 1], zbm]]; F = list(T) + [[q[0] + nP, q[2] + nP, q[1] + nP] for q in T]
 nb = len(outline); base = nP - nb
+# walls: top ring -> middle ring -> bottom ring. The middle ring is the hard line along the two sides (plan outline x, underside z + lens height). Beyond the tips of the lens it
+# stays on the wall 0.3 mm above the bottom arris (the hard line runs out INTO the bottom arris; a middle ring that jumped to half height there made one long sliver triangle on the
+# 46 degree plane at each tip, drawn as a stray edge on the overlays). On the front and back edges it is halfway down the wall (one flat face as before)
+Vm = 0.5 * (V[base:nP] + V[base + nP:2 * nP])
+if scoop_rep:
+    _oi = np.arange(nb); _side = (_oi < len(half)) | ((_oi >= len(half) + len(front_pts)) & (_oi < 2 * len(half) + len(front_pts))); _hh = scoop_h(outline[:, 1])
+    _zb_ = V[base + nP:2 * nP, 2]; _zt_ = V[base:nP, 2]; _k = _side & (_hh > 0.3); Vm[_k] = np.c_[outline[_k, 0], outline[_k, 1], _zb_[_k] + np.minimum(_hh[_k], 0.8 * (_zt_ - _zb_)[_k])]
+    _n = _side & ~_k; _Vt, _Vb = V[base:nP], V[base + nP:2 * nP]; Vm[_n] = _Vb[_n] + (_Vt[_n] - _Vb[_n]) * (0.3 / np.maximum(_zt_ - _zb_, 1.0))[_n, None]
+    scoop_rep["wall_points_on_the_hard_line"] = int(_k.sum()); scoop_rep["edge_face_height_mm"] = {f"y{int(y)}": float(np.interp(y, outline[:len(half), 1], (_zt_ - Vm[:, 2])[:len(half)])) for y in (110, 150, 200, 250, 300, 350, 400)}
+V = np.r_[V, Vm]; mid0 = 2 * nP
 for i in range(nb):
-    p, q = base + i, base + (i + 1) % nb; F += [[p, q, q + nP], [p, q + nP, p + nP]]
+    j = (i + 1) % nb; p, q, pm, qm = base + i, base + j, mid0 + i, mid0 + j; F += [[p, q, qm], [p, qm, pm], [pm, qm, q + nP], [pm, q + nP, p + nP]]
 seat = trimesh.Trimesh(V, np.array(F), process=True); seat.fix_normals(); meshes["SEAT"] = seat; seat_closed = bool(seat.is_watertight and seat.is_winding_consistent)
 dish = float(((zrim if seat_src else zedge) - zt).max())
 report["seat"] = {"outline": "cloud (98th percentile half-width per station; front-edge scallops NOT modelled)", "surface": "cloud (polynomial surface even in x, mirrored L+R)",
@@ -440,6 +462,9 @@ if face_rep:
 if edge_rep:
     report["seat"]["underside"] = "plane through the two triangulated bottom arrises of the side edge (+-2.5 mm at the edge; flat across is ASSUMED, no measurement between them)"
     report["seat"]["side_edge"] = edge_rep
+    if scoop_rep:
+        report["seat"]["side_edge_scoop"] = scoop_rep
+        report["seat"]["underside"] = "plane through the triangulated bottom arrises of the side edge (+-2.5 mm at the edge); flat across: not measured, but it mirrors the room without distortion in IMG_1492"
 
 # ---------------------------------------------------------------- arms (plank from the cloud)
 ma = (Cm[:, 0] > 226) & (Cm[:, 0] < 345) & (Cm[:, 1] > 25) & (Cm[:, 1] < 545) & (Cm[:, 2] > 465 + 0.36 * Cm[:, 1]) & (Cm[:, 2] < 540 + 0.36 * Cm[:, 1])
