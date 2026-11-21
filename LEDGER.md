@@ -966,3 +966,31 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   bands on the glossy roll fool the edge detector.
 - NEXT: left-side check of the seat scoop, arm underside and thickness (new file), rocker bottom edge u -330..572, seat side
   edge behind y 400.
+
+## 22:32 PST seat scoop left side measured: the mirror does not hold; design = L/R mean (PR #26) -> MODEL v20
+- Run on Opus 5.5. Same four steps as PR #20 (`tools/seat_scoop/` strip -> snap -> solve -> fit), inputs
+  `tools/seat_scoop/inputs_L/`; `compare_lr.py` compares the two sides relative to each side's own edge with jackknife
+  standard errors over photos (`solve.py` now also writes the leave-one-photo-out curves); figures `figures/seat_scoop_left/`.
+- LEFT data: hard line 12 photos (1505, 1506, 1518, 1519, 1521, 1522, 1523, 1524, 1530, 1531, 1547, 1548; elevation -12 to
+  +71 deg), rms 0.20-0.91 mm, leave-one-out <= 0.26 mm inside / 0.36 at the ends; bottom arris 7 low photos, rms 0.15-0.74,
+  leave-one-out <= 0.69 / 2.68. Dropped: 1549 (snap followed the inner sliver, then a floor shadow), 1572/1573 (registration),
+  1515/1529 (blur); 1521 trusted y 125-320 only. Eye checks on single photos at 10+ px/mm.
+- RESULT (left minus right, own edge): lens (hard line above own underside) -1.6 to -3.8 mm at y 150-300 (worst -3.78 at
+  y 200, se 0.68), -1.1 to -1.55 at y 310-390, within 0.8 at the ends; max 22.10 at y 271 vs 24.42 at y 256. Edge-face height
+  +1.8 to +3.3 at y 160-400 (se 0.4-1.1). Bevel angle median 45.22 vs 46.17 deg (-0.95, se 1.4). Lean of the hard line outboard
+  of the top arris: left +2.19 (se 0.16), right +0.38 (se 0.56). Tips: left y 83.5 / 460.7, right 89.7 / 456.4.
+  Absolute: hard lines at the same height within 1.5 mm (y 140-390); left bottom arris 2.2-2.7 mm higher (y 150-420), the same
+  L/R lean as PR #25 / `parts/lr_skew.json`; left hard line 1.9-3.0 mm further inboard (y 200-400).
+- CHANGE `parts/seat_scoop.json` (format addition: new blocks `left`, `left_vs_right`; `design.bevel_angle_deg` adds `left` /
+  `right`; lens table adds `left_minus_right_mm`; keys the build reads unchanged in meaning): design lens = L/R mean, max 24.41
+  -> 23.20 mm (-1.09 at y 150, -1.90 at y 200, -1.35 at y 250, -0.81 at y 300, -0.41 at y 400); y range [89.7, 456.4] ->
+  [83.5, 460.7]; bevel 46.2 -> 45.7 deg; design.left provenance assumed -> triangulated. Edge face kept vertical (mean lean 1.3,
+  inside 1.5). `tools/build_model.py`: the scoop's source text only. `fit.py` without the left solve stays byte-identical.
+- MODEL v20 = main after #26: `tools/model.sh --out parts/model_v20`, assembly check PASS, byte-identical to the branch trial.
+  vs v19 `_shapes.glb`: 12 of 13 parts vertex-identical, SEAT changed only at the side edges (|x| >= 227, y 91-458), surface
+  distance at most 1.30 mm, volume 8525.0 -> 8534.9 cm3. Joined: all 22 other parts vertex-identical; SEAT the same 1.30 mm
+  (nearest-vertex 8.3 mm is only retriangulation by the cuts).
+- OPEN: on the right side's photos the model's hard line now sits about 1-2 mm below the wood (design = mean); the model's
+  underside is symmetric, so on the left photos its bottom arris sits below the left wood by the L/R lean (not changed here).
+- NEXT: arm underside and thickness (NEW file, not `parts/arms.json`), rocker bottom edge u -330..572, seat side edge behind
+  y 400, register IMG_1588-1593.

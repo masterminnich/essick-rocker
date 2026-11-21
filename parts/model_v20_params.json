@@ -1,0 +1,571 @@
+{
+ "assumed_or_tape": {
+  "rocker_width_across": {
+   "value_mm": 31.0,
+   "provenance": "tape",
+   "note": "IMG_1493 read 1.20 in at the rear tip, +-1/16; assumed constant along the rocker"
+  },
+  "fleg_thickness_across": {
+   "value_mm": 33.0,
+   "provenance": "cloud+tape",
+   "note": "cloud inner-face depth 29-35 mm; IMG_1495 read 1.27 in"
+  },
+  "bleg_thickness_across": {
+   "value_mm": 38.0,
+   "provenance": "cloud+tape",
+   "note": "cloud 32-40 mm; IMG_1494 read 1.34-1.6 in"
+  },
+  "arm_thickness": {
+   "value_mm": 25.0,
+   "provenance": "assumed",
+   "note": "not measurable yet; caliper A1-A3 will replace"
+  },
+  "seat_edge_thickness": {
+   "value_mm": 40.0,
+   "provenance": "fitted",
+   "note": "only used without parts/seat_edge.json (or --legacy): side-edge face traced 39-45 mm at the back, thinner to the front; constant here"
+  },
+  "crest_height": {
+   "value_mm": 77.5,
+   "provenance": "tape",
+   "note": "IMG_1555 read 3.05 in"
+  }
+ },
+ "parts": {
+  "rocker": {
+   "profile": "fitted (face orthophoto, both sides averaged)",
+   "length_traced_mm": 1100.0,
+   "ends": "triangulated (parts/rocker_ends.json: each end traced in 11 to 18 photos, left and right averaged)",
+   "tail_tip_uv": [
+    -488.17,
+    170.53
+   ],
+   "nose_top_corner_uv": [
+    626.65,
+    126.31
+   ],
+   "tail_tip_to_nose_top_corner_mm": 1115.6966616424018,
+   "length_overall_mm": 1118.4369995193863,
+   "face_height_mm": [
+    19.939143415025,
+    30.62023870776993
+   ],
+   "rocking_radius_mm": 1066.0481101767214,
+   "left_right_shape_rms_mm": 1.0227473114484877
+  },
+  "front_leg": {
+   "profile": "triangulated per line from near-frontal side photos (tools/edge_tri.py), L and R averaged; outlines +-1 mm, rear outer-face ridge is a soft line +-2 mm",
+   "outer_face_width_mm": {
+    "v150": 31.89866040329143,
+    "v300": 38.14737691386052,
+    "v360": 40.09542229280263,
+    "v500": 39.518659184756345,
+    "v600": 30.314624958785725
+   },
+   "overall_side_view_width_mm": {
+    "v150": 37.91438421658759,
+    "v300": 44.61069575544082,
+    "v360": 45.77582698513334,
+    "v500": 40.7379016125462,
+    "v600": 33.55671463868598
+   },
+   "thickness_across_mm": {
+    "v150": 30.30870460669381,
+    "v300": 27.78835864935147,
+    "v500": 31.471253964482603,
+    "v600": 29.233332980592586
+   },
+   "left_right_fore_aft_mm": {
+    "fleg_front_hi": 4.82,
+    "fleg_front_lo": -0.12,
+    "fleg_rear_hi": 2.26,
+    "fleg_rear_lo": -0.37,
+    "fleg_rearfar_hi": 4.07,
+    "fleg_rearfar_lo": 0.16
+   },
+   "previous_trace_width_mm": {
+    "v150": 55.45271744313861,
+    "v300": 58.60889612372644,
+    "v500": 40.93844048301255,
+    "v600": 33.29245442110061
+   },
+   "note": "seat joint (v 370-470) is bridged linearly; the earlier 8-photo median trace was 13-27 mm too wide (thickness parallax)"
+  },
+  "back_leg": {
+   "lower": "below the seat (v 65-270): triangulated front outline and inner rear arris (tools/edge_tri.py, L+R averaged, +-1 mm); the old rear trace was +10..+11 mm off (front +0.4..+1.7); above v 270 the old trace with the correction at v 270 held; rear edge v 260-446 (seat joint, not traced) bridged by a cubic between the triangulated lines either side (fit 0.6 mm rms); it moved the rear edge there by -9..+2 mm",
+   "upper": "z 608-1028: front outline triangulated in side view from 4 cameras standing behind the leg on each side (solve residual 0.6 / 0.5 mm L / R); z 608-928: rear edge traced in side view in 2 cameras standing in front of the leg on each side, depth held on the back outer arris (residual 0.45 / 0.7 mm); L and R averaged. Above z 928 the rear follows the back-view arris, shifted to meet the side trace and ramped onto the crest's top-rear arris at the leg top (moved -2.0 mm there); z 450-608 (arm joint) is a linear ramp from the lower leg. Across-width still from the back view.",
+   "upper_side_view": {
+    "front_moved_mm": [
+     -20.921096661569244,
+     -9.814026815288315
+    ],
+    "rear_moved_mm": [
+     -3.5967054179365903,
+     -0.35334332363910903
+    ],
+    "left_right_fore_aft_mm": {
+     "bleg_front_hi": {
+      "mean": 0.83,
+      "rms_about_mean": 1.17
+     },
+     "bleg_rear_hi": {
+      "mean": 0.31,
+      "rms_about_mean": 0.36
+     }
+    },
+    "width_fore_aft_mm": {
+     "z620": 39.39324735193696,
+     "z700": 34.468711656594365,
+     "z800": 31.241347630014154,
+     "z900": 28.373014519674033,
+     "z1000": 25.114837871511625
+    },
+    "width_square_to_leg_mm": {
+     "z620": 35.108363648301165,
+     "z700": 31.931076000506327,
+     "z800": 30.026729178145086,
+     "z900": 27.7751052823876,
+     "z1000": 24.652840157948294
+    },
+    "crest_pin": {
+     "point_xyz": [
+      237.6,
+      -176.7,
+      1064.5
+     ],
+     "rear_moved_at_top_mm": -1.9532926110089477,
+     "ramp_from_z": 927.5,
+     "note": "rear line pinned to the crest's top-rear arris at the leg centre (parts/crest.json); the arris slants across the leg top (about -179.0 at the inner face, -176.2 at the outer), the model's leg section does not"
+    },
+    "one_board": {
+     "front": {
+      "measured_z": [
+       [
+        42.13818242666446,
+        270.1
+       ],
+       [
+        607.8,
+        1085.0
+       ]
+      ],
+      "fit_rms_mm": 0.0755294541026968,
+      "fit_max_mm": 0.3950810325128771,
+      "moved_in_gap_mm": [
+       -60.52007393702843,
+       27.327558317672846
+      ]
+     },
+     "rear": {
+      "measured_z": [
+       [
+        42.13818242666446,
+        261.1
+       ],
+       [
+        607.8,
+        1085.0
+       ]
+      ],
+      "fit_rms_mm": 0.047536822711649086,
+      "fit_max_mm": 0.2129358379693329,
+      "moved_in_gap_mm": [
+       -4.3373185094135565,
+       85.40098442330985
+      ]
+     }
+    }
+   },
+   "front_edge_scatter_mm": 0.8368287345986823,
+   "rear_edge_scatter_mm": 2.0013648674348743,
+   "width_side_view_mm": {
+    "z100": 41.45633596182696,
+    "z300": 48.536866571248964,
+    "z450": 46.579170681096706,
+    "z600": 36.70011239836495,
+    "z800": 30.026729178145086,
+    "z1000": 24.652840157948294
+   },
+   "across": "fitted (unrolled back view, by-eye seeded edges, L+R averaged) above the seat; blended to the side plane at the rocker; rear face moved onto the triangulated back arris (was off by +5.7 mm median, 13.9 max)",
+   "width_across_mm": {
+    "z100": 37.854418136413045,
+    "z300": 37.35121284597281,
+    "z450": 37.2182632665023,
+    "z600": 39.661108198181566,
+    "z800": 38.15003218039145,
+    "z1000": 38.781145929440825
+   },
+   "top_centre": [
+    218.2,
+    -166.5,
+    1085.0
+   ],
+   "splay_top_x_mm": 218.23499177564526
+  },
+  "seat": {
+   "outline": "sides y 110-400: triangulated top arris, L+R mean (+-1.5 mm); front edge: triangulated rolled edge, L+R mean (+-2 mm; parts/seat_front.json), scalloped in plan, rolled over (radius 8 assumed), top height and bottom arris triangulated (parts/seat_front_face.json); side from y 400 to the front corner: straight (hidden in the leg joint); back edge: triangulated bow between the back legs, L+R mean (+-1.6 mm; parts/seat_back.json); behind |x| 192 the outline closes inside the legs",
+   "surface": "measured inside |x| <= 251, y 64-530 (seat/surface.json: 103 tape dots on the right half, mirrored; thin-plate spline, leave-one-out 1.18 mm rms interior, 3.2 max); outside that the cloud polynomial shifted to meet it",
+   "surface_fit_rms_mm": 1.8292898999892055,
+   "n_surface_points": 3467,
+   "depth_y_mm": [
+    -3.71,
+    537.0
+   ],
+   "half_width_mm": {
+    "back": 214.54119886781584,
+    "mid": 262.2433101969998,
+    "front": 268.0
+   },
+   "max_scoop_below_rim_mm": 30.5178181818182,
+   "rim_tilt_deg": 11.17602555623484,
+   "mesh_closed": true,
+   "mesh_volume_cm3": 8534.923631653195,
+   "measured_minus_cloud_polynomial_mm": {
+    "median": -1.903723700238345,
+    "rms": 4.425799920147546,
+    "min": -16.69822058550045,
+    "max": 6.260425748045975
+   },
+   "rim_z_mm": {
+    "y100": 344.77,
+    "y200": 365.985,
+    "y300": 385.1,
+    "y400": 404.585,
+    "y500": 423.05
+   },
+   "underside": "plane through the triangulated bottom arrises of the side edge (+-2.5 mm at the edge); flat across: not measured, but it mirrors the room without distortion in IMG_1492",
+   "thickness_near_edge_mm": {
+    "y100": 42.25243877015362,
+    "y300": 43.88010222645346,
+    "y500": 43.14526340866678
+   },
+   "front_edge": {
+    "source": "parts/seat_front.json (rolled front edge traced in 8 overhead photos, tube solve, symmetric mean)",
+    "tol_mm": 2.0,
+    "pommel_tip_y": 537.0,
+    "hollow": {
+     "abs_x": 128.0,
+     "y": 514.4,
+     "scallop_depth_from_tip_mm": 22.5,
+     "scallop_depth_from_corner_mm": 19.7
+    },
+    "corner": [
+     268.0,
+     534.2
+    ],
+    "was": "straight line at y 513.6 from corner to corner (half-width 267.7)",
+    "front_minus_old_straight_line_mm": {
+     "pommel": 23.39888445354893,
+     "hollow": 0.7988844535489079,
+     "corner": 20.598884453548976
+    },
+    "top_z_along_front_edge": {
+     "x0": 425.5667633253134,
+     "x40": 413.2149253731343,
+     "x80": 404.53663500678425,
+     "x130": 402.20151515151514,
+     "x180": 407.139303482587,
+     "x230": 421.4679104477612,
+     "x260": 428.8757575757576
+    },
+    "front_edge_height_top_to_underside_mm": {
+     "x0": 40.16676332531347,
+     "x40": 29.714925373134342,
+     "x80": 22.40678426051559,
+     "x130": 20.600746268656682,
+     "x180": 24.59999999999993,
+     "x230": 36.079421076436006,
+     "x260": 39.49999999999994
+    },
+    "top_z_along_front_edge_was": {
+     "x0": 426.1782837189096,
+     "x40": 411.8397595544783,
+     "x80": 402.6288164771572,
+     "x130": 400.2993135904319,
+     "x180": 405.5874178529754,
+     "x230": 421.7593210428,
+     "x260": 423.5418138764403
+    }
+   },
+   "front_face": {
+    "source": "parts/seat_front_face.json (top of the rolled edge: 8 overhead + 6 level/low front photos in one tube solve; bottom arris: 9 front photos; symmetric mean)",
+    "roll_radius_mm": 8.0,
+    "roll_radius_provenance": "assumed",
+    "top_of_roll_moved_mm": {
+     "note": "measured top of the roll minus the surface the model had on that line (seat/surface.json carried to the edge)",
+     "mean": 1.4166901318022678,
+     "min": -0.6787815966184212,
+     "max": 5.333943699317274,
+     "at_x": {
+      "x8": -0.6115203935962086,
+      "x40": 1.37516581865603,
+      "x80": 1.90781852962703,
+      "x130": 1.9022015610832188,
+      "x180": 1.5518856296116454,
+      "x230": -0.2914105950388239,
+      "x260": 5.333943699317274
+     },
+     "fades_out_over_mm_behind_the_roll": 30
+    },
+    "underside_raised_at_front_mm": {
+     "note": "measured bottom arris minus the side-arris plane carried forward; fades out over 60 mm behind the front edge (assumed)",
+     "min": 2.1161935772735205,
+     "max": 4.7399426089046415
+    },
+    "bottom_corner_extra_mm": {
+     "note": "beyond |x| 240 the bottom arris rounds up into the end of the front corner; extra rise over the line above, fades out over 25 mm behind the front edge (assumed)",
+     "at_corner": 11.699999999999989
+    },
+    "bottom_of_front_face_z": {
+     "x0": 385.3999999999999,
+     "x40": 383.5,
+     "x80": 382.1298507462687,
+     "x130": 381.60076888285846,
+     "x180": 382.5393034825871,
+     "x230": 385.3884893713252,
+     "x260": 389.37575757575763
+    },
+    "top_of_front_face_z": {
+     "x0": 417.5667633253134,
+     "x40": 405.2149253731343,
+     "x80": 396.53663500678425,
+     "x130": 394.20151515151514,
+     "x180": 399.139303482587,
+     "x230": 413.4679104477612,
+     "x260": 420.8757575757576
+    },
+    "face": "vertical (measured lean of the bottom arris against the top outline is within +-2 mm for |x| < 240)",
+    "min_height_of_flat_face_below_the_roll_mm": 12.599868533127335
+   },
+   "side_edge": {
+    "source": "parts/seat_edge.json (top and bottom arris of the side edge triangulated on both sides, symmetric mean)",
+    "measured_y_range": [
+     110.0,
+     400.0
+    ],
+    "outline_minus_cloud_outline_mm": {
+     "mean": 1.6854446976035777,
+     "min": -0.6359604115094726,
+     "max": 4.657825749489916
+    },
+    "outline_beyond_range": "cloud outline shifted by +0.0 mm (back) / +4.6 mm (front) at the end of the range, faded out over 60 mm",
+    "strip_beyond_dots_raised_mm": {
+     "max": 5.692159257999606,
+     "min": -1.3528814247931538,
+     "note": "top surface outside the dotted region tilted to meet the measured top arris at the outline"
+    },
+    "underside_moved_mm": {
+     "y100": -12.346603921457358,
+     "y300": -7.6007974594443795,
+     "y500": -2.8549909974314005
+    },
+    "min_thickness_mm": 16.9833870072826,
+    "model_top_at_outline_minus_measured_top_arris_z_mm": {
+     "mean": 0.2997066472742043,
+     "min": -0.22065402460845007,
+     "max": 1.8519959574309723
+    },
+    "top_at_outline_by_y": {
+     "y110": {
+      "model_z": 349.22838596831417,
+      "measured_arris_z": 349.4613526648282,
+      "half_width": 232.98255635101577
+     },
+     "y160": {
+      "model_z": 358.8233018120444,
+      "measured_arris_z": 357.8734559787057,
+      "half_width": 242.7165939720805
+     },
+     "y210": {
+      "model_z": 367.8217152323492,
+      "measured_arris_z": 366.68302004366274,
+      "half_width": 251.10511034200962
+     },
+     "y260": {
+      "model_z": 375.89175098202435,
+      "measured_arris_z": 375.89004485969934,
+      "half_width": 258.0268255795854
+     },
+     "y310": {
+      "model_z": 385.4956435560733,
+      "measured_arris_z": 385.49453042681546,
+      "half_width": 263.3604598035902
+     },
+     "y360": {
+      "model_z": 395.49672594550054,
+      "measured_arris_z": 395.4964767450112,
+      "half_width": 266.9847331328061
+     },
+     "y400": {
+      "model_z": 403.78420554034506,
+      "measured_arris_z": 403.78420554034506,
+      "half_width": 268.5719118717526
+     }
+    }
+   },
+   "side_edge_scoop": {
+    "source": "parts/seat_scoop.json (hard line and bottom arris triangulated on both side edges: right 14 and 8 photos, left 12 and 7; design = left/right mean, built symmetric)",
+    "y_range": [
+     83.48,
+     460.68
+    ],
+    "max_height_of_hard_line_above_underside_mm": 23.2,
+    "bevel_angle_deg": 45.7,
+    "max_bevel_run_mm": 22.63993171782954,
+    "edge_face": "vertical from the plan outline to the hard line",
+    "bottom_half_width_minus_old_straight_wall_mm": {
+     "y110": 4.54951721199987,
+     "y150": 0.6697326646015784,
+     "y200": -2.362103591927097,
+     "y250": -3.118240116061599,
+     "y300": -1.3454293337376764,
+     "y350": 2.3435687878596005,
+     "y400": 6.727272385447861
+    },
+    "outside_y_range": "edge face vertical for the full thickness (was: leaning under at the ratio found at the end of the measured range)",
+    "wall_points_on_the_hard_line": 74,
+    "edge_face_height_mm": {
+     "y110": 37.48173514432055,
+     "y150": 29.99636326324958,
+     "y200": 23.90235736093799,
+     "y250": 19.033009791797905,
+     "y300": 20.542972079926667,
+     "y350": 26.133957689491066,
+     "y400": 34.68209976878296
+    }
+   },
+   "back_edge": {
+    "source": "parts/seat_back.json (top arris, hard line and bottom arris of the back edge triangulated in 11, 7 and 10 photos from behind; symmetric solves)",
+    "was": "straight vertical edge at y 10.8 (1st percentile of the cloud), half-width 202.3, running on behind the back legs",
+    "top_arris_y": {
+     "x0": -3.71,
+     "x60": -0.47,
+     "x120": 9.29,
+     "x150": 17.24,
+     "x180": 28.51
+    },
+    "top_arris_minus_old_straight_edge_mm": {
+     "x0": -14.51783058862301,
+     "x60": -11.27783058862301,
+     "x120": -1.51783058862301,
+     "x150": 6.432169411376989,
+     "x180": 17.702169411376993
+    },
+    "corner": "side outline stops at y 45 inside the back leg and runs straight to the end of the bow at |x| 192 (inside the leg); the leg cuts the corner",
+    "lens_tip_abs_x": 173.5,
+    "top_behind_dots": {
+     "note": "top surface between the back edge and the dotted region (y 64): straight in y from the measured top arris to the measured surface at the dots' limit (fitted: no dots there). moved_at_edge_mm = measured top arris z minus the old cloud polynomial read ON THE NEW EDGE LINE (the old surface was an extrapolation there, pulled up by the slats' feet)",
+     "moved_at_edge_mm": {
+      "x0": -35.48506184339948,
+      "x60": -17.046187012594515,
+      "x120": -0.9087789740280527,
+      "x150": -1.7418759180487342,
+      "x180": -5.648844649715016
+     },
+     "slope_in_y": {
+      "x0": 0.14589360623927022,
+      "x60": 0.12008343484766351,
+      "x120": 0.17354699458903403,
+      "x150": 0.1679032170249124,
+      "x180": 0.15131543010034976
+     }
+    },
+    "underside_edge_in_front_of_top_arris_mm": {
+     "x0": 19.16,
+     "x60": 18.07,
+     "x120": 14.970000000000002,
+     "x150": 12.220000000000002,
+     "x180": 7.41
+    },
+    "section_on_centre_line": {
+     "top_arris_yz": [
+      -3.71,
+      324.8
+     ],
+     "hard_line_yz": [
+      -0.26,
+      306.72
+     ],
+     "bottom_arris_yz": [
+      15.45,
+      290.0418563967266
+     ],
+     "back_face_lean_deg": 10.803227549034833,
+     "back_face_height_mm": 18.406219057698934,
+     "bevel_angle_deg": 46.71217067869739,
+     "bevel_width_mm": 22.91210540416159
+    },
+    "wall_points_on_the_hard_line": 43,
+    "model_top_at_edge_minus_measured_top_arris_z_mm": 0.0
+   }
+  },
+  "arm": {
+   "source": "parts/arms.json design (triangulated top arrises of both arms, mirrored mean)",
+   "y_range": [
+    40.0,
+    503.8
+   ],
+   "back_extension": "carried from y 68.2 back to 40.0 into the back leg (not seen)",
+   "thickness_mm": 25.0,
+   "front_leg_top": {
+    "leg_top_z": 628.7432885258758,
+    "arm_underside_z_at_leg": 621.9438210475977,
+    "leg_top_xy": [
+     268.8,
+     438.7
+    ],
+    "arm_x_range_at_leg": [
+     238.2096006721522,
+     312.0643437967712
+    ],
+    "action": "cut at the arm underside (it ran through the arm)"
+   }
+  },
+  "crest": {
+   "source": "parts/crest.json (four arrises triangulated from overhead + rear photos; design = even polynomials)",
+   "span_between_legs_mm": 436.7,
+   "top_centre_z": 1078.4944162938061,
+   "top_at_leg_centre_z": 1064.5400744929786,
+   "back_leg_top_cut": {
+    "before_z_max": 1087.346068353695,
+    "plane_point": [
+     237.6,
+     -176.7,
+     1064.5
+    ],
+    "slope_dzdx": -0.06766087250457531,
+    "slope_dzdy": 0.09581568541065134
+   }
+  },
+  "slats": {
+   "edges": "fitted (unrolled back view, by-eye seeded edges, L+R averaged)",
+   "surface": "back face located by photo consistency in 7 height bands, separately for centre and outer slats",
+   "thickness_mm": 10.0,
+   "thickness_provenance": "front-face cloud layer vs photo-consistent back face (about 10 mm)",
+   "centre_width_mm": {
+    "near_seat": 77.26433077773679,
+    "under_crest": 99.2698671014883
+   },
+   "outer_width_mm": {
+    "near_seat": 40.45951772369547,
+    "under_crest": 52.28631902914272
+   }
+  },
+  "crest_arms_source": "parts/crest.json + parts/arms.json",
+  "overall": {
+   "bbox_min_mm": [
+    -315.7,
+    -484.8,
+    0.3
+   ],
+   "bbox_max_mm": [
+    315.7,
+    626.2,
+    1082.7
+   ],
+   "height_in": 42.62465652075348,
+   "width_in": 24.85536053943937,
+   "length_in": 43.738608519673136
+  }
+ }
+}
