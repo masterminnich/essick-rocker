@@ -14,7 +14,7 @@
   "length_mm": {"value": null, "provenance": "assumed: not visible. Front: through the leg (33) + 25 into the seat edge. Back: 25 deep, see below"}
  },
  "joints": {
-  "front_leg": {"centre_xyz": [-284.2, 466.7, 394.8], "kind": "leg lapped on the OUTSIDE of the seat's side edge; Domino runs across (x) through the leg into the seat edge; whole end inside the leg face"},
+  "front_leg": {"centre_xyz": [-284.4, 468.2, 394.8], "centre_provenance": "measured (hub, fix-list item 3, tools/front_domino/): on 19 photos of both legs the Domino centre sits 0.58 mm (sd 0.73) rearward of the middle between the leg face's two arrises (left 0.29, n 7; right 0.74, n 12); design = mean of the legs, 0.5 mm rearward of the flat outer face's middle. Was [-284.2, 466.7, 394.8], 2.0 mm rearward", "kind": "leg lapped on the OUTSIDE of the seat's side edge; Domino runs across (x) through the leg into the seat edge; whole end inside the leg face"},
   "back_leg": {"centre_xyz": [-225.3, 76.5, 322.8], "kind": "seat side edge BUTTS the leg's front edge with the outer faces flush (photo-consistent across 1504-1522: both halves sharp in the leg-face orthophoto); the Domino end straddles the joint line, ~15 mm in the leg and ~10 mm in the seat, driven in from outside (x)",
    "correction": "PR #12 said all four legs are lapped; at the BACK legs the seat butts flush, only the front legs are lapped"}
  }
