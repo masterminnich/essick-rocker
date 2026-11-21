@@ -239,6 +239,19 @@ if SFL and "bleg_front_hi" in SFL and "bleg_rear_hi" in SFL:
         r_new = r_new + gap * np.clip((z_ - zR[-1]) / (z_tr - zR[-1]), 0, 1.2)
         pin_rep = {"point_xyz": [round(_xl, 1), round(y_tr, 1), round(z_tr, 1)], "rear_moved_at_top_mm": gap, "ramp_from_z": float(zR[-1]),
                    "note": "rear line pinned to the crest's top-rear arris at the leg centre (parts/crest.json); the arris slants across the leg top (about -179.0 at the inner face, -176.2 at the outer), the model's leg section does not"}
+    one_board = {}
+    if not a.legacy:
+        # ONE BOARD (audit PR #12): the leg is one continuous piece of wood. Nothing is measured between the lower leg's lines (top z ~265) and the
+        # side trace above the arm (z0 ~608); the stitching there (cubic rear bridge + linear ramp) put a 27 mm kink in the leg. Fit one smoothing
+        # spline per outline through the measured stretches only, so the unmeasured band is bridged by the smoothest curve the measurements allow.
+        from scipy.interpolate import make_smoothing_spline
+        zlo_f = float(SFL["bleg_front_lo"]["z"][-1]); zlo_r = float(max(SFL["bleg_rearfar_lo"]["z"][-1], SFL["bleg_rear_lo"]["z"][-1]))
+        def _board(yline, zlo, lam):
+            meas = (z_ <= zlo) | (z_ >= z0); sp = make_smoothing_spline(z_[meas], yline[meas], lam=lam); y_ = sp(z_); r_ = (y_ - yline)[meas]
+            return y_, {"measured_z": [[float(z_.min()), zlo], [z0, float(z_.max())]], "fit_rms_mm": float(np.sqrt(np.mean(r_ ** 2))), "fit_max_mm": float(np.abs(r_).max()),
+                        "moved_in_gap_mm": [float((y_ - yline)[~meas].min()), float((y_ - yline)[~meas].max())]}
+        lam_b = 2e3            # stiffness: residual on the measured stretches stays under the line tolerance (+-1 mm) while the gap carries no wiggle
+        f_new, one_board["front"] = _board(f_new, zlo_f, lam_b); r_new, one_board["rear"] = _board(r_new, zlo_r, lam_b)
     allc = np.c_[allc[:, 0], (f_new + r_new) / 2, allc[:, 2]]; tan, e_acr, e_side = _frame(allc); w_side = (f_new - r_new) * np.abs(e_side[:, 1])
     inr = (z_ >= z0) & (z_ <= zR[-1])
     bl_up_src = (f"z {z0:.0f}-{zF[-1]:.0f}: front outline triangulated in side view from 4 cameras standing behind the leg on each side (solve residual 0.6 / 0.5 mm L / R); z {z0:.0f}-{zR[-1]:.0f}: rear edge traced in side view "
@@ -247,7 +260,7 @@ if SFL and "bleg_front_hi" in SFL and "bleg_rear_hi" in SFL:
     up_rep = {"front_moved_mm": [float(dF[inr].min()), float(dF[inr].max())], "rear_moved_mm": [float(dR[inr].min()), float(dR[inr].max())],
               "left_right_fore_aft_mm": {k: {"mean": SFL[k]["lr_diff_y_mean_mm"], "rms_about_mean": SFL[k]["lr_diff_y_rms_about_mean_mm"]} for k in ("bleg_front_hi", "bleg_rear_hi")},
               "width_fore_aft_mm": {f"z{int(z)}": float(np.interp(z, z_, f_new - r_new)) for z in (620, 700, 800, 900, 1000)},
-              "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}, "crest_pin": pin_rep}
+              "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}, "crest_pin": pin_rep, "one_board": one_board}
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
 report["back_leg"] = {"lower": bl_low_src, "upper": bl_up_src, "upper_side_view": up_rep,
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
