@@ -97,12 +97,24 @@ for side, S in ((1, "R"), (-1, "L")):
     # 2 back leg / seat: butt, outer faces flush. Remove the seat inside the leg and the sliver outboard of the leg's outer face
     tool = trimesh.boolean.union([M[BL], shifted(M[BL], [side * 6, 0, 0]), shifted(M[BL], [side * 12, 0, 0])], engine="manifold")
     cut("SEAT", tool, f"{BL} butt joint: seat side edge stops at the leg (front face), nothing of the seat inside or outside the leg")
-    # 3 feet onto the rocker top: carry the bottom 20 mm of each leg down 5 mm, then cut it to the rocker's curve
+    # 3 feet onto the rocker top. The leg is swept ALONG ITS OWN AXIS (convex hull of the bottom slab and its copy 12 mm further
+    #   down the axis: the leg is straight and convex there), so its faces carry on with no step. Then everything below the rocker's
+    #   top is cut away with the rocker widened across its own direction in plan (it toes in ~10 deg), so nothing hangs down beside the rocker's side faces.
+    R = M[RK]; RV = np.asarray(R.vertices)
     for L in (FL, BL):
         z0 = M[L].bounds[0, 2]
-        foot = M[L].slice_plane([0, 0, z0 + 20], [0, 0, -1], cap=True)
-        unite(L, shifted(foot, [0, 0, -5]), f"{L} foot carried 5 mm down (it floated 0.8-1.8 mm above the rocker)")
-        cut(L, M[RK], f"{L} foot cut to the rocker's top edge (contact face; the fastener between them is hidden and NOT modelled)")
+        cs = [M[L].section([0, 0, 1], [0, 0, z]).vertices.mean(0) for z in (z0 + 25, z0 + 90)]
+        a = cs[1] - cs[0]; a /= np.linalg.norm(a)                                                     # leg axis near the foot, upward
+        slab = M[L].slice_plane([0, 0, z0 + 15], [0, 0, -1], cap=True)
+        sweep = trimesh.convex.convex_hull(np.r_[slab.vertices, slab.vertices - a * 12.0])
+        unite(L, sweep, f"{L} foot extended 12 mm along the leg axis (it floated 0.8-1.8 mm above the rocker)")
+        yc = slab.bounds.mean(0)[1]; near = RV[np.abs(RV[:, 1] - yc) < 60][:, :2]                    # the rocker in plan under this foot
+        _, _, vt = np.linalg.svd(near - near.mean(0)); nrm = np.r_[-vt[0][1], vt[0][0], 0.0]       # across the rocker, in plan
+        wide = trimesh.boolean.union([shifted(R, nrm * k + [0, 0, dz]) for k in range(-16, 17, 2) for dz in (0, -30)], engine="manifold")
+        above = trimesh.boolean.union([shifted(R, [0, 0, dz]) for dz in range(0, 61, 5)], engine="manifold")   # over the rocker's footprint
+        wide = trimesh.boolean.union([trimesh.boolean.difference([wide, above], engine="manifold"), R], engine="manifold")  # there: the rocker itself
+        cut(L, wide, f"{L} foot cut to the rocker's top surface across the full width (contact face; the fastener is hidden and NOT modelled)")
+        rep["joints"][f"{L}_foot"] = {"leg_axis": a.round(3).tolist(), "method": "swept along the leg axis, cut by the widened rocker"}
     # 4 arm coped to the back leg
     cut(AR, M[BL], f"{AR} end coped to {BL} (it ran 4 mm into the leg; the arm's hidden joint into the leg is NOT modelled)")
     cut(AR, M[FL], f"{AR} underside vs {FL} top: contact face")

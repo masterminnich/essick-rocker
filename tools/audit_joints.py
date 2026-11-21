@@ -27,6 +27,8 @@ for a_, b_ in [p for p in JOIN if p[0] in G and p[1] in G]:
     Q, _ = trimesh.sample.sample_surface_even(B, 300000, radius=0.8, seed=1); d, _ = cKDTree(Q).query(P)
     if B.is_watertight:
         d = np.where(B.contains(P), d, -d)
+        if d.max() <= 0:                    # no sample inside B: refine the gap with exact closest points for the nearest 400 samples
+            near = np.argsort(-d)[:400]; d[near] = -trimesh.proximity.closest_point(B, P[near])[1]
         r["max_penetration_mm"] = round(float(max(d.max(), 0)), 1); r["min_gap_mm"] = round(float(max(-d.max(), 0)), 1)
     else:
         r["min_dist_mm"] = round(float(d.min()), 1); r["note"] = f"{b_} is not watertight"
