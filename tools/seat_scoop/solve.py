@@ -7,7 +7,8 @@ Fit: x(y), z(y) Legendre polynomials of degree DEG; residual = signed distance i
 polyline, divided by the local pixels per mm square to the line of sight (so in mm at the edge), soft-L1 0.5 mm. Samples every 5 mm; a sample whose nearest
 trace point is the END of a trusted piece is left out in that photo.
 CFG "init": {curve: [file, key]} starts from an earlier solution (needed when traces from ALT strips are in: their t is not between the arrises).
-Prints per-photo residuals and leave-one-photo-out changes; writes {curve: {"xyz": [[x, y, z] every mm], "photos": {...}, "leave_one_out_mm": ..}}."""
+Prints per-photo residuals and leave-one-photo-out changes; writes {curve: {"xyz": [[x, y, z] every mm], "photos": {...}, "leave_one_out_mm": .., "loo_xyz": {photo: the curve solved without it}}}.
+SIDE L: tools/seat_scoop/inputs_L/solve.json -> work/seat_scoop_L/solved_L.json (left-side check, tools/seat_scoop/compare_lr.py)."""
 import sys, json, numpy as np
 sys.path.insert(0, ".")
 from numpy.polynomial import legendre as L
@@ -77,14 +78,15 @@ for curve, use in cfg["use"].items():
         v, ok = resid_photo(P, n); info[n] = {"rms_mm": round(float(np.sqrt(np.mean(v[ok] ** 2))), 2), "mean_mm": round(float(v[ok].mean()), 2), "samples": int(ok.sum()), "y": [float(yk[ok].min()), float(yk[ok].max())]}
         _d = np.asarray(c.views[f"IMG_{n}.JPG"].center, float) - P[len(P) // 2]; info[n]["camera_elevation_deg"] = round(float(np.degrees(np.arctan2(_d[2], np.hypot(_d[0], _d[1])))), 1)
         print(f"   {n}: rms {info[n]['rms_mm']:.2f} mm  mean {info[n]['mean_mm']:+.2f}  n {ok.sum():3d}  y {yk[ok].min():.0f}-{yk[ok].max():.0f}   elevation {info[n]['camera_elevation_deg']:+.1f}   camera {np.round(c.views[f'IMG_{n}.JPG'].center).astype(int).tolist()}")
-    loo = {}
+    loo = {}; loo_p = {}
     for n in photos:
-        q = curve_xyz(solve([m for m in photos if m != n])); dd = np.linalg.norm(q - P, axis=1); mid = (yk > ya + 40) & (yk < yb - 40); loo[n] = [round(float(dd[mid].max()), 2), round(float(dd.max()), 2)]
+        loo_p[n] = solve([m for m in photos if m != n]); q = curve_xyz(loo_p[n]); dd = np.linalg.norm(q - P, axis=1); mid = (yk > ya + 40) & (yk < yb - 40); loo[n] = [round(float(dd[mid].max()), 2), round(float(dd.max()), 2)]
         print(f"   without {n}: curve moves by up to {loo[n][0]:.2f} mm (inner part), {loo[n][1]:.2f} mm (whole)")
     y1 = np.arange(ya, yb + 1e-9, 1.0); B1 = np.stack([L.legval((y1 - ym) / hw, np.eye(DEG + 1)[k]) for k in range(DEG + 1)], 1); P1 = curve_xyz(p, B1, y1)
     Tc, Bc = at(T, y1), at(B, y1); chd = Bc - Tc; ln = np.linalg.norm(chd[:, [0, 2]], axis=1); nrm = np.c_[-chd[:, 2], chd[:, 0]] / ln[:, None]      # outward normal of the old wall in the section plane
     offw = ((P1[:, [0, 2]] - Tc[:, [0, 2]]) * nrm).sum(1); along = ((P1[:, [0, 2]] - Tc[:, [0, 2]]) * chd[:, [0, 2]]).sum(1) / ln
     for y in range(int(ya // 50 * 50 + 50), int(yb), 50):
         i = int(y - ya); print(f"   y {y}: x {P1[i, 0]:.1f} z {P1[i, 2]:.1f}   top arris x {Tc[i, 0]:.1f} z {Tc[i, 2]:.1f}   old bottom x {Bc[i, 0]:.1f} z {Bc[i, 2]:.1f}   off the old wall {offw[i]:+.1f} mm, {along[i]:.1f} of {ln[i]:.1f} mm down it")
-    OUT[curve] = {"xyz": P1.round(2).tolist(), "photos": info, "leave_one_out_mm": loo, "off_old_wall_mm": offw.round(2).tolist(), "degree": DEG}
+    OUT[curve] = {"loo_xyz": {n: curve_xyz(v, B1, y1).round(2).tolist() for n, v in loo_p.items()},      # the curve solved without each photo (jackknife; tools/seat_scoop/compare_lr.py)
+                  "xyz": P1.round(2).tolist(), "photos": info, "leave_one_out_mm": loo, "off_old_wall_mm": offw.round(2).tolist(), "degree": DEG}
 json.dump(OUT, open(outf, "w")); print("wrote", outf)
