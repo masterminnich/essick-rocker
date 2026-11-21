@@ -1,0 +1,272 @@
+{
+ "note": "seed photo and points inside the outer side face (plane mm, read by eye on tools/rocker_ends/zoom.py views) for each rocker end; u_inner = where the end outline starts (noses: just in front of the front leg; tails: well inside the taper, so the end overlaps the stretch where parts/rocker_profile.json is good). 'hand' = an outline read by eye on the 5 mm grid, used instead of the grown one where glare breaks the growing (R nose: a glare patch on the face and a lit strip at the end in IMG_1489). 'bridge' = pairs of points on the all-photo seed (second round of trace.py) between which the seed is replaced by a smooth curve and no photo's snapped points are used, where a mark on the face reaches its edge ('bridge_note' says what the mark is)",
+ "L_tail": {
+  "photo": "1505",
+  "inside": [
+   [
+    -420,
+    163
+   ],
+   [
+    -330,
+    139.9
+   ],
+   [
+    -360,
+    148.5
+   ],
+   [
+    -390,
+    156.4
+   ],
+   [
+    -440,
+    168
+   ],
+   [
+    -460,
+    171
+   ],
+   [
+    -475,
+    171.5
+   ]
+  ],
+  "u_inner": -312,
+  "tip": "min"
+ },
+ "R_tail": {
+  "photo": "1469",
+  "inside": [
+   [
+    -420,
+    172
+   ],
+   [
+    -330,
+    149.0
+   ],
+   [
+    -360,
+    158.4
+   ],
+   [
+    -390,
+    166.0
+   ],
+   [
+    -440,
+    175
+   ],
+   [
+    -460,
+    178
+   ],
+   [
+    -478,
+    179
+   ]
+  ],
+  "u_inner": -312,
+  "tip": "min"
+ },
+ "L_nose": {
+  "photo": "1519",
+  "inside": [
+   [
+    575,
+    90
+   ],
+   [
+    595,
+    100
+   ],
+   [
+    610,
+    108
+   ],
+   [
+    620,
+    114
+   ]
+  ],
+  "u_inner": 568,
+  "tip": "max"
+ },
+ "R_nose": {
+  "photo": "1489",
+  "inside": [
+   [
+    575,
+    88
+   ],
+   [
+    595,
+    97
+   ],
+   [
+    610,
+    104
+   ],
+   [
+    620,
+    110
+   ]
+  ],
+  "u_inner": 568,
+  "tip": "max",
+  "hand": {
+   "top": [
+    [
+     568,
+     101.2
+    ],
+    [
+     570,
+     102
+    ],
+    [
+     575,
+     104.2
+    ],
+    [
+     580,
+     106.3
+    ],
+    [
+     585,
+     108.4
+    ],
+    [
+     590,
+     110.5
+    ],
+    [
+     595,
+     112.6
+    ],
+    [
+     600,
+     114.6
+    ],
+    [
+     605,
+     116.8
+    ],
+    [
+     610,
+     118.9
+    ],
+    [
+     615,
+     121
+    ],
+    [
+     620,
+     123
+    ],
+    [
+     621.8,
+     123.8
+    ]
+   ],
+   "bot": [
+    [
+     568,
+     72.4
+    ],
+    [
+     570,
+     73.2
+    ],
+    [
+     580,
+     77.2
+    ],
+    [
+     590,
+     81.2
+    ],
+    [
+     600,
+     85.2
+    ],
+    [
+     610,
+     89.4
+    ],
+    [
+     615,
+     91.6
+    ],
+    [
+     618,
+     93.2
+    ],
+    [
+     620.5,
+     95
+    ],
+    [
+     622.7,
+     97.8
+    ],
+    [
+     624.6,
+     101.2
+    ],
+    [
+     626.2,
+     105.1
+    ],
+    [
+     626.9,
+     108.2
+    ],
+    [
+     626.5,
+     110.5
+    ],
+    [
+     625.5,
+     114
+    ],
+    [
+     624.3,
+     117.5
+    ],
+    [
+     623.2,
+     121
+    ],
+    [
+     621.8,
+     123.8
+    ]
+   ]
+  },
+  "bridge": [
+   [
+    [
+     585.5,
+     106.5
+    ],
+    [
+     600.5,
+     113.2
+    ]
+   ],
+   [
+    [
+     624.4,
+     121.4
+    ],
+    [
+     625.9,
+     107.9
+    ]
+   ]
+  ],
+  "bridge_note": "two marks on the right rocker's face reach its edge and are bridged in the all-photo seed (points in the frame of the all-photo median, +-1 mm): a white scuff across the face at u 587-598 (Joe's IMG_1619 shows it; in the median it cuts 8 mm into the top edge) and finish worn off the end's arris at v 110-120 (a pale band 1-2 mm wide inside the silhouette)"
+ }
+}
