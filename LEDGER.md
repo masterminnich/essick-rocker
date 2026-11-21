@@ -502,7 +502,7 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   (e) register IMG_1588-1593 at half resolution only; (f) M1-M8 if Joe sends them (never block). Templates: the templates
   session (branch `templates`), not here.
 
-## 16:30 PST left/right skew: it is the chair's side frames, not a roll of the frame (main)
+## 16:24 PST left/right skew: it is the chair's side frames, not a roll of the frame (main)
 - tools/lr_skew.py -> parts/lr_skew.json (NEW file; reads rocker_profile.json, seat_edge.json, arms.json; changes nothing).
 - Both rockers' lowest points are on the table: left 0.1 mm at y 183, right 0.4 mm at y 198 (bottom edge there is the top edge
   minus the fitted face height, not a direct trace). A roll of the frame of 0.3-0.5 deg would lift one of them 2.5-4 mm. So
@@ -522,3 +522,56 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   the right). It is the one cheap reading that tells the chair from the solve. Not blocking.
 - NEXT unchanged: (a) seat front corners and front edge in plan; (b) arm underside and thickness (separate file);
   (d) underside from 1570-1576; (e) register IMG_1588-1593 at half resolution only.
+
+## 16:55 PST seat front edge in plan: scalloped, measured from above (branch seat-front, model v10)
+- RESULT (parts/seat_front.json, NEW file; tools/seat_front_fit.py): the seat's front edge is not a straight line. In plan the
+  pommel tip is at y 537.0 (x 0), the thigh hollows are deepest at |x| 128, y 514.4, and the front corners are at
+  (|x| 268, y 534.2). Scallop depth 22.5 mm from the tip, 19.7 mm from the corners. Model v9 had one straight line at y 513.6.
+  Provenance triangulated, tolerance +-2 mm (NOT 1/16 in, see below); pommel tip = seat session dot 108 (measured, +-1.5);
+  corners = outline carried 6 mm straight on to the side line (fitted, +-2).
+- METHOD (new: tools/tube_tri.py, seeds parts/seat_front_seeds.json; viewer tools/tube_show.py; plot tools/seat_front_plot.py).
+  The front edge is rolled over, no arris, so each camera outlines a different line on it. tools/edge_tri.py (one fixed line,
+  parallax along one normal) cannot do that. The edge is modelled as a tube (circle of radius r swept along a spine); for each
+  camera the outline is where its rays touch the tube; the spine is solved so those outlines match the outline traced in each
+  photo on the rectified front sheet (work/parts/seatF/fp, sheet through the front rim). 8 overhead photos: 1545, 1544 (behind),
+  1549, 1548, 1547 (left), 1539, 1538, 1537 (right). Seeds by eye on 1545, snap within a 7 mm band shrinking to 2.3 mm.
+  Residual rms right 0.39 mm, left 0.50 mm (per photo 0.13-0.75).
+- WHAT THE PHOTOS CANNOT TELL:
+  - the roll radius: solved free it went negative; fixed at 4, 8, 12 or 16 mm the residual is the same and the plan outline moves
+    by under 1 mm (mean -0.25 / 0 / +0.23 / +0.58). Fixed at 8 mm, ASSUMED.
+  - height and forward depth: the cameras look at the edge from 0-34 deg round the roll, so the solved top of the roll wanders
+    against the seat session's surface (right -3.6..+4.6 mm, left -5.3..+10.7). The plan outline is what is used; heights at the
+    front edge in the model still come from seat/surface.json.
+  - sensitivity of the plan outline (design, |x| 8-262): roll height tied to the measured seat surface instead of solved:
+    moves +0.39 mean, -0.5..+2.0; without the two steepest photos 1539, 1538: +1.13 mean, 0.0..+2.7; without 1545, 1544:
+    +2.06 mean, up to +7.4 (the right half beyond x 126 then has one camera group left and is no longer triangulated).
+    Hence +-2 mm.
+- CHECKS: right minus mirrored left 0.81 mean, sd 1.4, -1.8..+2.4. Five of the seat session's tape dots on the front face
+  (91, 94, 96, 100, 109; 11-23 mm below the top; not used in the solve): design outline minus dot +0.03 mean, rms 1.11,
+  -1.9..+1.4, so the face is vertical within about 1 mm there. Dot 107 (on the horn, 35 mm below the top) is 4.1 mm behind
+  the outline; not counted. Every tape dot on the seat top is inside the outline (smallest margin 1.6 mm, dot 103).
+- TRACES CHECKED BY EYE on single rectified photos, both halves, all 8 photos (figures/seat_front/traces_*.jpg): on the edge.
+  Two things had to be cut out: 1537 right half beyond u 36 (the steel ruler lies behind the edge and the snap took its marks)
+  and 1549 right half u 96-150 (white blob and ruler).
+- MODEL v10 (tools/build_model.py reads parts/seat_front.json; --legacy skips it):
+  - front outline = the design outline, a point every 8 mm; side from y 400 to the corner straight (hidden in the leg joint).
+  - front wall vertical (the side face's lean-under fades out over the last 40 mm).
+  - seat depth in y 10.8 .. 537.0 (was 513.6). Top along the front edge: 427.5 at the pommel tip (dot 88, 7 mm behind the tip,
+    426.4), 399.7 at x 130, 423.1 at x 260. Front wall height top to underside: 44.3 / 20.5 / 40.6 mm at x 0 / 130 / 260.
+    Least wood under the scoop 20.0 mm (was 20.5). Overall box unchanged: 42.62 in high, 24.86 wide, 43.01 long.
+- CHECKED BY EYE, v9 vs v10 outlines (figures/seat_front/v9_v10_IMG_*.jpg): 1545 (above), 1549 (left), 1539 (right): the
+  outline now runs along the scalloped edge, pommel tip and both corners on the wood.
+- STILL WRONG, visible in the figures:
+  - IMG_1485 (low, from the front): the model's front wall reaches visibly below the wood. The underside is still one plane
+    carried to the front and the front face's bottom edge is not measured (M1). The real seat thins toward the front edge.
+  - IMG_1539 / 1538: a dark band outside the outline on the right flank of the pommel (about 5 mm wide at u 20-50 on the sheet's 5 mm grid,
+    gone by u 125) and a thinner one at the far horn: the lower part of the front face stands further forward than the top
+    edge. Not measured (figures/seat_front/dark_band_IMG_1539_1538.jpg).
+- FORMATS: no existing parts file changed. NEW: parts/seat_front.json (design.front_y_of_abs_x = [[|x|, y], ...] every 2 mm,
+  0..268; x -> -x for the left), parts/seat_front_seeds.json, parts/model_v10.*. Templates session: the seat blank's front
+  outline should now come from parts/seat_front.json instead of a straight line.
+- PLAN.md: optional M10 added (straightedge from pommel tip to a front corner, largest gap to the edge in the hollow:
+  predicted 21.3 mm). Not blocking.
+- NEXT: (a2) front face of the seat: bottom edge and section from the low front photos (1485, 1496, 1484) and the dark band
+  in 1539; (b) arm underside and thickness from the side sheets (separate file, not parts/arms.json); (d) underside from
+  1570-1576; (e) register IMG_1588-1593 at half resolution only; M1-M10 if Joe sends them (never block).

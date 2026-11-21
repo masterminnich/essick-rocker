@@ -278,7 +278,19 @@ if _ef.exists() and not a.legacy:
 # the front and back edges get a point every ~10 mm too: with only the two corner points the front wall's top edge was one straight line from corner to
 # corner, bridging over the thigh hollows of the measured surface (seen as a flat horizon in the level photo 1491)
 _fx = lambda h: np.linspace(h, -h, int(2 * h // 10) + 1)[1:-1]
-outline = np.r_[np.c_[half, ys], np.c_[_fx(half[-1]), np.full(len(_fx(half[-1])), y_front)], np.c_[-half[::-1], ys[::-1]], np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]]
+front_pts = np.c_[_fx(half[-1]), np.full(len(_fx(half[-1])), y_front)]
+# front edge in plan: measured (parts/seat_front.json, tools/seat_front_fit.py): scalloped, pommel point at the centre, hollows either side, corners forward again.
+# The sides run on from the end of the measured side range (y 400) straight to the front corner (that stretch is hidden in the front-leg joint)
+front_rep = None; _ff = ROOT / "parts/seat_front.json"; front_y = None
+if _ff.exists() and edge_rep and not a.legacy:
+    _F = json.load(open(_ff))["design"]; _fxy = np.array(_F["front_y_of_abs_x"]); _xcn, _ycn = float(_F["corner"]["abs_x"]), float(_F["corner"]["y"]); front_y = lambda x: np.interp(np.abs(x), _fxy[:, 0], _fxy[:, 1])
+    _k = ys < _y1 - 1e-6; _h1 = float(_pv("top_half_width_of_y", _y1)); y_front_cloud = y_front; half_front_cloud = float(half[-1])
+    ys = np.r_[ys[_k], np.linspace(_y1, _ycn, 15)]; half = np.r_[half[_k], np.linspace(_h1, _xcn, 15)]; y_front = float(_fxy[:, 1].max())
+    _xf = np.linspace(_xcn, -_xcn, 2 * int(_xcn // 8) + 1)[1:-1]; front_pts = np.c_[_xf, front_y(_xf)]
+    front_rep = {"source": "parts/seat_front.json (rolled front edge traced in 8 overhead photos, tube solve, symmetric mean)", "tol_mm": _F["tol_mm"], "pommel_tip_y": float(front_y(0.0)), "hollow": _F["hollow"],
+                 "corner": [_xcn, _ycn], "was": "straight line at y %.1f from corner to corner (half-width %.1f)" % (y_front_cloud, half_front_cloud),
+                 "front_minus_old_straight_line_mm": {"pommel": float(front_y(0.0) - y_front_cloud), "hollow": float(_fxy[:, 1].min() - y_front_cloud), "corner": float(_ycn - y_front_cloud)}}
+outline = np.r_[np.c_[half, ys], front_pts, np.c_[-half[::-1], ys[::-1]], np.c_[-_fx(half[0]), np.full(len(_fx(half[0])), y_back)]]
 # top surface (mirrored cloud), smooth bivariate spline on (|x|, y)
 St = S[S[:, 2] > seat_z(S[:, 1]) - 16]
 both = St
@@ -338,7 +350,10 @@ if edge_rep:
     # straight on to the front leg), never closer than 2 mm to the top outline; behind the range the ratio at its end is held
     _bh = np.where(pts2[:, 1] > _y1, np.minimum(np.polyval(_E["bottom_half_width_of_y"]["poly_in_(y-250)"], np.minimum(pts2[:, 1], _y1 + 60) - 250.0), _top - 2.0),
                    _top * _pv("bottom_half_width_of_y", pts2[:, 1]) / _pv("top_half_width_of_y", pts2[:, 1]))
-    xbm = pts2[:, 0] * _bh / _top
+    _ratio = _bh / _top
+    if front_y is not None:      # the front face is vertical (tape dots on it sit on the plan outline within about 1 mm): the side lean fades out over the last 40 mm before the front edge
+        _ratio = 1 + (_ratio - 1) * np.clip((front_y(pts2[:, 0]) - pts2[:, 1]) / 40.0, 0, 1)
+    xbm = pts2[:, 0] * _ratio
     edge_rep["underside_moved_mm"] = {f"y{int(y)}": float(np.polyval(_E["bottom_z_of_y"]["poly_in_(y-250)"], y - 250.0) - (seat_z(y) + 4 - P("seat_edge_thickness"))) for y in (100, 300, 500)}
     edge_rep["min_thickness_mm"] = float((zt - zbm).min()); _o = pts2[-len(outline):]; _s = (_o[:, 1] >= _y0) & (_o[:, 1] <= _y1)
     edge_rep["model_top_at_outline_minus_measured_top_arris_z_mm"] = {"mean": float(np.mean((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "min": float(np.min((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s])), "max": float(np.max((zt[-len(outline):] - _pv("top_z_of_y", _o[:, 1]))[_s]))}
@@ -360,6 +375,14 @@ if seat_src:
     report["seat"]["thickness_near_edge_mm"] = {f"y{int(y)}": float(np.median((zt - zbm)[_e & (np.abs(pts2[:, 1] - y) < 25)])) for y in (100, 300, 500)}
 if edge_rep:
     report["seat"]["outline"] = "sides y %.0f-%.0f: triangulated top arris, L+R mean (+-1.5 mm); front, back and corners: cloud (98th percentile half-width per station; the front and back edges are straight in plan, their top follows the surface height)" % (_y0, _y1)
+if front_rep:
+    report["seat"]["outline"] = ("sides y %.0f-%.0f: triangulated top arris, L+R mean (+-1.5 mm); front edge: triangulated rolled edge, L+R mean (+-%.0f mm; parts/seat_front.json), scalloped in plan; "
+                                 "side from y %.0f to the front corner: straight (hidden in the leg joint); back edge and back corners: cloud, straight in plan") % (_y0, _y1, front_rep["tol_mm"], _y1)
+    _o = pts2[-len(outline):]; _fr = np.abs(_o[:, 1] - front_y(_o[:, 0])) < 1e-6; _zf = zt[-len(outline):]
+    front_rep["top_z_along_front_edge"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], _zf[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}
+    front_rep["front_edge_height_top_to_underside_mm"] = {f"x{int(x)}": float(np.interp(x, _o[_fr, 0][::-1], (_zf - zbm[-len(outline):])[_fr][::-1])) for x in (0, 40, 80, 130, 180, 230, 260)}
+    report["seat"]["front_edge"] = front_rep; report["seat"]["depth_y_mm"] = [y_back, y_front]
+if edge_rep:
     report["seat"]["underside"] = "plane through the two triangulated bottom arrises of the side edge (+-2.5 mm at the edge; flat across is ASSUMED, no measurement between them)"
     report["seat"]["side_edge"] = edge_rep
 
