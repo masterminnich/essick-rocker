@@ -16,7 +16,19 @@ your checkout's `parts/`, committed or not).
   plane at the depth you set (GPU projective texturing through the solved camera). Wood at that depth lines up exactly;
   wood nearer or farther shifts by parallax, so slide the depth to the part you are checking.
 - **Model**: opacity slider (0 = outlines only), outline toggle, parts on/off.
+- **Measured points vs model**: the measured 3D points drawn in the scene, each coloured by its signed distance to the model
+  that is showing (rust = inside the model, so the model is too big there; grey = on it; blue = outside, so the model is too
+  small there). The rail shows the median distance, the 90 % figure and a per-part table (points, median, bias = median
+  signed distance, 90 %), worst part first. Hover a dot for its distance, part, photo count and reprojection error; a line
+  runs to the nearest model surface. Point sets: *Matched points* (`work/dense/chair_dense.npy`, tools/densify.py tracks),
+  *Solve points* (the COLMAP solve's own points, off by default) and *Seat dots* (seat/dots.csv). Points farther than the
+  *Hide past* distance from every part (default 25 mm) are left out of the figures and the picture, and so are the points of
+  parts switched off. Distances are worked out in the browser (three-mesh-bvh) each time a model loads, so a new model needs
+  no export. Inside/outside: ray parity for closed parts, the nearest face's normal for open ones (the seat). While the dots
+  are coloured by distance the model is drawn in neutral grey so its part colours don't read as distance.
 
 `viewer/photos/` is made by `tools/viewer_photos.py`: each photo undistorted, upright, resampled to a pinhole camera with the
 principal point at the centre (1600 px), plus `cameras.json`. Re-run it only if the camera solve or photo set changes.
+`viewer/cloud/` is made by `tools/viewer_cloud.py` (`tools/py.sh tools/viewer_cloud.py`): the three point sets in the chair
+frame as small binary files plus `index.json`. Re-run it only when the dense cloud, the solve or the seat dots change.
 `.nojekyll` in the repo root makes Pages publish the files as they are (no Jekyll pass).

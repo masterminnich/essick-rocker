@@ -4,6 +4,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { createCloud } from './cloud.js'
 
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1)
 const $ = (id) => document.getElementById(id)
@@ -52,9 +53,11 @@ const modelGroup = new THREE.Group(); scene.add(modelGroup)
 const planeGroup = new THREE.Group(); scene.add(planeGroup)
 const gridGroup = new THREE.Group(); scene.add(gridGroup)
 const measureGroup = new THREE.Group(); scene.add(measureGroup)
+const cloud = createCloud({ scene, request: () => request(), $, onChange: () => applyModelStyle() })
 
 // ------------------------------------------------------------------ model
 const loader = new GLTFLoader()
+const NEUTRAL_FILL = new THREE.Color('#d6cfbf'), NEUTRAL_LINE = new THREE.Color('#5f5a50')
 const partOf = (name) => PARTS.find(([p]) => name.startsWith(p)) || ['OTHER', 'Other', '#6b7280']
 
 async function loadModel(m, quiet) {
@@ -62,23 +65,26 @@ async function loadModel(m, quiet) {
   modelGroup.clear()
   gltf.scene.traverse((o) => {
     if (!o.isMesh) return
-    const [key, , col] = partOf(o.name || o.parent?.name || '')
+    const name = o.name || o.parent?.name || ''; const [key, , col] = partOf(name)
     const c = new THREE.Color(col)
     const mesh = new THREE.Mesh(o.geometry, new THREE.MeshStandardMaterial({ color: c.clone().lerp(new THREE.Color(0xffffff), 0.15), roughness: 0.75, metalness: 0, flatShading: true, transparent: true, side: THREE.DoubleSide }))
     o.updateWorldMatrix(true, false); mesh.applyMatrix4(o.matrixWorld)
     const edges = new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 28), new THREE.LineBasicMaterial({ color: c.clone().multiplyScalar(0.7), transparent: true }))
     edges.applyMatrix4(o.matrixWorld); edges.renderOrder = 2
-    const g = new THREE.Group(); g.add(mesh, edges); g.userData = { key, mesh, edges }; modelGroup.add(g)
+    const g = new THREE.Group(); g.add(mesh, edges); g.userData = { key, name, mesh, edges, fill: mesh.material.color.clone(), line: edges.material.color.clone() }; modelGroup.add(g)
   })
   state.modelId = m.id; commitInfo(m)
+  cloud.measure(modelGroup, `${m.id}@${m.tag}`)
   applyModelStyle(); renderVersion(); request()
   if (!quiet) toast(`Showing v${m.version}`)
 }
 
 function applyModelStyle() {
   for (const g of modelGroup.children) {
-    const { key, mesh, edges } = g.userData
+    const { key, mesh, edges, fill, line } = g.userData
     g.visible = !state.hidden.has(key)
+    const plain = cloud.colouring()                               // distance colours on the points: keep the model neutral
+    mesh.material.color.copy(plain ? NEUTRAL_FILL : fill); edges.material.color.copy(plain ? NEUTRAL_LINE : line)
     mesh.material.opacity = state.opacity; mesh.material.depthWrite = state.opacity > 0.98; mesh.visible = state.opacity > 0.01
     edges.visible = state.edges || state.opacity <= 0.01
     edges.material.opacity = state.view === 'photo' ? 1 : 0.85
@@ -266,7 +272,9 @@ stage.addEventListener('pointerdown', (e) => {
 stage.addEventListener('pointermove', (e) => {
   if (drag) { state.zoom.x = drag.zx + e.clientX - drag.x; state.zoom.y = drag.zy + e.clientY - drag.y; layout() }
   readout(e)
+  if (!drag && !e.buttons && !pickQueued) { pickQueued = true; requestAnimationFrame(() => { pickQueued = false; cloud.pick(e, camera(), canvas) }) }
 })
+let pickQueued = false
 stage.addEventListener('pointerup', (e) => {
   drag = null
   if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 4 && VIEWS[state.view]) measureClick(e)
@@ -391,7 +399,7 @@ function bindUI() {
     if (m.id !== state.models[0].id) { state.follow = false; $('follow').checked = false }
     loadModel(m)
   })
-  $('parts').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; const k = b.dataset.k; state.hidden.has(k) ? state.hidden.delete(k) : state.hidden.add(k); renderParts(); applyModelStyle() })
+  $('parts').addEventListener('click', (e) => { const b = e.target.closest('.chip'); if (!b) return; const k = b.dataset.k; state.hidden.has(k) ? state.hidden.delete(k) : state.hidden.add(k); renderParts(); applyModelStyle(); cloud.setHiddenParts(state.hidden) })
   $('planes').addEventListener('input', (e) => {
     const row = e.target.closest('.plane'); if (!row) return; const a = row.dataset.a; const axis = AX.indexOf(a); const p = state.planes[a]
     if (e.target.classList.contains('pon')) { p.on = e.target.checked; row.classList.toggle('off', !p.on) }
@@ -485,6 +493,7 @@ async function main() {
   bindUI(); renderParts()
   state.cams = await (await fetch('photos/cameras.json')).json()
   renderPhotoList(); renderPlanes(); setView('free')
+  await cloud.load().catch((e) => console.warn('cloud', e))
   await poll(); setInterval(poll, 20000); setInterval(renderVersion, 30000)
   tick()
 }

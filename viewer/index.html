@@ -11,7 +11,8 @@
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+  "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js"
 } }
 </script>
 </head>
@@ -26,6 +27,7 @@
     <div class="hud hud-bottom">
       <span id="readout" class="mono"></span>
       <span id="measure" class="mono"></span>
+      <span id="pointInfo" class="mono"></span>
     </div>
     <div class="toast" id="toast" hidden></div>
     <div class="state" id="state" hidden></div>
@@ -74,6 +76,36 @@
       </div>
       <label class="switch"><input type="checkbox" id="edges" checked><span></span>Outlines</label>
       <div class="chips" id="parts"></div>
+    </section>
+
+    <section class="block cloud" id="cloudBlock" data-screen="rv.viewer.cloud">
+      <div class="block-head">
+        <h2>Measured points vs model</h2>
+        <label class="switch"><input type="checkbox" id="cloudOn" checked><span></span></label>
+      </div>
+      <div id="cloudBody" class="sub">
+        <p class="busy mono" id="cloudBusy">Loading points…</p>
+        <div id="cloudHead" hidden>
+          <div class="hero"><span class="hero-num mono" id="cloudMed">–</span><span class="hero-unit">mm</span></div>
+          <p class="note" id="cloudSub"></p>
+        </div>
+        <div class="legend" aria-label="Colour scale">
+          <div class="leg-bar"></div>
+          <div class="leg-ticks mono"><span id="legMin">−6</span><span>0</span><span id="legMax">+6</span></div>
+          <div class="leg-words"><span><i style="--c:#c2410c"></i>inside the model<br><small>model too big here</small></span><span class="r">outside the model<i style="--c:#1d5fd6"></i><br><small>model too small here</small></span></div>
+        </div>
+        <table class="ptable mono" id="cloudTable"></table>
+        <div class="chips" id="cloudLayers"></div>
+        <div class="seg seg-2" id="cloudMode" role="tablist">
+          <button data-m="dist">Colour by distance</button>
+          <button data-m="photo">Photo colour</button>
+        </div>
+        <div class="slider"><label for="cloudScale">Scale</label><input type="range" id="cloudScale" min="2" max="20" step="1" value="6"><output id="cloudScaleOut" class="mono">±6 mm</output></div>
+        <div class="slider"><label for="cloudCut">Hide past</label><input type="range" id="cloudCut" min="3" max="60" step="1" value="25"><output id="cloudCutOut" class="mono">25 mm</output></div>
+        <div class="slider"><label for="cloudSize">Dot size</label><input type="range" id="cloudSize" min="1" max="8" step="1" value="3"><output id="cloudSizeOut" class="mono">3 px</output></div>
+        <p class="note">Each dot is a point measured from several photos, coloured by how far it sits from the model on screen.
+          Hover a dot for its numbers; the line shows the nearest model surface. Lower the model's opacity to see dots inside it.</p>
+      </div>
     </section>
 
     <section class="block" id="backBlock">
