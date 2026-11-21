@@ -1,0 +1,50 @@
+{
+ "frame": "chair frame mm: +x = chair's right, +y = forward, +z = up, table at z = 0",
+ "arm_front_leg": {
+  "observed": {
+   "method": "orthophotos of each arm's top over its front leg, 0.2 mm/px, plane fitted to the model arm top (tools/arm_top_ortho.py, model v13); left arm: 12 of 15 photos within 60 deg show it; right arm: 15 photos, none show anything",
+   "left_arm_oval": {
+    "what": "a darker oval on the LEFT arm top, long axis along the arm's grain (fore-aft); the one seen in IMG_1528",
+    "size_mm": [
+     18.5,
+     9.5
+    ],
+    "size_spread_mm": [
+     [
+      18,
+      19
+     ],
+     [
+      8.5,
+      10
+     ]
+    ],
+    "photos": [
+     "IMG_1480",
+     "IMG_1538",
+     "IMG_1545",
+     "IMG_1549"
+    ],
+    "centre_xyz": [
+     -282.4,
+     458.6,
+     653.0
+    ],
+    "position_note": "not over the leg's centre: it sits at the leg's front-outer corner and mostly in front of it, about 14 mm outboard of the model leg's centreline and 20-28 mm forward of its top centre (the leg rakes, so the two views differ by ~8 mm). Its outer edge is ~4 mm outside the leg's outer face. The model front leg is placed right: its front edge matches the side photos within ~3 mm."
+   },
+   "right_arm": "nothing visible at the matching place or anywhere over the leg (15 photos, IMG_1476-1549)",
+   "figure": "figures/joinery/arm_front_leg.jpg"
+  },
+  "reading": "not a through-tenon: a tenon from the leg would sit over the leg's top, would show on both arms, and its end grain would be roughly as long across as along. The oval is most likely a feature of the board (a filled knot or patch) on the left arm only. The joint between arm and front leg is therefore HIDDEN.",
+  "design": {
+   "kind": "blind 10 mm Domino, vertical along the leg axis, centred on the leg top's contact face with the arm underside, long axis fore-aft",
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_in_leg_mm": 25,
+   "depth_in_arm_mm": 15,
+   "provenance": "ASSUMED: the builder uses 10 mm Dominos at the seat (parts/dominos.json); the arm is ~25 mm thick (parts/arms.json, assumed), so 15 mm in leaves 10 mm of arm above it. A short round tenon would fit the photos equally well; it changes no template outline."
+  }
+ }
+}
