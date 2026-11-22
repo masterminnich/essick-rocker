@@ -15,3 +15,5 @@ tools/py.sh templates/crest.py
 tools/py.sh templates/check_crest_overlay.py --geom templates/out/crest_geom.json --out figures/templates/crest_overlay.jpg
 tools/py.sh templates/arms.py
 tools/py.sh templates/check_arm_overlay.py --geom templates/out/arms_geom.json --out figures/templates/arms_overlay.jpg
+tools/py.sh templates/legs.py
+tools/py.sh templates/check_legs_overlay.py --geom templates/out/legs_geom.json --out figures/templates/legs_overlay.jpg
