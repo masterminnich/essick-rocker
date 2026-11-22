@@ -1276,3 +1276,18 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
   - a reading: compare with the model value in HUB_HANDOFF; if outside tolerance, fix the owning parts file on a branch, trial
     build, critique, PR, next model number; if inside, tick it in PLAN as a check passed.
   - a joinery change: trial-build main + its branch, critique, merge, next model number.
+
+## 2026-11-21 PST viewer v2: the review app (branch viewer-v2, PR to come; NOT merged)
+- RUN ON Opus 5.5 (subagent for Joe). Spec: viewer-review/VIEWER_REVIEW.md §4-6 + mockup; Joe's three changes (fraction
+  entry, dimension lines on the part, photos on notes).
+- `viewer/index.html` is now the review app (Look / Measurements / Templates, My notes, Start over); the old page moved to
+  `viewer/workbench.html` unchanged (link in the corner, or `?workbench`). New: `review.js`, `review.css`, `scene.js`,
+  `store.js` (all saving; IndexedDB; `REMOTE_URL` null; API in viewer/README.md), `inches.js`.
+- `tools/dimensions.py` -> `parts/model_v24_dimensions.json`: 29 sizes with chair-frame end points, each checked against its
+  parts-file number (largest gaps 1.0 mm centre-slat width and 0.9 mm arm inner face; the rest under 0.9) and drawn over the model
+  in screenshots (all 29 sit on the right part and face). Left out: arm length (the arm curves in plan; no straight line
+  between two arm points means "arm length"; arms_geom.json measures it along the curve). Seat depth is drawn on the slant
+  (back edge z 325 to front point z 420), the way a tape lies, not level.
+- The review app picks the newest model with a dimensions file: a new model number needs `tools/py.sh tools/dimensions.py
+  --model N` before the app moves to it.
+- NEXT: Joe reviews the PR; a remote store if he wants answers to arrive without "Send to Joe".
