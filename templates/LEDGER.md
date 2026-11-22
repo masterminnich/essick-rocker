@@ -151,3 +151,36 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 - OPEN: underside flatness across X is ASSUMED in the model (raised 1-4 mm at the front); slat mortise depth and all Domino depths
   ASSUMED; the leg cuts are the model's leg shapes, scribe to the real legs; left front corner M9 / seat front corner reading
   (PR #30 lead) could move the horn top 3 mm (height only); glue-up board layout not seen in the photos (blank size only).
+## 2026-11-21 16:47-17:10 crest
+- templates/crest.py -> crest_plan_*, crest_back_*, crest_sections_* (+ crest_geom.json); templates/check_crest_overlay.py ->
+  figures/templates/crest_overlay.jpg. Inputs: parts/crest.json (four arrises, design even polys, lean, joints; PR #4),
+  parts/model_v24_shapes.glb (BLEG_R inner face beside the crest = shoulder line, PR #5 pinned the leg rear to the crest;
+  SLAT_C/L/R faces where they meet the crest bottom = mortises), parts/edge_radii.json (arris note).
+- HOW IT IS MADE: SAWN FROM SOLID and shaped; NO bending form. Basis: crest.json's design is a solid rail tapering 28 -> 41 mm
+  top to bottom with a twisted front face (front lean 12-19 deg vs back 9.9); no lamination lines were reported on the top face
+  (overhead traces at 0.3 mm/px); bow 16.5 mm over 437 mm (plan R 1231) saws easily from 2 in stock. Not checked by eye here.
+- VIEWS (why): all drawn in a RAIL FRAME tipped by the back legs' 9.9 deg lean: crest.json carried the bottom-rear arris down
+  that lean from the top-rear one, so the back face is a ruled cylinder (bottom-rear vs top-rear differ <= 0.34 mm in w):
+  a square bandsaw cut, developable, and the blank shrinks to 49 mm thick (59 in the chair frame). (1) plan square onto the top
+  face: saw line = back face + bottom-front arris (outermost), top-front arris to shape the front face to, shoulders, mortise
+  footprints, leg tops, stations X100/X200; (2) back face UNROLLED (exact): both arches, shoulders, arch over the leg tops,
+  mortises; (3) section gauges X0 / X100 / X200 / shoulder (cards; slat mortise drawn at X0 and X100; plumb line shown).
+  Order for the maker: blank -> plan (back face square, front square to the bottom-front line) -> wrap crest_back, saw arches
+  square to the back face (top/bottom faces are square to it in crest.json) -> spokeshave the front to the top-front line, gauges.
+- Numbers: shoulder to shoulder 436.6 (17 3/16") at the top, 432.6 at the bottom (model leg inner face leans out 2 mm over the
+  crest height: 216.3 at z 998 -> 218.3 at z >= 1038); 438.2 along the bowed back face. Height 76.0 centre / 70.0 shoulder;
+  thickness 28.4 / 40.7 at X0, 26.8 / 28.6 at the shoulder (= crest.json per_station within 0.2). Bow of the back face 16.5 at
+  the shoulders in the rail frame (crest.json 18.0 is measured to the line between the joints at the top-rear arris). Blank
+  526 x 49 x 89 mm (20 23/32 x 1 29/32 x 3 1/2") incl. 3/4" allowance + 25 mm waste per end. Mortises (v24 slats at the bottom
+  face): C 100.0 wide x 10.2 (at X0), outer 53.0 wide (x 83.8-136.8); slats run 10.7 deg further back than the back face;
+  v24 slats reach 20.8 / 23.4 mm in.
+- Checks: overlay by projecting the 3D template geometry with the solved cameras into raw photos (no plane parallax) 1545,
+  1548, 1502, 1501: top/bottom arrises on the wood edges, shoulders on the leg seams (1502 both ends), slat lines over the slats,
+  arch over the leg tops (right end on 1502 runs ~1-2 mm past the lit leg corner: glare/round). Check squares 144.0 pt on every
+  tile (3 + 3 + 2). DXFs read in ezdxf, mm; back-face CUT perimeter 1020.4 (= 2 x 438.2 + 76 + 70 - rounding).
+- ROADBLOCKS: overhead/rear sheets for the crest live only in ../rocking-chair-crest (not read); projecting into raw photos
+  instead. First slat-face fits picked up the slat edges' end faces (front line flat, a 47.9 mm footprint); fixed by per-band
+  outline extremes. A leg section outlier (x 256.8 at z 1058) from undersampled outline; fixed by densifying.
+- OPEN: crest/leg joint hidden (3/4" tenon allowance ASSUMED); mortise depth ASSUMED 3/4" to match slat_template; M3 (height
+  74.7 vs tape 77.5) and M7 open; critique bottom/front +2.9 at x 0..100 (frozen-file doubt) would move the bottom-front line;
+  fits extrapolated 6 mm past |x| 212 to the shoulder; arris rounds are a note only; lamination question not checked on a photo.
