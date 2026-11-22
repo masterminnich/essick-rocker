@@ -184,3 +184,39 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 - OPEN: crest/leg joint hidden (3/4" tenon allowance ASSUMED); mortise depth ASSUMED 3/4" to match slat_template; M3 (height
   74.7 vs tape 77.5) and M7 open; critique bottom/front +2.9 at x 0..100 (frozen-file doubt) would move the bottom-front line;
   fits extrapolated 6 mm past |x| 212 to the shoulder; arris rounds are a note only; lamination question not checked on a photo.
+## 2026-11-21 16:46-17:05 arms
+- templates/arms.py -> arms_plan_* (plan from straight above, chair X-Y, front to the right, outside edge down) and arms_side_*
+  (side profile from outside the right arm, chair Y-Z, front to the right). ONE template for both arms, flipped for the left.
+- Inputs: parts/arms.json design (top arrises, plan, front line), parts/arm_underside.json design (h_outer / h_inner below the
+  outer top arris, straight across), parts/model_v24.glb: ARM_R silhouettes (= the build, carried back to y 40 and coped to
+  BLEG_R), FLEG_R (section 10 mm below its top = front-leg footprint; faces at its centre x in side view), BLEG_R (front face at
+  the arm's end, plan section at mid-end height, side sections at the arm's outer / inner face), DOMINO_AR (ASSUMED vertical
+  10 mm Domino arm/front leg, 24 x 10, 15 into the arm), DOMINO_RAR (through the back leg into the arm's end; position measured,
+  depth ASSUMED). The oval on the left arm top is not a tenon (parts/joints.json): not drawn. Stations S0-S9 at chair y 50..500
+  are the same vertical planes on both drawings; the side one also gives mm along the top from the end.
+- Numbers: plan length (chair fore-aft) 463.9 mm (18 1/4"), y 40.0..503.9; along the outer top arris 491.2 (19 11/32");
+  overall plan width 125.0 (4 15/16", the arm sweeps outboard); arm width 41.0 / 63.3 / 76.4 at y 100 / 300 / 500; front end
+  77.8 straight. Thickness, outer face, vertical: 38.1 (1 1/2") at the cope (y 45; 36.7 at y 60) -> 21.2 (27/32") at the front;
+  inner face 44.2 -> 23.5 (the underside slopes down inward: CUT = inner bottom arris, REF = outer bottom arris). Top rises
+  ~160 mm, slope 24 deg at the back, 13 at the front. Front leg under the arm y 423.5..456.2 (383.5..416.2 from the end).
+  Profile fits a board 43.7 x 503 at 21 deg to level; blank 46 x 136 x 510 with its jointed edge = the plan's REF baseline
+  (x 323.7, 8 mm outboard of the front outer corner); side template goes on that edge, plan set out by station offsets.
+- Sides are VERTICAL in the chair (arm_underside.json); cutting them square to the sloping top instead moves the bottom edge
+  up to 5.5 mm (outer) / 4.2 (inner) at the back: stated on both templates (saw outside both lines, plane to them).
+- L/R: model arms are exact mirrors. Measured (arms.json): width L-R 3.9 mm rms, 6.4 max from y 180 (6.8 rms overall: the left
+  inner trace behind y 180 follows a shading line); outer-edge shape 2.2 rms / 4.0 max after the common +x shift; tops up to 5.1
+  apart at the front; underside h_outer L-R <= 3.1. Within the design tolerance (half the L/R difference) -> one flipped template.
+- ROADBLOCK: first plan overlay projected the outline square onto the overhead sheet plane: the left arm's front end sat ~10-15 mm
+  off on IMG_1538 because aL's plane runs ~15 mm above the arm top at the front (tilt 3.4 deg). Fixed: each point goes where the
+  photo's camera ray through it meets the sheet plane (rocker.cameras); then on the wood. Strongest-gradient edge reading on the
+  median sheets was tried as a numeric check and dropped (grain lines and the side faces beat the arris).
+- Checks: silhouette vs parts curves (y 80-470) max 0.05 mm inner / 0.04 outer / 0.04 top / 0.04 inner bottom. Overlay
+  (figures/templates/arms_overlay.jpg): plan on the overhead sheets R 1544/1549, L 1544/1538 (each arm moved rigidly by its
+  own offset from the design, R dx +2.7 dz -1.2, L dx +2.2 dz +1.2): both edges, the front end and corners on the wood at the
+  back, middle and front zooms. Side on the unrolled outer-face strips R 1469/1477, L 1504/1516 (tools/arm_underside/strip.py):
+  top and outer bottom arris on the wood end to end, front end on the end. Check squares 144.0 x 144.0 pt on every tile (3 + 3)
+  and on both 1:1 sheets (pymupdf); DXFs read in ezdxf (R12, $INSUNITS 4), CUT bbox 463.9 x 125.0 (plan), 463.9 x 198.4 (side).
+- OPEN: back end / cope not seen from above (traces stop at y 66-68): scribe the end to the real leg. Front leg placement +-3 mm
+  (joinery); front-leg y range on the side strips is not checkable (the leg face is ~30 mm inboard: parallax). Both Dominos'
+  depths ASSUMED. M6 (front-end thickness), M15 (inner face), M16 (edge radii; drawn sharp). The arm's top is assumed flat across
+  (arms.json). A narrower blank (plan min rectangle 79 mm, angled in plan) needs a different set-out: not drawn.
