@@ -220,3 +220,45 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
   (joinery); front-leg y range on the side strips is not checkable (the leg face is ~30 mm inboard: parallax). Both Dominos'
   depths ASSUMED. M6 (front-end thickness), M15 (inner face), M16 (edge radii; drawn sharp). The arm's top is assumed flat across
   (arms.json). A narrower blank (plan min rectangle 79 mm, angled in plan) needs a different set-out: not drawn.
+## 2026-11-21 16:47-17:05 legs
+- templates/legs.py -> legs_front_* and legs_back_* (tiled Letter, full 1:1, DXF, preview) + legs_geom.json; check:
+  templates/check_legs_overlay.py -> figures/templates/legs_overlay.jpg. Both appended to build.sh.
+- INPUT = what the build makes: model v24 joined parts FLEG_R / BLEG_R (parts/model_v24.glb: feet extended 12 mm and cut to the
+  rocker top PR #19, back-leg top cut to the crest arch PR #5, back leg one board PR #14/#16), Domino solids (PR #17/#18/#22/#24),
+  parts/model_v24_shapes.glb (traced legs, for the mortises), parts/side_frame*.json (the measured arrises, as REF lines and as a
+  check). The model legs are exact L/R mirrors: ONE template per leg, drawn as the right leg's outer face (front to the right), flipped
+  for the left.
+- Frame: the outer face's mean plane (area-weighted mean normal), v up from the table, u forward. ROADBLOCK: first used a least-
+  squares plane through the face points; the lofted faces twist (3-4.5 mm rms off any plane), the fit turned the front leg's plane
+  5 deg in plan (toe 3.3 instead of 8.4) and the measured front arris came out 2.9 mm inside the cut line. With the mean normal the
+  front arris sits 0.2 mm inside, the inner rear arris 0.02. A second false start: sections 0.8 mm inside each face as REF lines;
+  dropped (the faces are not flat, the sections wander up to 24 mm); the measured arrises are drawn instead.
+- CUT = silhouette of the joined part square to that plane. MARK = contact faces (leg surface within 1 mm of SEAT, ARM, CREST,
+  ROCKER in the joined model) and each Domino mortise (Domino volume inside the traced leg, winding-number test), centre crossed.
+- Numbers. FRONT: top 628.6 mm (24 3/4") above the floor, foot bottom 86.0, fore-aft 140.9 (5 9/16"); blank (min. rectangle)
+  548 x 56 (21 9/16 x 2 7/32"); thickness across 28.9-31.3 (mesh) = v24 front_leg.thickness_across_mm 27.8-31.5; face toe 8.4 deg,
+  splay 1.0. BACK: top 1068.4 (42 1/16"), foot 28.9, fore-aft 261.4 (10 9/32"); blank 1065 x 113 (41 29/32 x 4 7/16"); thickness
+  37.3-40.2 = v24 back_leg.width_across_mm 37.2-39.7; toe -0.3, splay 2.3. (fleg/bleg_thickness_across 33/38 are fallback params.)
+- Joints. Front: SEAT lap on the inner face v 367-422 (33 cm2); ARM on the top end v 621-629; ROCKER under the foot. D-FR centre
+  u 46.0 v 394.9, 13.6 mm in from the outer face, through (opens outer + inner face); D-AR in the top end, u 17.4, 26 deep (ASSUMED
+  joint, PR #18). Back: SEAT butt v 293-346 (inner face / front edge); ARM on the front edge v 465-502; CREST on the inner face
+  v 997-1068; ROCKER under the foot. D-BR u 250.2 v 323.0 (opens on the outer face, straddles the front edge); D-RSR u 222.4 v 314.6
+  (rear edge, 31 in from the outer face); D-RAR u 198.6 v 483.7, through rear -> front edge into the arm end.
+- L vs R (measured lines, side_frame_L/R + ub_L/R, L mirrored): after a rigid fit front 1.17 mm rms (max 2.78 at z 590), back
+  1.08 rms (max 4.76 at z 71, the foot end of the rear inner arris); raw 2.5 / 1.65 mean. Hard-line widths agree to 0.2-1.3 mm
+  mean; the soft front-leg rear ridge reads R 2.6 wider at z 480-590. Inside 1.6 mm in rms: one template, flipped.
+- Checks: measured arrises vs the cut line (median, - = inside): front fleg_front -0.2 (max 0.2), rearfar (inner rear arris) 0.0,
+  rear (outer ridge, soft) -1.8 / -5.8 = the rear bevel, drawn dashed; back upper front / rear -0.1 (max 0.6); back LOWER front -1.7
+  (max 2.5), rearfar -3.9 (max 4.9): v24 puts the lower rear face on the back-view arris (parts/back_legs.json), not on the side
+  lines, so the template is up to 5 mm generous there. Rocker landing (outer face, rocker template frame): front 538.5-567.4 vs rocker
+  template 539.1-565.9; back 30.2-67.1 vs 32.5-66.8 (2.3 mm, same cause). Check squares: 144.0 x 144.0 pt on every tile (8 + 18) and
+  on both full sheets (pymupdf); DXFs read in ezdxf, mm, layers CUT 1 / REF / MARK / DIM / TEXT, CUT bbox 141.3 x 542.4 and 261.4 x 1039.5.
+  Overlay on rectified side photos (L 1507 / 1506, R 1474 / 1470, o-sheets; ub-sheets L 1507, R 1470): by eye the outline sits on
+  the wood and the D-FR / D-BR crosses on the visible Domino ends (R). Strongest edge within +-5 mm: upper back leg on the ub sheets
+  median 0.5 / 1.0 mm (79 / 70 % within 1.6); on the o-sheets 1.5-4 mm (the o-sheet is the side frame plane, 9 deg off the back
+  leg's face, plus seat / arm / background edges): by-eye check only there.
+- OPEN: (1) back leg between z 265 and 608 is not measured (one-board spline, a guess); (2) lower back-leg rear face: back-view
+  arris vs side lines differ by 4 mm (template follows v24); (3) the model's faces bow 3-4.5 mm rms off flat: a real board is flat,
+  so expect to plane to the line; (4) Domino depths assumed, arm / front-leg Domino assumed; crest and rocker joints hidden (contact
+  faces only); (5) M11 (leg thickness across) still a check to do; (6) the back leg is not toed (-0.3 deg) while the rocker is (9 deg):
+  the feet sit about 3 mm off the rocker faces (joinery OPEN), the foot cut follows the model.
