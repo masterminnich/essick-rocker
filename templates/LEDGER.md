@@ -117,3 +117,37 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 - OPEN: leg seats on the rocker (flats / notches) still not modelled: scribe to the leg. The outer face bows -2.3..+1.2 mm (rocker_section)
   and the left/right rockers differ by ~1 mm rms: the template is the design mean. Spring-back not allowed for. The concave R 511 at u -49
   is a 1-2 mm bump in the traced bottom (inside its tolerance); fair the form there if the glue-up shows a flat.
+## 2026-11-21 16:47-17:05 seat
+- templates/seat.py -> seat_plan_* (plan outline, true size on the flat underside) and seat_sections_* (cross-section gauges S1-S5
+  + centre line); templates/check_seat_overlay.py -> figures/templates/seat_overlay.jpg. Inputs: the model v24 SEAT mesh itself
+  (parts/model_v24.glb after joinery, parts/model_v24_shapes.glb before), so the template is exactly what tools/build_model.py
+  makes from seat_edge.json (PR #8, #30 ends), seat_front.json (#11 scallops), seat_front_face.json (#34), seat_back.json (#21,
+  #35), seat_scoop.json (#20, #26) and seat/surface.json; joinery = parts/model_v24_joinery.json.
+- Frame: the underside is one plane in the model: z = 332.05 + 0.1800 (y - 250), tilt 10.2 deg, fitted to the mesh's downward
+  faces (rms 0.30, across x 0.00 mm/m). Outline = silhouette of the mesh projected square onto that plane (largest extent: top
+  arris at the sides and back, front roll at the front). Y = along the plane from the back edge on the centre line (chair y 3.0).
+- Numbers: width 537.1 mm (21 1/8") across the front horns; depth on the underside plane 548.6 mm (21 19/32") back bow to pommel
+  (chair-plan depth -3.7..537.0 = 540.7); horns 3.2 behind the pommel; scallop hollow at |X| 130, 23.2 behind the horn line.
+  Top 20.4..47.3 above the underside (blank >= 48 mm, 1 7/8"; edges 42-44); dish lowest 23.3 at X +-40, Y 184. Front face is
+  vertical in the chair = 10.2 deg off square to the underside (top forward); back face 0.6 deg off square (square to the board).
+  Stations S1-S5 at Y 50/150/250/350/450: CL 36.1/23.9/28.7/39.8/41.5, low 35.0/23.9/24.4/26.4/27.1, widths 376.9/
+  481.2/512.2/532.1/536.8 (DXF CUT extents).
+- MARK: leg faces at 15 mm up (back legs X 187.8-225.2, Y 33-82; front legs X 253-288, Y 457-501), Domino mortises (side front
+  X +-259 Y 477 23 up; side back X +-217 Y 81 22.5 up; back edge X +-186.7 Y 43.6 L / 40.7 R 20 up: the model's rear pair is not
+  mirror-placed), slat mortises (C X 0 Y 57, outer X +-87.7 Y 64; bottoms 32 above the underside, depth NOT measured).
+- L/R DECISION: one symmetric template. Measured (not drawn): side top arris R - mirrored L +3.8 half-width (sd 1.2), bottom arris
+  -0.03 (sd 2.2), front outline +0.8 (sd 1.4). The +3.8 is a 1.9 mm sideways shift on the chair centre plane with the same total
+  width (the bottom arrises agree), so there is no plan-shape asymmetry to cut; the R front corner is 3.6-3.9 mm LOWER (PR #25),
+  which is height (sections), not plan.
+- ROADBLOCKS: (1) the joined mesh's up-facing Domino mortise floors entered the top-surface interpolation (dish low read 14 mm
+  at a back leg): top surface now from the before-joinery mesh. (2) contours were drawn 251 mm forward (Y offset applied twice);
+  fixed. (3) no photos in the worktree: the overlay reads the coordinator's drive/ read-only (--drive). (4) safe_run lock held by
+  other sessions: retried.
+- Checks: overlay on 1545 (behind), 1548 (left), 1538 (right) rectified 38 mm above the underside, each outline point carried
+  along its own camera ray: front edge, both hollows, pommel and both horns on the wood edge in all three by eye (1 mm/px zooms);
+  sides mostly hidden by the arms, back corners hidden by slats/legs except on 1545 (on the wood). Every tile carries one check
+  square, 144.0 x 144.0 pt (pymupdf; plan 12 tiles 3x4, sections 9 tiles 3x3; full 1:1 sheets too). DXFs read in ezdxf, units mm;
+  plan CUT 537.1 x 548.6, perimeter 2082.5; sections CUT x6.
+- OPEN: underside flatness across X is ASSUMED in the model (raised 1-4 mm at the front); slat mortise depth and all Domino depths
+  ASSUMED; the leg cuts are the model's leg shapes, scribe to the real legs; left front corner M9 / seat front corner reading
+  (PR #30 lead) could move the horn top 3 mm (height only); glue-up board layout not seen in the photos (blank size only).

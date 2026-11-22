@@ -9,3 +9,5 @@ tools/py.sh templates/check_overlay.py --geom templates/out/rocker_geom.json --o
 tools/py.sh templates/slats.py
 tools/py.sh templates/check_slat_overlay.py --geom templates/out/slats_geom.json --out figures/templates/slat_overlay.jpg
 # rocker vs the PR #6 template (numbers for the LEDGER): git show f3b1348:templates/out/rocker_geom.json > /tmp/rocker_geom_old.json && tools/py.sh templates/rocker_vs_old.py --old /tmp/rocker_geom_old.json
+tools/py.sh templates/seat.py
+tools/py.sh templates/check_seat_overlay.py --geom templates/out/seat_geom.json --out figures/templates/seat_overlay.jpg
