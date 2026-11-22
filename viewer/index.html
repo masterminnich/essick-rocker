@@ -3,130 +3,140 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Essick rocker · model viewer</title>
+<title>Essick rocker · check the model</title>
+<script>if (/[?&]workbench\b/.test(location.search)) location.replace('workbench.html' + location.hash)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="review.css">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
-  "three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js"
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
 } }
 </script>
 </head>
-<body data-screen="rv.viewer">
-<main class="app">
-  <section class="stage" id="stage">
-    <div class="frame" id="frame">
-      <img id="photo" alt="" hidden>
-      <canvas id="gl"></canvas>
+<body data-tab="look" data-screen="er.look">
+<header class="top">
+  <h1>Essick rocker</h1>
+  <nav class="tabs" role="tablist">
+    <button class="tab on" data-t="look" role="tab">Look</button>
+    <button class="tab" data-t="measure" role="tab">Measurements <small id="count">0 of 0</small></button>
+    <button class="tab" data-t="templates" role="tab">Templates</button>
+  </nav>
+  <button class="notes" id="notesBtn"><b id="notesN">0</b><span>My notes</span></button>
+</header>
+
+<main class="screens">
+  <!-- Look -->
+  <section class="screen" id="look">
+    <aside class="side" id="photoLeft" hidden>
+      <span class="lbl">Next to a photo</span>
+      <p class="lead">Slide the bar. The photo is on the left, the model on the right. They should meet with no step.</p>
+      <p class="mute">Tap a spot on the model where they don't meet to leave a note there.</p>
+      <div class="stack"><button class="btn big" id="photoBack">← Back to the chair</button></div>
+    </aside>
+    <div class="stagewrap" id="lookStage">
+      <div class="hint" id="hint">Drag to turn the chair. Tap any part to see its sizes.</div>
+      <div class="views ctl" id="views"><span class="lbl">Look from</span>
+        <div class="row seg">
+          <button class="btn" data-v="front">Front</button><button class="btn" data-v="side">Side</button><button class="btn" data-v="back">Back</button><button class="btn" data-v="top">Top</button><button class="btn on" data-v="corner">Corner</button>
+        </div></div>
+      <div class="show ctl" id="showAs"><span class="lbl">Show as</span>
+        <div class="row seg">
+          <button class="btn on" data-m="solid">Solid</button><button class="btn" data-m="ghost">See-through</button><button class="btn" data-m="photo">Next to a photo</button>
+        </div></div>
+      <div class="home ctl"><button class="btn" id="startOver">↺&nbsp; Start over</button></div>
     </div>
-    <div class="hud hud-top" id="hudTop"></div>
-    <div class="hud hud-bottom">
-      <span id="readout" class="mono"></span>
-      <span id="measure" class="mono"></span>
-      <span id="pointInfo" class="mono"></span>
-    </div>
-    <div class="toast" id="toast" hidden></div>
-    <div class="state" id="state" hidden></div>
+    <aside class="side r" id="photoRight" hidden>
+      <span class="lbl" id="photoNum">Photo 1 of 93</span>
+      <p class="serif dirname" id="photoDir">From the front right</p>
+      <p class="mute" id="photoSub"></p>
+      <div class="grid2"><button class="btn big" id="photoPrev">‹ Prev</button><button class="btn big" id="photoNext">Next ›</button></div>
+      <div class="stack"><button class="btn big" id="photoOff">Something is off here</button></div>
+    </aside>
+
+    <aside class="card" id="cardPart" hidden>
+      <button class="x" data-close aria-label="Close">×</button>
+      <span class="lbl">You tapped</span><h2 id="partTitle">Right arm</h2>
+      <ol class="sizes" id="partSizes"></ol>
+      <div class="stack"><button class="btn big pri" id="partOk">✓&nbsp; Looks right</button><button class="btn big" id="partOff">Something is off here</button></div>
+    </aside>
+
+    <aside class="card" id="cardNote" hidden>
+      <button class="x" data-close aria-label="Close">×</button>
+      <span class="lbl" id="noteLbl">Note 1 · Right arm</span><h2>What is off here?</h2>
+      <div class="grid2" id="noteWhat">
+        <button class="btn" data-w="too thick">Too thick</button><button class="btn" data-w="too thin">Too thin</button>
+        <button class="btn" data-w="too long">Too long</button><button class="btn" data-w="too short">Too short</button>
+        <button class="btn" data-w="curve is wrong">Curve is wrong</button><button class="btn" data-w="something else">Something else</button>
+      </div>
+      <textarea id="noteText" rows="3" placeholder="Say or type more, if you like"></textarea>
+      <div class="shots" id="noteShots">
+        <label class="btn addph"><input type="file" accept="image/*" capture="environment" multiple id="notePhotos"><span>＋ Add photos</span></label>
+      </div>
+      <div class="stack"><button class="btn big pri" id="noteSave">Save note</button><button class="btn big" id="noteCancel">Never mind</button></div>
+    </aside>
   </section>
 
-  <aside class="rail">
-    <header class="head">
-      <div class="kicker">Essick rocker · model</div>
-      <div class="ver">
-        <span class="ver-num" id="verNum">–</span>
-        <span class="ver-meta" id="verMeta">loading…</span>
+  <!-- Measurements -->
+  <section class="screen" id="measure">
+    <nav class="list" id="mList"></nav>
+    <div class="mstage">
+      <div class="pager"><button class="btn" id="pgPrev">‹ Back</button><span id="pgN">1 of 30</span><button class="btn" id="pgNext">Next ›</button></div>
+      <div class="stagewrap" id="measureStage">
+        <button class="btn printbtn ctl" id="printBtn">Print this list</button>
+        <div class="howto" id="howto"></div>
       </div>
-      <div class="row">
-        <select id="verSel" class="sel" aria-label="Model version"></select>
-        <label class="switch"><input type="checkbox" id="follow" checked><span></span>Follow newest</label>
+      <div class="ask" id="ask">
+        <div class="askt"><h2 id="askName">—</h2><div class="src" id="askSrc"></div></div>
+        <div class="val" id="askVal">—</div>
+        <div class="ans" id="askAns"></div>
       </div>
-    </header>
+    </div>
+    <div class="sheet" id="sheet" hidden><div class="sheetin">
+      <span class="lbl" id="shLbl">we have</span>
+      <h2>What should it be?</h2>
+      <div class="shrow">
+        <div class="val dimv" id="shVal">0″</div>
+        <div class="stepper"><span class="lbl">Whole inches</span>
+          <button class="btn sq" id="inMinus" aria-label="One inch less">−</button><b id="inWhole">0</b><button class="btn sq" id="inPlus" aria-label="One inch more">+</button></div>
+      </div>
+      <div class="fracs" id="fracs"></div>
+      <div class="finer"><button class="btn tog" id="finerBtn">Finer</button>
+        <div class="fine" id="fine" hidden><button class="btn" id="add16">+ 1/16″</button><button class="btn" id="add32">+ 1/32″</button></div>
+        <label class="typeit"><span>or type it</span><input id="shType" inputmode="text" autocomplete="off" placeholder="1 7/8 or 47mm"></label>
+      </div>
+      <div class="row2"><button class="btn big" id="shCancel">Cancel</button><button class="btn big pri" id="shSave">Save</button></div>
+    </div></div>
+  </section>
 
-    <section class="block">
-      <h2>View</h2>
-      <div class="seg" id="views" role="tablist">
-        <button data-view="free" title="Orbit (1)">3D</button>
-        <button data-view="front" title="From the front, square-on (2)">Front</button>
-        <button data-view="right" title="From the chair's right (3)">Right</button>
-        <button data-view="left" title="From the chair's left (4)">Left</button>
-        <button data-view="back" title="From behind (5)">Back</button>
-        <button data-view="top" title="From above (6)">Top</button>
-        <button data-view="photo" title="Through a photo's own camera (P)" class="wide">Through a photo</button>
-      </div>
-      <div id="photoBox" class="sub" hidden>
-        <div class="row">
-          <button class="icon" id="prevPhoto" aria-label="Previous photo">‹</button>
-          <select id="photoSel" class="sel grow" aria-label="Photo"></select>
-          <button class="icon" id="nextPhoto" aria-label="Next photo">›</button>
-        </div>
-        <p class="note">Exact for every part: the model is drawn through the solved camera of this photo. Scroll to zoom, drag to pan.</p>
-      </div>
-    </section>
+  <!-- Templates -->
+  <section class="screen" id="templates">
+    <div class="tpl" id="tpl"></div>
+  </section>
 
-    <section class="block">
-      <h2>Model</h2>
-      <div class="slider">
-        <label for="opacity">Opacity</label>
-        <input type="range" id="opacity" min="0" max="100" value="55">
-        <output id="opacityOut" class="mono">55%</output>
-      </div>
-      <label class="switch"><input type="checkbox" id="edges" checked><span></span>Outlines</label>
-      <div class="chips" id="parts"></div>
-    </section>
-
-    <section class="block cloud" id="cloudBlock" data-screen="rv.viewer.cloud">
-      <div class="block-head">
-        <h2>Measured points vs model</h2>
-        <label class="switch"><input type="checkbox" id="cloudOn" checked><span></span></label>
-      </div>
-      <div id="cloudBody" class="sub">
-        <p class="busy mono" id="cloudBusy">Loading points…</p>
-        <div id="cloudHead" hidden>
-          <div class="hero"><span class="hero-num mono" id="cloudMed">–</span><span class="hero-unit">mm</span></div>
-          <p class="note" id="cloudSub"></p>
-        </div>
-        <div class="legend" aria-label="Colour scale">
-          <div class="leg-bar"></div>
-          <div class="leg-ticks mono"><span id="legMin">−6</span><span>0</span><span id="legMax">+6</span></div>
-          <div class="leg-words"><span><i style="--c:#c2410c"></i>inside the model<br><small>model too big here</small></span><span class="r">outside the model<i style="--c:#1d5fd6"></i><br><small>model too small here</small></span></div>
-        </div>
-        <table class="ptable mono" id="cloudTable"></table>
-        <div class="chips" id="cloudLayers"></div>
-        <div class="seg seg-2" id="cloudMode" role="tablist">
-          <button data-m="dist">Colour by distance</button>
-          <button data-m="photo">Photo colour</button>
-        </div>
-        <div class="slider"><label for="cloudScale">Scale</label><input type="range" id="cloudScale" min="2" max="20" step="1" value="6"><output id="cloudScaleOut" class="mono">±6 mm</output></div>
-        <div class="slider"><label for="cloudCut">Hide past</label><input type="range" id="cloudCut" min="3" max="60" step="1" value="25"><output id="cloudCutOut" class="mono">25 mm</output></div>
-        <div class="slider"><label for="cloudSize">Dot size</label><input type="range" id="cloudSize" min="1" max="8" step="1" value="3"><output id="cloudSizeOut" class="mono">3 px</output></div>
-        <p class="note">Each dot is a point measured from several photos, coloured by how far it sits from the model on screen.
-          Hover a dot for its numbers; the line shows the nearest model surface. Lower the model's opacity to see dots inside it.</p>
-      </div>
-    </section>
-
-    <section class="block" id="backBlock">
-      <h2>Photo behind the model</h2>
-      <p class="note">Each photo is flattened onto a plane at the depth you set. Wood at that depth lines up exactly;
-        wood nearer or farther shifts. Square-on views (Front, Right, Left, Back, Top) show it best.</p>
-      <div id="planes"></div>
-      <div class="slider">
-        <label for="bgOpacity">Photo</label>
-        <input type="range" id="bgOpacity" min="0" max="100" value="100">
-        <output id="bgOpacityOut" class="mono">100%</output>
-      </div>
-      <label class="switch"><input type="checkbox" id="grid"><span></span>50 mm grid</label>
-    </section>
-
-    <footer class="foot">
-      <span class="mono" id="screenId">rv.viewer</span>
-      <span class="keys">1–6 views · P photo · [ ] photos · E outlines · Esc clears a measure</span>
-    </footer>
-  </aside>
+  <!-- the one 3D view; moved between the Look and Measurements stages -->
+  <div class="stage" id="stage">
+    <div class="pframe" id="pframe"><img id="photoImg" alt=""></div>
+    <canvas id="c3d"></canvas>
+    <svg class="dims" id="dims"></svg>
+    <div class="pins" id="pins"></div>
+    <div class="wipebar" id="wipebar" hidden><span class="tag l">Photo</span><span class="tag r">Model</span><div class="bar"><div class="knob">‹ ›</div></div></div>
+    <div class="loading" id="loading">Loading the chair…</div>
+  </div>
 </main>
-<script type="module" src="app.js"></script>
+
+<div class="drawer" id="drawer" hidden><div class="drawin">
+  <div class="dhead"><h2>My notes</h2><button class="x" id="drawClose" aria-label="Close">×</button></div>
+  <p class="mute" id="drawSub">Saved on this device.</p>
+  <div class="dlist" id="dList"></div>
+  <div class="dfoot"><button class="btn big pri" id="sendBtn">Send to Joe</button><p class="mute small" id="sendSub">Makes one file with every answer, note and photo.</p></div>
+</div></div>
+<div class="toast" id="toast" hidden></div>
+
+<a class="wb" href="workbench.html">Workbench</a>
+<span class="sid" id="sid">er.look</span>
+<script type="module" src="review.js"></script>
 </body>
 </html>
