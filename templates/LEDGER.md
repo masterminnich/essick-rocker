@@ -82,3 +82,38 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 - OPEN: seat end 1-2 mm below the photo transition on the centre slat (seat top at the slats, M13 / #35 doubt); joinery not
   seen (the model's in-run is 4 mm at the seat and 18 mm at the crest, both "NOT measured"); thickness M4; centre width M5;
   if the hub applies the turn (Joe's yes/no), the template and form stay, only the mortise angles change.
+
+## 2026-11-21 16:15-17:10 rocker (regenerated against model v24)
+- Inputs: the rocker outline of model v24 exactly as tools/build_model.py builds it (rocker_profile mean_top; mean_bot + the directly
+  traced bottom correction parts/rocker_bottom.json (#29); tail and nose from parts/rocker_ends.json (#23, triangulated, L+R); all carried
+  to the build's half-way design frame, to_mean). Check: every outline vertex sits on a ROCKER_R vertex of parts/model_v24.glb (0.000 mm;
+  rocker.py asserts < 0.05 so a later model change cannot pass silently). Thickness across T(u) from parts/rocker_section.json (#32) is now
+  printed at each station. Rocker top at nose/tail (#36) measured, no model change, so nothing extra. Leg landings: sections of the v24
+  FLEG_R / BLEG_R meshes across the rocker's thickness (every 1 mm of depth), where they sit on the rocker top; rake from
+  model_v24_joinery leg_axis. templates/rocker_ends.json (the by-eye ends) is no longer read (marked superseded).
+- Numbers: overall 1118.4 mm (44 1/32") tail tip to nose, along the floor; tail tip 175.8 above the floor (6 15/16"), nose top corner 123.3
+  (4 27/32"); the nose is now the measured round end (no plumb end / r 15). Face height 28.1 max, 10.3 at u -480 (the tail thins to a slim
+  tip). T 29.7 (tail) - 36.2 mm. Floor = tangent at the rest point u 193 (v 0.31 in the design frame). Back leg on the rocker: rear edge on the
+  outer face 28.3, front face 67.2 (38.9 wide; the foot's rear on the inner face reaches 23.4, dashed); front leg 539.1..567.6 (28.5; inner
+  rear 533.7). Clear span 471.9. Form: bottom from u -471 to 605 (where the end rounds start, bottom R < 150) + 60 mm each end; the
+  bottom reverses at u -257 (450 mm behind the rest point; convex from the form end to u -265, concave forward) so the form stays TWO-PART. Tightest bend
+  over 80 mm: R 477 convex (tail, u -324), 511 concave (a local bend at u -49); old 344 / 825. Stack suggestion unchanged (10 x 1/8").
+- Differences vs the PR #6 template (templates/rocker_vs_old.py; new outline carried to the left sheet; distances both ways):
+  as drawn max 6.35 mm, rms 0.99; after the best rigid fit on the middle (0.05 deg, 0.2 mm) max 5.63, rms 0.82. By region (as drawn):
+  tail end u < -400 max 6.35 / rms 2.95 (triangulated slim tip, bottom raised up to 8.5 mm at u -480); middle -400..560 max 2.10 / rms 0.55
+  (top edge identical: rms 0.06, max 0.21; bottom +0.45 mean, max 2.17 at u -330: the traced bottom); nose u > 560 max 4.03 / rms 0.88
+  (round end instead of plumb end + r 15). Length 1114.5 -> 1118.4 (+3.9: tail tip 3.7 mm further back, nose 0.7 further forward).
+  Leg marks moved -2.0 / +2.6 (back leg rear / front), +1.8 / +3.4 (front leg), mostly the half-way frame (2.5 mm shift) plus the
+  model's feet (the template marks the side-view foot; the old marks were the outer-face leg lines extrapolated).
+- ROADBLOCKs: (1) the design frame is the half-way frame, not the left sheet the photos are in: check_overlay.py now carries the outline
+  through the geom's to_left first (backward compatible). (2) Raw curvature of the traced bottom flips sign several times in the tail (2 mm
+  sampling, noise); bend radii and the S are read over 80 mm, near-straight (|R| > 3 m) samples ignored and blips < 40 mm dropped: one
+  reversal left. (3) The back leg's side-view foot (23.4..67.2) is wider than what shows on the outer face (rear ridge 28.3; the rear face is
+  bevelled): both marked, the inner rear dashed. (4) The shared safe_run lock was busy (other template jobs): waited and retried.
+- Checks: outline = v24 mesh (0.000 mm). Overlay on 4 rectified photos (L 1507/1506, R 1472/1471, figures/templates/rocker_overlay.jpg),
+  by eye on the zooms: tail tip, both edges, the round nose and the leg marks on the wood (the front-face marks on the leg fronts, the rear
+  marks on the visible rear edges; the dashed inner-rear marks a few mm behind, as expected). Check squares 144.0 x 144.0 pt on every tile
+  (template 7, form 14; pymupdf). DXFs read in ezdxf, $INSUNITS 4 (mm), layers CUT/REF/MARK/DIM/TEXT; template CUT 1118.4 long.
+- OPEN: leg seats on the rocker (flats / notches) still not modelled: scribe to the leg. The outer face bows -2.3..+1.2 mm (rocker_section)
+  and the left/right rockers differ by ~1 mm rms: the template is the design mean. Spring-back not allowed for. The concave R 511 at u -49
+  is a 1-2 mm bump in the traced bottom (inside its tolerance); fair the form there if the glue-up shows a flat.

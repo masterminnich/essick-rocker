@@ -1,5 +1,6 @@
 """USAGE: tools/py.sh templates/check_overlay.py --geom templates/out/rocker_geom.json --out figures/templates/rocker_overlay.jpg
 Draw the rocker template outline (and the leg-landing marks) on rectified single photos of both rockers' outer side faces
+(geometry in the build's design frame is first carried to the left sheet with the geom's to_left)
 (work/parts/rocker{L,R}/o_<photo>.png, 0.5 mm/px). Right sheet: the outline is moved into the right rocker's own sheet frame
 with the inverse of parts/rocker_profile.json right_vs_left. Output: one full strip per photo plus 3x zooms (nose, back leg,
 rest point, front leg, front end). Tiny compute (one 2560x480 sheet at a time)."""
@@ -9,8 +10,12 @@ ap = argparse.ArgumentParser(); ap.add_argument("--geom", required=True); ap.add
 ap.add_argument("--photos", default="L:1507,L:1506,R:1472,R:1471"); a = ap.parse_args()
 G = json.load(open(a.geom)); P = json.load(open("parts/rocker_profile.json")); rv = P["right_vs_left"]
 res, ur, vr = 0.5, (-560, 720), (-10, 230)
+TL = G.get("to_left")          # geometry drawn in the build's design frame: carry it to the left sheet first
 def to_side(pts, side):
     pts = np.asarray(pts, float)
+    if TL:
+        th = np.radians(TL["rotation_deg"]); c, s = np.cos(th), np.sin(th)
+        pts = np.stack([c * pts[:, 0] - s * pts[:, 1] + TL["shift_u_mm"], s * pts[:, 0] + c * pts[:, 1] + TL["shift_v_mm"]], 1)
     if side == "L": return pts
     th = np.radians(rv["rotation_deg"]); c, s = np.cos(th), np.sin(th); q = pts - [rv["shift_u_mm"], rv["shift_v_mm"]]
     return np.stack([c * q[:, 0] + s * q[:, 1], -s * q[:, 0] + c * q[:, 1]], 1)
@@ -28,7 +33,7 @@ for spec in a.photos.split(","):
     panels = []
     for name, u0, u1 in zooms:
         x0, x1 = int((u0 - ur[0]) / res), int((u1 - ur[0]) / res)
-        vc = np.interp((u0 + u1) / 2, np.array(G["outline"])[:, 0][np.argsort(np.array(G["outline"])[:, 0])], np.array(G["outline"])[:, 1][np.argsort(np.array(G["outline"])[:, 0])])
+        OL = to_side(G["outline"], "L"); vc = np.interp((u0 + u1) / 2, OL[:, 0][np.argsort(OL[:, 0])], OL[:, 1][np.argsort(OL[:, 0])])
         y0 = int(max(0, (vr[1] - vc - 45) / res)); y1 = int(min(H, y0 + 160))
         c = im.crop((x0, y0, x1, y1)); c = c.resize((c.size[0] * 3, c.size[1] * 3), Image.NEAREST)
         ImageDraw.Draw(c).text((4, 4), f"{side} IMG_{ph}: {name}", fill=(255, 255, 0)); panels.append(c)
