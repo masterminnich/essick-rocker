@@ -13,7 +13,10 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 ## State
 - [x] 1. Rocker template + two-part bending form: PR #6, squash-merged ddca1fe (16:45). Local main NOT touched (coordinator's ref).
 - [x] 2. Slats: flat outlines (centre x1, outer x2) + one two-part bending form for all three (PR, this entry)
-- [ ] 3. Leg side profiles (parts/side_frame*.json), crest, arms, seat outline when the coordinator has one
+- [x] 3. Hold (Joe, 2026-11-20 ~17:50) lifted by Joe 2026-11-21: all families generated against model v24, one parallel agent each.
+  Slats regenerated PR #38 (899b32e); rocker regenerated PR #39 (aef696c); seat plan + sections PR #40 (194f159);
+  crest plan / unrolled back / sections PR #41 (6d6945e); arms plan + side PR #42 (378328f); front + back legs PR #43 (5fa04e5).
+- [ ] 4. Re-run templates/build.sh after Joe's readings (M3-M16) change the model; each entry below lists its OPEN items.
 
 ## 2026-11-20 16:00-16:40 rocker
 - Profile = parts/rocker_profile.json mean_top / mean_bot (u -480..620). Ends were never traced: fitted by eye on 5 mm
