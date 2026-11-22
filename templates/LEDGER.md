@@ -51,3 +51,34 @@ read only. NOTE work/toolkit/rk.sh cds into the COORDINATOR's tree; use it only 
 - Checks: overlay on rectified single photos 1502 / 1501 / 1503 (figures/templates/slat_overlay.jpg): all six edges, seat ends and
   crest ends on the wood. Check squares 144.0 pt on every tile (8 + 10); DXFs read in ezdxf, mm.
 - OPEN: outer slats' twist in plan not modelled (their sheet is a pure extrusion along x); joinery not seen.
+
+## 2026-11-21 16:30-17:00 slats (regenerated against model v24)
+- Inputs, as tools/build_model.py builds SLAT_C/R/L in v24: parts/slats.json (edges, back-face profiles, thickness_mm 10;
+  unchanged since PR #7), the v24 SEAT and CREST solids (parts/model_v24_shapes.glb) for the visible ends; parts/slat_turn.json
+  (PR #33) for a note only (apply_in_build false in v24). templates/slat_ends.json now feeds only the 3/4 in joinery allowance
+  and the PR #7 by-eye seat ends as a comparison line on the overlay.
+- CHANGES in templates/slats.py: (1) ends = where each slat's back face crosses the model SEAT top / CREST bottom, on plane
+  sections at 11 points across the width (end lines are now polylines, no longer square); (2) edges held constant above
+  v_range like the build (PR #7 carried them on the end tangent for the last 9 mm); (3) stack defaults to thickness_mm.
+- Why the seat ends moved: v24's seat top behind the dotted region is a ruled strip from the measured top arris
+  (parts/seat_back.json); the older cloud polynomial climbed 16 mm toward the back edge where the slats' feet stand.
+- NUMBERS (old PR #7 -> new): centre seat to crest 707.6 -> 711.8 mm (28"), outer 705.3 -> 708.8 mm (27 29/32");
+  centre width 77.0 -> 77.0 at the seat, 101.8 -> 101.2 under the crest (3 1/32" -> 3 31/32"); outer 39.6 -> 39.6 (1 9/16"),
+  53.0 -> 52.8 (2 3/32"). Seat ends v 16.5 (centre) / 16-18 (outer) -> 11.2-12.3 / 11.7 (inner edge) - 15.0 (outer edge);
+  crest ends 724.1 / 722.3 -> 723.8-724.1 / 721.2-723.2 (centre lines identical to the crest.json computation). Outlines: edges
+  over v 30-700 identical (max 0.01 mm); max point difference 5.3 / 4.3 mm, all at the seat end; area 601.0 -> 604.5 /
+  320.0 -> 321.4 cm2. Gaps 29.5 / 33.8. Form: back-face profile identical (new vs old working face inside the run-out max
+  0.05, rms 0.04 mm; 4.5 mm only in the extended run-out); C vs O profile dev 2.05 max / 1.15 rms; inflections S0+50, +356,
+  +596 (same places, S0 moved 4.2 mm down); tightest R 315 / 503; S0 331.9 mm above the floor (was 336).
+- OUTER SLATS' TURN (#33): NO separate form. Turn is a rotation about the slat's own centre line, so its back-face side profile
+  (= the bend) is unchanged; 7.15 deg at the seat (held at the z 375 table value) -> 3.44 deg under the crest, i.e. a 3.7 deg
+  twist = 1.7 mm at an edge over 700 mm, small enough to spring in at glue-up into turned mortises. Width-true outline stays
+  valid (PR #33 width fit vs model within 1 mm). A note on the template says so; the model (v24) has it unapplied.
+- Checks: overlay figures/templates/slat_overlay.jpg on rectified 1502 / 1501 / 1503: all six edges and the crest ends on the
+  wood; stations S0-S7 yellow; PR #7 by-eye seat line cyan. Seat end, numeric read (strongest wood -> seat brightness step,
+  13 px wide strips): centre 13.0-14.0, outer 13.0-15.5 across the three photos; model 11.2-12.3 / 11.7-15.0, so the v24
+  seat end is 1-2 mm low on the centre slat (inside the +-2 tolerance; the by-eye 16.5 read the top of the transition).
+  Every check square 144.0 x 144.0 pt (pymupdf; 8 + 10 tiles); DXFs R12 (AC1009), units mm, layers CUT/REF/MARK/DIM/TEXT.
+- OPEN: seat end 1-2 mm below the photo transition on the centre slat (seat top at the slats, M13 / #35 doubt); joinery not
+  seen (the model's in-run is 4 mm at the seat and 18 mm at the crest, both "NOT measured"); thickness M4; centre width M5;
+  if the hub applies the turn (Joe's yes/no), the template and form stay, only the mortise angles change.

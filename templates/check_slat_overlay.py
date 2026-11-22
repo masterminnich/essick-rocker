@@ -2,7 +2,8 @@
 Draw the slat template outlines (green; dashed-allowance not drawn) on the rectified single photos of the unrolled back view:
 centre slat on work/parts/back/f/sc_<photo>.png, both outer slats (right as drawn, left mirrored) on so_<photo>.png. The template is
 in the symmetric (centre-plane) frame; the sheets carry the slat set's +set_offset_u_mm placement, added back here.
-Output per photo: centre + outer sheet side by side (half size), plus 3x zooms of the seat ends and the crest ends. Tiny compute."""
+Also drawn (open lines, when the geom json has them): stations S0-S7 (yellow; S0 = the seat line on the centre line) and the
+PR #7 by-eye seat ends (cyan, comparison only: the template's ends now come from the model). Output per photo: centre + outer sheet side by side (half size), plus 3x zooms of the seat ends and the crest ends. Tiny compute."""
 import json, argparse, numpy as np
 from PIL import Image, ImageDraw
 ap = argparse.ArgumentParser(); ap.add_argument("--geom", required=True); ap.add_argument("--out", required=True)
@@ -10,18 +11,23 @@ ap.add_argument("--photos", default="1502,1501,1503"); a = ap.parse_args()
 G = json.load(open(a.geom)); off = G["set_offset_u_mm"]
 def sheet(key):
     pl = json.load(open(f"work/parts/back/f/{key}_plane.json")); return pl["res"], pl["urange"], pl["vrange"]
-def draw(im, key, polys):
+def draw(im, key, polys, lines=()):
     res, ur, vr = sheet(key); d = ImageDraw.Draw(im)
+    px = lambda P: np.stack([(P[:, 0] + off - ur[0]) / res, (vr[1] - P[:, 1]) / res], 1)
+    for P, col in lines: d.line([tuple(p) for p in px(np.asarray(P, float))], fill=col, width=1)
     for P in polys:
-        P = np.asarray(P, float); q = np.stack([(P[:, 0] + off - ur[0]) / res, (vr[1] - P[:, 1]) / res], 1)
-        d.line([tuple(p) for p in np.vstack([q, q[:1]])], fill=(0, 255, 60), width=1)
+        q = px(np.asarray(P, float)); d.line([tuple(p) for p in np.vstack([q, q[:1]])], fill=(0, 255, 60), width=1)
     return res, ur, vr
 C = np.array(G["centre"]); O = np.array(G["outer_right"]); OL = O * [-1, 1]
+YEL, CYA = (255, 220, 0), (0, 200, 255); mir = lambda P: (np.asarray(P, float) * [-1, 1]).tolist()
+SLs = G.get("station_lines", []); EYE = G.get("seat_by_eye_pr7", {}).get("lines", [])
+cen_l = [(P, YEL) for P in SLs if abs(np.mean(np.asarray(P)[:, 0])) < 40] + ([(EYE[0], CYA)] if EYE else [])
+out_l = [(Q, YEL) for P in SLs if abs(np.mean(np.asarray(P)[:, 0])) >= 40 for Q in (P, mir(P))] + ([(EYE[1], CYA), (mir(EYE[1]), CYA)] if EYE else [])
 rows = []
 for ph in a.photos.split(","):
     ims = []
-    for key, polys in (("sc", [C]), ("so", [O, OL])):
-        im = Image.open(f"work/parts/back/f/{key}_{ph}.png").convert("RGB"); res, ur, vr = draw(im, key, polys); ims.append((key, im, res, ur, vr))
+    for key, polys, lines in (("sc", [C], cen_l), ("so", [O, OL], out_l)):
+        im = Image.open(f"work/parts/back/f/{key}_{ph}.png").convert("RGB"); res, ur, vr = draw(im, key, polys, lines); ims.append((key, im, res, ur, vr))
     full = [im.resize((im.size[0] // 2, im.size[1] // 2)) for _, im, *_ in ims]
     panels = []
     for key, im, res, ur, vr in ims:
