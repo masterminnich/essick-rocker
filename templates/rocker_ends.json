@@ -1,4 +1,5 @@
 {
+ "superseded": "2026-11-21: no longer read. templates/rocker.py now takes both ends from model v24 (parts/rocker_ends.json, triangulated, via tools/build_model.py). Kept for the record of the PR #6 template.",
  "note": "Rocker end shapes, fitted by eye on 10/5 mm gridded zooms of the rectified single photos IMG_1507 (left rocker sheet work/parts/rockerL) and IMG_1472 (right, work/parts/rockerR, shifted onto the left with parts/rocker_profile.json right_vs_left). Frame: left rocker sheet u/v mm. Checked by templates/check_overlay.py.",
  "provenance": "fitted (by eye)",
  "rear": {
