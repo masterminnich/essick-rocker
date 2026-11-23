@@ -249,7 +249,7 @@ body.photo #lookStage .ctl, body.photo #hint { display: none }
   .notes { flex: none; font-size: 0; padding: 0 6px }
   .notes b { margin: 0; background: var(--ink); font-size: 15px }
   .notes b { display: inline-flex; align-items: center; height: 36px; padding: 0 12px; gap: 5px }
-  .notes b::after { content: "notes"; font: 600 14px var(--sans) }
+  .notes b::after { content: "feedback"; font: 600 14px var(--sans) }
   .hint { left: 16px; top: 12px; right: 16px; max-width: none; font-size: 16px }
   .show { left: 16px; right: 16px; top: auto; bottom: 92px; align-items: stretch }
   .views { left: 16px; right: 16px; bottom: 14px; gap: 6px }

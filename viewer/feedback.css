@@ -1,0 +1,83 @@
+/* Shared feedback: the Feedback drawer (everyone's notes, answers and comments, comment box at the bottom), the
+   tallies on Measurements, the tappable pins and the one-time name box. Uses review.css tokens and the drawer shell. */
+
+/* pins anyone left: tap to read the note */
+.pins .pin[data-note] { pointer-events: auto; border: 0; padding: 0; cursor: pointer; transition: transform .12s, box-shadow .12s }
+.pins .pin[data-note]:hover { box-shadow: 0 5px 14px rgba(0, 0, 0, .32) }
+.pins .pin[data-note]:active { transform: rotate(-45deg) scale(.94) }
+
+/* drawer */
+.fdraw .dhead h2 { font: 600 32px var(--serif) }
+.dfilter { display: flex; gap: 6px; padding: 0 28px 14px; flex-wrap: wrap }
+.dfilter .btn { height: 40px; min-height: 40px; padding: 0 14px; font-size: 15px; border-radius: 99px; gap: 8px }
+.dfilter .btn b { font: 500 13px var(--mono); color: var(--mute); font-variant-numeric: tabular-nums }
+.dfilter .btn.on b { color: rgba(255, 255, 255, .7) }
+.fdraw .dlist { scroll-behavior: smooth }
+.dl { list-style: none; padding: 0 }
+.fdraw .drow { padding: 16px 28px 18px }
+.drow.fresh { animation: fresh 1.8s ease-out }
+@keyframes fresh { from { background: #f6e3d9 } }
+.dwho { display: flex; align-items: baseline; gap: 10px; margin-bottom: 2px; min-width: 0 }
+.dwho b { font: 600 15px var(--sans); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.dwho time { margin-left: auto; font: 400 13px var(--mono); color: var(--mute); white-space: nowrap; flex: none }
+.drow h4 { font-size: 18px }
+.drow p.say { color: var(--ink); font-size: 17px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px }
+.drow .k.cm { background: none; border: 1.5px solid var(--rule) }
+.drow .k.cm svg { width: 17px; height: 17px; fill: none; stroke: var(--mute); stroke-width: 1.8; stroke-linejoin: round }
+.drow .ths a { display: block; border-radius: 8px; overflow: hidden }
+.drow .ths img { display: block; width: 72px; height: 72px }
+.drow .del { align-self: start }
+
+/* comment box at the bottom of the drawer */
+.cform { padding: 16px 28px 22px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; background: var(--card) }
+.cfield { display: flex; flex-direction: column; gap: 6px }
+.cfield .lbl { font-size: 12px }
+.cfield input, .cfield textarea { width: 100%; border: 1.5px solid var(--rule); border-radius: 12px; padding: 0 16px; font: 17px/1.4 var(--sans); color: var(--ink); background: var(--btn); transition: border-color .12s }
+.cfield input { height: 48px }
+.cfield textarea { padding: 11px 16px; min-height: 68px; max-height: 32vh; border-style: solid }
+.cfield input:hover, .cfield textarea:hover { border-color: #bdb4a0 }
+.cfield input::placeholder, .cfield textarea::placeholder { color: #a9a394 }
+.hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden }
+.csend { display: flex; align-items: center; gap: 16px }
+.csend .btn { flex: none; margin-left: auto; height: 52px; padding: 0 28px }
+.cstatus { font-size: 15px; line-height: 1.3; color: var(--mute); min-width: 0 }
+.cstatus:empty { display: none }
+.cstatus::before { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: currentColor; content: "" }
+.cstatus.ok { color: var(--good) } .cstatus.warn { color: var(--amber) } .cstatus.err { color: var(--dim) }
+.cclosed { padding: 22px 28px 26px; border-top: 1px solid var(--rule); background: var(--card); color: var(--mute); font-size: 16px }
+.cclosed b { display: block; font: 600 22px var(--serif); color: var(--ink); margin-bottom: 4px }
+
+/* Measurements: what everyone said */
+.tally { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 10px; font-size: 15px; color: var(--mute) }
+.tally .none { font-style: italic }
+.tally .t { display: inline-flex; align-items: baseline; gap: 6px; min-width: 0 }
+.tally .t i { font-style: normal; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: inline-grid; place-items: center; color: #fff; font-size: 11px; align-self: center }
+.tally .ok i { background: var(--good) } .tally .no i { background: var(--dim) } .tally .q i { background: var(--amber) }
+.tally .t b { font: 500 15px var(--mono); color: var(--ink) }
+.tally .t em { font-style: normal; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px }
+.tally .t em .mono { color: var(--ink) }
+
+/* your name, asked once */
+.who { position: fixed; inset: 0; z-index: 25; background: rgba(29, 33, 38, .35); display: grid; place-items: center; padding: 20px }
+.whoin { width: min(460px, 100%); background: var(--paper); border-radius: 20px; padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, .3); animation: up .16s ease-out }
+.whoin h2 { font: 600 30px/1.1 var(--serif); letter-spacing: -.01em }
+.whoin input { height: 56px; border: 1.5px solid var(--rule); border-radius: 12px; padding: 0 16px; font: 19px var(--sans); color: var(--ink); background: var(--btn); margin-top: 4px }
+.whoin .row2 { margin-top: 6px }
+.whoin .row2 .btn { flex: 1 }
+
+/* phone */
+@media (max-width: 700px) {
+  .dfilter { padding: 0 18px 12px; flex-wrap: nowrap; overflow-x: auto }
+  .dfilter .btn { flex: none; height: 44px }
+  .fdraw .drow { padding: 14px 18px 16px; grid-template-columns: 36px 1fr auto; gap: 4px 10px }
+  .fdraw .dhead { padding: 18px 18px 0 }
+  .fdraw > .mute { padding: 2px 18px 10px; font-size: 15px }
+  .cform { padding: 12px 18px 16px; gap: 8px }
+  .cfield textarea { min-height: 56px }
+  .csend .btn { height: 48px; padding: 0 22px }
+  .cclosed { padding: 18px }
+  .tally { margin-top: 6px; font-size: 14px }
+  .tally .t em { max-width: 150px }
+  .whoin { padding: 22px 20px 18px }
+  .whoin h2 { font-size: 26px }
+}
