@@ -1,0 +1,62 @@
+/* Public comments: header button + right drawer. Shares the My notes drawer shell (review.css .drawer/.drawin). */
+
+/* header button */
+.cmt { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 4px; background: none; border: 0; font-weight: 600; font-size: 17px; white-space: nowrap; color: var(--ink) }
+.cmt svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round }
+.cmt b { font: 500 15px var(--mono); color: var(--mute); font-variant-numeric: tabular-nums }
+.cmt:hover span { text-decoration: underline }
+
+/* list */
+.cdraw .dlist { scroll-behavior: smooth }
+.clist { list-style: none; padding: 0 }
+.crow { padding: 18px 28px 20px; border-bottom: 1px solid var(--rule) }
+.crow.fresh { animation: fresh 1.6s ease-out }
+@keyframes fresh { from { background: #e3efe9 } }
+.chead { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px }
+.cname { font: 600 18px/1.25 var(--sans); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.cwhen { margin-left: auto; font: 400 13px var(--mono); color: var(--mute); white-space: nowrap; flex: none }
+.cbody { font-size: 17px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere }
+
+/* form */
+.cform { padding: 18px 28px 24px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 12px; background: var(--card); transition: opacity .15s }
+.cform.busy .cfield { opacity: .6 }
+.cfield { display: flex; flex-direction: column; gap: 6px }
+.cfield .lbl { font-size: 12px }
+.cfield input, .cfield textarea { width: 100%; border: 1.5px solid var(--rule); border-radius: 12px; padding: 0 16px; font: 18px/1.4 var(--sans); color: var(--ink); background: var(--btn); transition: border-color .12s }
+.cfield input { height: 52px }
+.cfield textarea { padding: 12px 16px; min-height: 92px; max-height: 40vh; border-style: solid }
+.cfield input:hover, .cfield textarea:hover { border-color: #bdb4a0 }
+.cfield input::placeholder, .cfield textarea::placeholder { color: #a9a394 }
+.hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden }
+.cts { min-height: 65px }
+.csend { display: flex; align-items: center; gap: 16px }
+.csend .btn { flex: none; margin-left: auto; height: 56px }
+.cstatus { font-size: 15px; line-height: 1.3; color: var(--mute); min-width: 0 }
+.cstatus:empty { display: none }
+.cstatus::before { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: currentColor; content: "" }
+.cstatus.ok { color: var(--good) }
+.cstatus.warn { color: var(--amber) }
+.cstatus.err { color: var(--dim) }
+.cclosed { padding: 22px 28px 26px; border-top: 1px solid var(--rule); background: var(--card); color: var(--mute); font-size: 16px }
+.cclosed b { display: block; font: 600 22px var(--serif); color: var(--ink); margin-bottom: 4px }
+
+/* phone */
+@media (max-width: 700px) {
+  .topr { flex: none; gap: 0 }
+  body.has-comments .top { padding: 0 4px }
+  body.has-comments .tab { padding: 0 5px; font-size: 15px }
+  body.has-comments .notes { padding: 0 2px 0 0 }
+  body.has-comments .notes b { padding: 0 9px; font-size: 13px }
+  body.has-comments .notes b::after { font-size: 13px }
+  .cmt { width: 40px; height: 44px; padding: 0; justify-content: center; position: relative }
+  .cmt span { display: none }
+  .cmt b { position: absolute; right: 0; top: 2px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 99px; background: var(--teal); color: #fff; font-size: 11px; display: grid; place-items: center }
+  .cmt b:empty, .cmt b[data-zero] { display: none }
+  .crow { padding: 14px 18px 16px }
+  .cform { padding: 14px 18px 18px; gap: 10px }
+  .cfield textarea { min-height: 72px }
+  .csend .btn { height: 52px; padding: 0 20px }
+  .cdraw .dhead { padding: 18px 18px 0 }
+  .cdraw > .mute { padding: 2px 18px 10px; font-size: 15px }
+  .cclosed { padding: 18px }
+}
