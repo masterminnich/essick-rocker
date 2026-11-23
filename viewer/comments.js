@@ -1,20 +1,30 @@
-// Public comments. Stays hidden unless the comments API answers with a list: until the backend is live the page
-// must look exactly as it did. All comment text goes in with textContent, never innerHTML.
-// Its own small Worker + D1 database, deployed from comments-api/ in this repo.
-const API = 'https://essick-rocker-comments.sean-b08.workers.dev/comments'
-const TURNSTILE_SITE_KEY = '' // set to the Cloudflare Turnstile site key to require a check; empty skips it
+// Public comments, stored in Supabase (see supabase/essick-comments.sql). Stays hidden unless the database
+// answers with a list, so until it is set up the page looks exactly as it did. All comment text goes in with
+// textContent, never innerHTML.
+// The URL and the publishable (anon) key are public by design: the database only lets that key call the two
+// comment functions, which enforce the limits and spam rules.
+const SUPABASE_URL = '' // e.g. 'https://abcdefgh.supabase.co' (Project Settings > API)
+const SUPABASE_KEY = '' // the publishable / anon public key (never the secret / service_role key)
+const LIVE_HOSTS = ['masterminnich.github.io'] // the preview never touches the real comments
 const NAME_KEY = 'er.comments.name'
 const MAX_NAME = 60, MAX_BODY = 2000
 
+const configured = SUPABASE_URL && SUPABASE_KEY && LIVE_HOSTS.includes(location.hostname)
+const rpc = (fn, args, signal) => fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+  method: 'POST', signal,
+  headers: { apikey: SUPABASE_KEY, 'content-type': 'application/json', accept: 'application/json' },
+  body: JSON.stringify(args || {}),
+})
+
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e }
-const st = { comments: [], closed: false, sending: false, token: '', widget: null, prevScreen: '' }
+const st = { comments: [], closed: false, sending: false, prevScreen: '' }
 
 // ------------------------------------------------------------------ load (or stay hidden)
 async function load() {
   const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 8000)
   try {
-    const r = await fetch(API, { signal: ctl.signal, headers: { accept: 'application/json' } })
+    const r = await rpc('essick_comments_list', {}, ctl.signal)
     if (!r.ok) return null
     const j = await r.json()
     return Array.isArray(j?.comments) ? { comments: j.comments, postingEnabled: j.postingEnabled !== false } : null
@@ -75,22 +85,19 @@ async function post(e) {
   const name = $('cmtName').value.trim(), body = $('cmtBody').value.trim()
   if (!name) { status('warn', 'Add your name first.'); $('cmtName').focus(); return }
   if (!body) { status('warn', 'Write a comment first.'); $('cmtBody').focus(); return }
-  if (TURNSTILE_SITE_KEY && !st.token) { status('warn', 'One moment: finishing the robot check.'); return }
   try { localStorage.setItem(NAME_KEY, name) } catch {}
   setSending(true); status('', '')
-  const payload = { name, body, website: $('cmtWebsite').value }
-  if (TURNSTILE_SITE_KEY) payload.turnstileToken = st.token
   let r
   try {
-    r = await fetch(API, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' }, body: JSON.stringify(payload) })
+    r = await rpc('essick_comment_post', { p_name: name, p_body: body, p_website: $('cmtWebsite').value })
   } catch {
     setSending(false); status('err', 'Could not reach the server. Check your connection and try again.'); return
-  } finally { resetTurnstile() }
+  }
   setSending(false)
   if (r.status === 429) { status('warn', 'Slow down a little. Wait a minute, then post again.'); return }
   if (r.status === 403) { closeForm(); return }
   if (!r.ok) {
-    let msg = ''; try { const e = (await r.json())?.error; msg = typeof e === 'string' ? e : e?.message || '' } catch {}
+    let msg = ''; try { const j = await r.json(); msg = (r.status === 400 && j?.code === 'PT400' && j.message) || '' } catch {}
     status('err', typeof msg === 'string' && msg ? msg : 'That did not post. Try again in a moment.'); return
   }
   let c = null; try { const j = await r.json(); c = j?.comment || (j?.id ? j : null) } catch {}
@@ -98,25 +105,6 @@ async function post(e) {
   st.comments.push(c); $('cmtBody').value = ''
   render(c.id); status('ok', 'Posted. Thanks!')
   const l = $('cmtList'); l.scrollTop = l.scrollHeight
-}
-
-// ------------------------------------------------------------------ Turnstile (only when a site key is set)
-function loadTurnstile() {
-  if (!TURNSTILE_SITE_KEY) return
-  const box = $('cmtTs'); box.hidden = false
-  window.erTurnstileReady = () => {
-    st.widget = window.turnstile.render(box, {
-      sitekey: TURNSTILE_SITE_KEY, theme: 'light', size: 'flexible',
-      callback: (t) => { st.token = t }, 'expired-callback': () => { st.token = '' }, 'error-callback': () => { st.token = '' },
-    })
-  }
-  const s = document.createElement('script')
-  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=erTurnstileReady'
-  s.async = true; s.defer = true; document.head.append(s)
-}
-function resetTurnstile() {
-  if (!TURNSTILE_SITE_KEY || st.widget == null || !window.turnstile) return
-  st.token = ''; window.turnstile.reset(st.widget)
 }
 
 // ------------------------------------------------------------------ drawer
@@ -135,6 +123,7 @@ function close() {
 }
 
 async function init() {
+  if (!configured) return
   const got = await load()
   if (!got) return // backend not live (404, unreachable, bad answer): leave everything hidden
   st.comments = got.comments
@@ -149,7 +138,7 @@ async function init() {
   $('cmtForm').addEventListener('submit', post)
   $('cmtBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) post(e) })
   for (const id of ['cmtName', 'cmtBody']) $(id).addEventListener('input', () => { if ($('cmtStatus').classList.contains('warn') || $('cmtStatus').classList.contains('ok')) status('', '') })
-  if (!got.postingEnabled) closeForm(); else loadTurnstile()
+  if (!got.postingEnabled) closeForm()
   if (location.hash === '#comments') open()
 }
 init()
