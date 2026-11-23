@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="review.css">
-<link rel="stylesheet" href="comments.css">
+<link rel="stylesheet" href="feedback.css">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -27,8 +27,7 @@
     <button class="tab" data-t="templates" role="tab">Templates</button>
   </nav>
   <div class="topr">
-    <button class="cmt" id="commentsBtn" hidden aria-label="Comments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4A1.5 1.5 0 0 1 4 14.5z"/></svg><span>Comments</span><b id="cmtN">0</b></button>
-    <button class="notes" id="notesBtn"><b id="notesN">0</b><span>My notes</span></button>
+    <button class="notes" id="notesBtn" aria-label="Feedback from everyone"><b id="notesN">0</b><span>Feedback</span></button>
   </div>
 </header>
 
@@ -94,7 +93,7 @@
         <div class="howto" id="howto"></div>
       </div>
       <div class="ask" id="ask">
-        <div class="askt"><h2 id="askName">—</h2><div class="src" id="askSrc"></div></div>
+        <div class="askt"><h2 id="askName">—</h2><div class="src" id="askSrc"></div><div class="tally" id="askTally" aria-live="polite"></div></div>
         <div class="val" id="askVal">—</div>
         <div class="ans" id="askAns"></div>
       </div>
@@ -132,29 +131,32 @@
   </div>
 </main>
 
-<div class="drawer" id="drawer" hidden><div class="drawin">
-  <div class="dhead"><h2>My notes</h2><button class="x" id="drawClose" aria-label="Close">×</button></div>
-  <p class="mute" id="drawSub">Saved on this device.</p>
-  <div class="dlist" id="dList"></div>
-  <div class="dfoot"><button class="btn big pri" id="sendBtn">Send to Joe</button><p class="mute small" id="sendSub">Makes one file with every answer, note and photo.</p></div>
-</div></div>
-<div class="drawer" id="cdrawer" hidden><div class="drawin cdraw" role="dialog" aria-labelledby="cmtTitle">
-  <div class="dhead"><h2 id="cmtTitle">Comments</h2><button class="x" id="cmtClose" aria-label="Close">×</button></div>
-  <p class="mute" id="cmtSub">Anyone with the link can read these.</p>
-  <div class="dlist" id="cmtList" aria-live="polite"></div>
-  <form class="cform" id="cmtForm" novalidate autocomplete="on">
-    <label class="cfield"><span class="lbl">Your name</span><input id="cmtName" name="name" autocomplete="name" placeholder="So people know who said it" required></label>
-    <label class="cfield"><span class="lbl">Comment</span><textarea id="cmtBody" name="body" rows="3" placeholder="What do you think?" required></textarea></label>
-    <div class="hp" aria-hidden="true"><label>Website <input id="cmtWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
-    <div class="csend"><p class="cstatus" id="cmtStatus" role="status"></p><button class="btn pri" id="cmtPost" type="submit">Post comment</button></div>
+<div class="drawer" id="drawer" hidden><div class="drawin fdraw" role="dialog" aria-labelledby="drawTitle">
+  <div class="dhead"><h2 id="drawTitle">Feedback</h2><button class="x" id="drawClose" aria-label="Close">×</button></div>
+  <p class="mute" id="drawSub">Everyone with the link can see these.</p>
+  <div class="dfilter seg" id="dFilter"></div>
+  <div class="dlist" id="dList" aria-live="polite"></div>
+  <form class="cform" id="cForm" novalidate autocomplete="on">
+    <div class="crow2">
+      <label class="cfield cname"><span class="lbl">Your name</span><input id="cName" name="name" autocomplete="name" maxlength="60" placeholder="So people know who said it" required></label>
+    </div>
+    <label class="cfield"><span class="lbl">Comment</span><textarea id="cBody" name="body" rows="2" maxlength="2000" placeholder="What do you think of the chair?" required></textarea></label>
+    <div class="hp" aria-hidden="true"><label>Website <input id="cWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
+    <div class="csend"><p class="cstatus" id="cStatus" role="status"></p><button class="btn pri" id="cPost" type="submit">Post</button></div>
   </form>
-  <div class="cclosed" id="cmtClosed" hidden><b>Comments are closed for now</b>You can still read what people have said.</div>
+  <div class="cclosed" id="cClosed" hidden><b>Feedback is closed for now</b>You can still read what people have said.</div>
 </div></div>
+<div class="who" id="who" hidden><form class="whoin" id="whoForm" role="dialog" aria-labelledby="whoTitle" novalidate>
+  <span class="lbl">Before you save</span>
+  <h2 id="whoTitle">What’s your name?</h2>
+  <p class="mute">Everyone can see your feedback, with your name next to it. You only need to say it once.</p>
+  <input id="whoName" autocomplete="name" maxlength="60" placeholder="Your name" required>
+  <div class="row2"><button class="btn big" type="button" id="whoCancel">Cancel</button><button class="btn big pri" type="submit">Save</button></div>
+</form></div>
 <div class="toast" id="toast" hidden></div>
 
 <a class="wb" href="workbench.html">Workbench</a>
 <span class="sid" id="sid">er.look</span>
 <script type="module" src="review.js"></script>
-<script type="module" src="comments.js"></script>
 </body>
 </html>

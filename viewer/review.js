@@ -1,5 +1,6 @@
 // The review app: Look (tap a part, see its sizes drawn on it, leave a note), Measurements (one size at a time, right / wrong /
-// not sure) and Templates. Answers and notes are saved by store.js. The old tools live in workbench.html.
+// not sure) and Templates. All feedback is shared (everyone sees everyone's) and saved by store.js; the Feedback drawer
+// lists it with the general comments. The old tools live in workbench.html.
 import * as S from './scene.js'
 import * as store from './store.js'
 import { inch, mmText, parse, MM } from './inches.js'
@@ -30,7 +31,8 @@ async function boot() {
   S.init($('c3d'), $('stage'), { onFrame: overlay })
   wire()
   st.records = await store.all().catch(() => [])
-  store.syncAll()
+  setInterval(() => { if (!document.hidden) refresh() }, 60000)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh() })
   const m = await findModel()
   if (!m) { $('loading').textContent = 'Could not find the model. Check the connection and reload.'; $('loading').classList.add('err'); return }
   st.version = m.v; st.dims = m.data.dimensions; st.questions = m.data.questions || []
@@ -46,7 +48,7 @@ async function boot() {
 // ------------------------------------------------------------------ routing and screen IDs
 function route() {
   const [tab, arg] = (location.hash.slice(1) || 'look').split('/')
-  if (tab === 'notes') { openDrawer(); return }
+  if (['feedback', 'notes', 'comments'].includes(tab)) { openDrawer(); return }
   go(['look', 'measure', 'templates'].includes(tab) ? tab : 'look', arg, true)
 }
 addEventListener('hashchange', route)
@@ -74,27 +76,42 @@ function setScreen() {
   let id = 'er.' + st.tab
   if (st.tab === 'look') id += st.photo ? '.photo' : !$('cardNote').hidden ? '.note' : !$('cardPart').hidden ? '.part' : ''
   if (st.tab === 'measure' && !$('sheet').hidden) id += '.wrong'
-  if (!$('drawer').hidden) id = 'er.notes'
+  if (!$('drawer').hidden) id = 'er.feedback'
+  if (!$('who').hidden) id = 'er.who'
   document.body.dataset.screen = id; $('sid').textContent = id
   document.body.classList.toggle('card-open', !$('cardPart').hidden || !$('cardNote').hidden)
 }
 
-// ------------------------------------------------------------------ records
-function answerOf(id) { return st.records.find((r) => r.id === `answer-${id}` || r.id === `question-${id}`) }
-function status(item) {
-  const a = answerOf(item.id); if (!a) return ''
-  if (a.type === 'question') return a.choice === 'unsure' ? 'q' : 'ok'
-  return { right: 'ok', wrong: 'no', unsure: 'q' }[a.verdict] || ''
+// ------------------------------------------------------------------ records (everyone's)
+const isAns = (r, id) => (r.type === 'answer' && r.dimId === id) || (r.type === 'question' && r.qid === id)
+const answersTo = (id) => st.records.filter((r) => isAns(r, id))
+function answerOf(id) { return st.records.find((r) => r.mine && isAns(r, id)) }   // your own answer
+const kindOf = (a) => (a.type === 'question' ? (a.choice === 'unsure' ? 'q' : 'ok') : ({ right: 'ok', wrong: 'no', unsure: 'q' }[a.verdict] || ''))
+function status(item) {               // what most people said: ok / no / q; a tie goes to "wrong", then "not sure"
+  const n = { ok: 0, no: 0, q: 0 }; for (const a of answersTo(item.id)) n[kindOf(a)]++
+  const best = Math.max(n.ok, n.no, n.q); if (!best) return ''
+  return n.no === best ? 'no' : n.q === best ? 'q' : 'ok'
 }
 const notes = () => st.records.filter((r) => r.type === 'note')
+const people = () => new Set(st.records.map((r) => r.who)).size
 async function refresh() {
   st.records = await store.all().catch(() => st.records)
-  const done = st.items.filter((x) => answerOf(x.id)).length
+  const done = st.items.filter((x) => answersTo(x.id).length).length
   $('count').textContent = `${done} of ${st.items.length}`
   $('notesN').textContent = st.records.length
   renderList(); if (st.tab === 'measure') renderAsk()
   if (!$('drawer').hidden) renderDrawer()
   S.request()
+}
+// Save one piece of feedback under the reader's name (asked once). Returns the saved record, or null.
+async function submit(rec, photos = []) {
+  const who = await ensureName(); if (!who) return null
+  try { return await store.save({ ...rec, who, model: `v${st.version}` }, photos) } catch (e) {
+    if (e.status === 429) toast('Slow down a little. Wait a few minutes, then try again.')
+    else if (e.status === 403) { store.state.postingEnabled = false; toast('Feedback is closed for now.'); renderDrawer() }
+    else toast(e.message || 'That did not save. Try again in a moment.')
+    return null
+  }
 }
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.hidden = false
@@ -209,7 +226,8 @@ function overlay() {                  // runs after every rendered frame
     for (const r of list) {
       if (!r.point) continue
       const q = S.project(r.point); if (q.behind) continue
-      p += `<div class="pin${r.draft ? ' new' : ''}" style="left:${q.x}px;top:${q.y}px"><b>${r.n}</b></div>`
+      p += r.draft ? `<div class="pin new" style="left:${q.x}px;top:${q.y}px"><b>${r.n}</b></div>`
+        : `<button class="pin" data-note="${esc(r.id)}" style="left:${q.x}px;top:${q.y}px" aria-label="Note ${r.n} from ${esc(r.who)}" title="Note ${r.n} · ${esc(r.who)}"><b>${r.n}</b></button>`
     }
   }
   $('pins').innerHTML = p
@@ -242,7 +260,7 @@ function pickRow(id) {
 
 // notes
 function openNote(part, point, camera = null) {
-  const n = Math.max(0, ...notes().map((r) => r.n || 0)) + 1
+  const n = notes().length + 1
   st.note = { n, part, point, camera, what: null, text: '', photos: [] }
   $('noteLbl').textContent = `Note ${n}${part ? ' · ' + S.partName(part) : ''}`
   document.querySelectorAll('#noteWhat .btn').forEach((b) => b.classList.remove('on'))
@@ -250,10 +268,7 @@ function openNote(part, point, camera = null) {
   $('cardPart').hidden = true; $('cardNote').hidden = false; $('hint').hidden = true; $('showAs').hidden = true
   setScreen(); S.request()
 }
-function cancelNote() {
-  if (st.note) for (const p of st.note.photos) store.dropPhoto(p.id)
-  st.note = null
-}
+function cancelNote() { st.note = null }
 async function renderShots() {
   const box = $('noteShots'); box.querySelectorAll('.th').forEach((e) => e.remove())
   for (const p of st.note?.photos || []) {
@@ -266,9 +281,12 @@ async function saveNote() {
   const n = st.note; if (!n) return
   n.text = $('noteText').value.trim()
   if (!n.what && !n.text && !n.photos.length) { toast('Pick what is off, or type a word or two.'); return }
-  await store.save({ id: store.newId('note'), type: 'note', model: `v${st.version}`, n: n.n, part: n.part, point: n.point, camera: n.camera,
-    what: n.what, text: n.text, photos: n.photos.map((p) => p.id), view: S.viewDir() })
-  st.note = null; toast(`Saved note ${n.n}`)
+  $('noteSave').disabled = true
+  const saved = await submit({ id: store.newId('note'), type: 'note', part: n.part, point: n.point, camera: n.camera,
+    what: n.what, text: n.text, view: S.viewDir() }, n.photos)
+  $('noteSave').disabled = false
+  if (!saved) return
+  st.note = null; toast(`Saved note ${n.n}. Everyone can see it.`)
   if (st.photo) { $('cardNote').hidden = true; setScreen() } else closeCards()
   refresh()
 }
@@ -334,9 +352,9 @@ function renderList() {
     const s = status(it), mark = { ok: '✓', no: '✕', q: '?' }[s] || ''
     const name = it.kind === 'dim' ? it.d.name : it.q.name
     let em = it.kind === 'dim' ? labelOf(it.d).replace('?', '') : it.q.model
-    const a = answerOf(it.id)
-    if (a?.verdict === 'wrong' && a.value_mm) em = inch(a.value_mm)
-    if (a?.type === 'question' && a.choice !== 'unsure') em = a.choice
+    const all = answersTo(it.id), wrong = all.filter((a) => a.verdict === 'wrong' && a.value_mm).pop()
+    if (s === 'no' && wrong) em = inch(wrong.value_mm)
+    if (it.kind === 'q' && s === 'ok') { const c = topChoice(all); if (c) em = c }
     h += `<button class="item${i === st.mIdx && st.tab === 'measure' ? ' on' : ''}" data-i="${i}"><span class="dot ${s}">${mark}</span>${esc(name)}<em>${esc(em)}</em></button>`
   })
   $('mList').innerHTML = h
@@ -354,6 +372,23 @@ function showItem(i, instant) {
   $('mList').querySelector('.item.on')?.scrollIntoView({ block: 'nearest' })
   S.request()
 }
+function topChoice(all) {
+  const n = {}; for (const a of all) if (a.choice && a.choice !== 'unsure') n[a.choice] = (n[a.choice] || 0) + 1
+  return Object.keys(n).sort((x, y) => n[y] - n[x])[0] || ''
+}
+function tallyHTML(it) {               // what everyone said about this one
+  const all = answersTo(it.id)
+  if (!all.length) return '<span class="none">No one has answered yet.</span>'
+  const by = (pred) => all.filter(pred), names = (xs) => xs.map((a) => esc(a.mine ? 'you' : a.who)).join(', ')
+  const part = (cls, mark, label, xs, extra = '') => xs.length ? `<span class="t ${cls}"><i>${mark}</i><b>${xs.length}</b> ${label}<em>${names(xs)}${extra}</em></span>` : ''
+  if (it.kind === 'q') {
+    return it.q.choices.map(([k, label]) => part('ok', '✓', esc(label), by((a) => a.choice === k))).join('') + part('q', '?', 'not sure', by((a) => a.choice === 'unsure'))
+  }
+  const wrong = by((a) => a.verdict === 'wrong')
+  return part('ok', '✓', 'right', by((a) => a.verdict === 'right')) +
+    (wrong.length ? `<span class="t no"><i>✕</i><b>${wrong.length}</b> wrong<em>${wrong.map((a) => `${esc(a.mine ? 'you' : a.who)} <span class="mono">${a.value_mm ? inch(a.value_mm) : '?'}</span>`).join(', ')}</em></span>` : '') +
+    part('q', '?', 'not sure', by((a) => a.verdict === 'unsure'))
+}
 function srcText(d) {
   const tol = d.tolerance_mm ? ` Good to about ${inch(d.tolerance_mm)}.` : ''
   let s = { taped: '<b>Taped on the chair.</b>', photos: `<b>Worked out from the photos.</b>${tol}`, guess: '<b>Our guess.</b> No photo shows it well.' }[d.source] || ''
@@ -364,6 +399,7 @@ function renderAsk() {
   const it = st.items[st.mIdx]; if (!it) return
   const a = answerOf(it.id)
   $('pgN').textContent = `${st.mIdx + 1} of ${st.items.length}`
+  $('askTally').innerHTML = tallyHTML(it)
   $('pgPrev').disabled = st.mIdx === 0; $('pgNext').disabled = st.mIdx === st.items.length - 1
   if (it.kind === 'dim') {
     const d = it.d, t = valueText(d)
@@ -393,12 +429,12 @@ function slatSketch(q) {               // plan view, seen from above: flat vs tu
 async function answer(v) {
   const it = st.items[st.mIdx]
   if (v === 'wrong') { openSheet(it.d); return }
-  await store.save({ id: `answer-${it.id}`, type: 'answer', model: `v${st.version}`, dimId: it.id, name: it.d.name, verdict: v, value_mm: it.d.value_mm, model_mm: it.d.value_mm })
+  if (!await submit({ id: `answer-${it.id}`, type: 'answer', dimId: it.id, name: it.d.name, verdict: v, value_mm: it.d.value_mm, model_mm: it.d.value_mm })) return
   await refresh(); next()
 }
 async function choose(c) {
   const it = st.items[st.mIdx]
-  await store.save({ id: `question-${it.id}`, type: 'question', model: `v${st.version}`, qid: it.id, name: it.q.name, choice: c })
+  if (!await submit({ id: `question-${it.id}`, type: 'question', qid: it.id, name: it.q.name, choice: c })) return
   await refresh(); next()
 }
 function next() {
@@ -431,8 +467,8 @@ function untype() { st.sheet.typed = null; $('shType').value = ''; $('shType').c
 function closeSheet() { $('sheet').hidden = true; st.sheet = null; setScreen() }
 async function saveSheet() {
   const s = st.sheet, mm = sheetMM(), it = st.items[st.mIdx]
-  await store.save({ id: `answer-${it.id}`, type: 'answer', model: `v${st.version}`, dimId: it.id, name: s.d.name, verdict: 'wrong', value_mm: Math.round(mm * 100) / 100,
-    model_mm: s.d.value_mm, typed: s.typed != null ? $('shType').value.trim() : null })
+  if (!await submit({ id: `answer-${it.id}`, type: 'answer', dimId: it.id, name: s.d.name, verdict: 'wrong', value_mm: Math.round(mm * 100) / 100,
+    model_mm: s.d.value_mm, typed: s.typed != null ? $('shType').value.trim() : null })) return
   closeSheet(); toast(`Saved ${inch(mm)} for ${s.d.name.toLowerCase()}`); await refresh(); next()
 }
 
@@ -488,49 +524,124 @@ async function renderTemplates() {
     `<div class="todo"><b>Not drawn yet:</b> ${[...not.map((r) => r.title.toLowerCase()), 'joint layout'].join(' · ')}</div>`
 }
 
-// ------------------------------------------------------------------ My notes
-function openDrawer() { $('drawer').hidden = false; renderDrawer(); setScreen() }
-function closeDrawer() { $('drawer').hidden = true; if (location.hash === '#notes') history.replaceState(null, '', '#' + st.tab); setScreen() }
-async function renderDrawer() {
-  const rs = st.records
-  $('drawSub').textContent = rs.length ? `${rs.length} saved on this device${store.REMOTE_URL ? ', and sent' : ''}. Send them to Joe when you are done.` : 'Saved on this device.'
-  $('sendBtn').disabled = !rs.length
-  if (!rs.length) { $('dList').innerHTML = '<div class="dempty"><b>Nothing yet</b>Tap a part on the Look page, or answer a few on Measurements. Everything you give is kept here, even after a reload.</div>'; return }
-  const urls = {}
-  for (const r of rs) for (const p of r.photos || []) { const ph = await store.photo(p); if (ph) urls[p] = URL.createObjectURL(ph.blob) }
-  $('dList').innerHTML = rs.map((r) => {
-    let k, title, body = ''
-    if (r.type === 'note') { k = `<span class="k pin">${r.n}</span>`; title = `${r.part ? S.partName(r.part) : 'Note'}${r.what ? ': ' + r.what : ''}`; body = r.text ? `<p>${esc(r.text)}</p>` : ''; if (r.camera) body += `<p>Next to photo ${esc(r.camera)}</p>` }
-    else if (r.type === 'answer') { const c = { right: 'ok', wrong: 'no', unsure: 'q' }[r.verdict]; k = `<span class="k ${c}">${{ ok: '✓', no: '✕', q: '?' }[c]}</span>`; title = r.name; body = `<p>${r.verdict === 'wrong' ? `Should be <span class="v">${inch(r.value_mm)}</span> (${mmText(r.value_mm)}); model has ${inch(r.model_mm)}` : r.verdict === 'right' ? `Right: <span class="v">${inch(r.value_mm)}</span>` : 'Not sure'}</p>` }
-    else if (r.type === 'question') { k = `<span class="k ${r.choice === 'unsure' ? 'q' : 'ok'}">${r.choice === 'unsure' ? '?' : '✓'}</span>`; title = r.name; body = `<p>${r.choice === 'unsure' ? 'Not sure' : esc(r.choice)}</p>` }
-    else { k = '<span class="k ok">✓</span>'; title = `${S.partName(r.part)} looks right`; body = '' }
-    const ths = (r.photos || []).filter((p) => urls[p]).map((p) => `<img alt="" src="${urls[p]}">`).join('')
-    return `<div class="drow">${k}<div><h4>${esc(title)}</h4>${body}${ths ? `<div class="ths">${ths}</div>` : ''}</div><button class="del" data-del="${r.id}">Delete</button></div>`
-  }).join('')
+// ------------------------------------------------------------------ Feedback: everyone's notes, answers and comments
+const FILTERS = [['all', 'All'], ['note', 'Notes'], ['size', 'Sizes'], ['comment', 'Comments']]
+const group = (r) => (r.type === 'note' || r.type === 'comment' ? r.type : 'size')
+const fmtDay = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' })
+function when(ms) {
+  const mins = (Date.now() - ms) / 60000; if (!(mins >= 0)) return ''
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${Math.floor(mins)} min ago`
+  if (mins < 60 * 24) return `${Math.floor(mins / 60)} h ago`
+  return fmtDay.format(new Date(ms))
 }
-async function send() {
-  const file = await store.exportFile({ model: `v${st.version}`, device: navigator.userAgent })
-  try {
-    if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], title: 'Essick rocker notes' }); toast('Sent.'); return }
-  } catch (e) { if (e?.name === 'AbortError') return }
-  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); a.remove()
-  toast(`Saved ${file.name}. Email or text it to Joe.`)
+function openDrawer(focus) {
+  if (focus) st.filter = 'all'
+  st.focus = focus || null
+  $('drawer').hidden = false; renderDrawer(); setScreen()
+  $('cName').value = store.getName()
+  if (!focus) { const l = $('dList'); l.scrollTop = l.scrollHeight }
+}
+function closeDrawer() {
+  $('drawer').hidden = true
+  if (['#notes', '#feedback', '#comments'].includes(location.hash)) history.replaceState(null, '', '#' + st.tab)
+  setScreen()
+}
+function rowHTML(r, urls) {
+  let k, title, body = ''
+  if (r.type === 'note') { k = `<span class="k pin">${r.n}</span>`; title = `${r.part ? S.partName(r.part) : 'Note'}${r.what ? ': ' + r.what : ''}`; body = r.text ? `<p class="say">${esc(r.text)}</p>` : ''; if (r.camera) body += `<p>Next to photo ${esc(r.camera)}</p>` }
+  else if (r.type === 'comment') { k = '<span class="k cm" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 4v-4A1.5 1.5 0 0 1 4 14.5z"/></svg></span>'; title = ''; body = `<p class="say">${esc(r.text)}</p>` }
+  else if (r.type === 'answer') { const c = kindOf(r); k = `<span class="k ${c}">${{ ok: '✓', no: '✕', q: '?' }[c]}</span>`; title = r.name; body = `<p>${r.verdict === 'wrong' ? `Should be <span class="v">${inch(r.value_mm)}</span> (${mmText(r.value_mm)}); model has ${inch(r.model_mm)}` : r.verdict === 'right' ? `Right: <span class="v">${inch(r.value_mm)}</span>` : 'Not sure'}</p>` }
+  else if (r.type === 'question') { k = `<span class="k ${r.choice === 'unsure' ? 'q' : 'ok'}">${r.choice === 'unsure' ? '?' : '✓'}</span>`; title = r.name; body = `<p>${r.choice === 'unsure' ? 'Not sure' : esc(r.choice)}</p>` }
+  else { k = '<span class="k ok">✓</span>'; title = `${S.partName(r.part)} looks right`; body = '' }
+  const ths = (r.photos || []).filter((p) => urls[p]).map((p) => `<a href="${urls[p]}" target="_blank" rel="noopener"><img alt="Photo" loading="lazy" src="${urls[p]}"></a>`).join('')
+  const head = `<div class="dwho"><b>${esc(r.mine ? `${r.who} (you)` : r.who)}</b><time>${esc(when(r.at))}</time></div>`
+  return `<li class="drow${r.id === st.focus ? ' fresh' : ''}" data-id="${esc(r.id)}">${k}<div>${head}${title ? `<h4>${esc(title)}</h4>` : ''}${body}${ths ? `<div class="ths">${ths}</div>` : ''}</div>` +
+    (r.mine ? `<button class="del" data-del="${esc(r.id)}">Delete</button>` : '<span></span>') + '</li>'
+}
+async function renderDrawer() {
+  const rs = st.records, f = st.filter || 'all', n = rs.length, ppl = people()
+  $('drawSub').textContent = store.SHARED
+    ? (n ? `${n} from ${ppl} ${ppl === 1 ? 'person' : 'people'}. Everyone with the link can see these.` : 'Everyone with the link can see these.')
+    : 'Preview: kept on this device only. On the live page everyone sees everyone’s.'
+  $('dFilter').innerHTML = FILTERS.map(([k, label]) => {
+    const c = k === 'all' ? n : rs.filter((r) => group(r) === k).length
+    return `<button class="btn${f === k ? ' on' : ''}" data-f="${k}">${label}<b>${c}</b></button>`
+  }).join('')
+  const show = rs.filter((r) => f === 'all' || group(r) === f)
+  const closed = !store.state.postingEnabled
+  $('cForm').hidden = closed; $('cClosed').hidden = !closed
+  if (store.state.loadError && !n) { $('dList').innerHTML = '<div class="dempty"><b>Could not load the feedback</b>Check your connection. It will try again in a minute.</div>'; return }
+  if (!show.length) {
+    const msg = { all: 'Tap a part on the Look page, answer a few on Measurements, or leave a comment below.', note: 'Tap a part on the Look page, then “Something is off here”.',
+      size: 'Answer a few on Measurements, or tap a part and “Looks right”.', comment: 'Say what you think of the chair, or ask Joe a question.' }[f]
+    $('dList').innerHTML = `<div class="dempty"><b>Nothing yet</b>${msg}</div>`; return
+  }
+  const urls = {}
+  for (const r of show) for (const p of r.photos || []) { const u = await store.photoURL(p).catch(() => null); if (u) urls[p] = u }
+  $('dList').innerHTML = `<ol class="dl">${show.map((r) => rowHTML(r, urls)).join('')}</ol>`
+  if (st.focus) { $('dList').querySelector(`[data-id="${CSS.escape(st.focus)}"]`)?.scrollIntoView({ block: 'center' }); st.focus = null }
+}
+function cStatus(kind, text) { const s = $('cStatus'); s.className = 'cstatus' + (kind ? ' ' + kind : ''); s.textContent = text || '' }
+async function postComment(e) {
+  e.preventDefault()
+  const name = $('cName').value.trim(), body = $('cBody').value.trim()
+  if (!name) { cStatus('warn', 'Add your name first.'); $('cName').focus(); return }
+  if (!body) { cStatus('warn', 'Write a comment first.'); $('cBody').focus(); return }
+  store.setName(name)
+  $('cPost').disabled = true; $('cPost').textContent = 'Posting…'; cStatus('', '')
+  let saved = null
+  try { saved = await store.save({ id: store.newId('comment'), type: 'comment', who: name, text: body, website: $('cWebsite').value, model: `v${st.version}` }) } catch (err) {
+    if (err.status === 403) store.state.postingEnabled = false
+    cStatus(err.status === 429 ? 'warn' : 'err', err.status === 429 ? 'Slow down a little. Wait a few minutes, then post again.' : err.message || 'That did not post. Try again in a moment.')
+  }
+  $('cPost').disabled = false; $('cPost').textContent = 'Post'
+  if (!saved) { if (!store.state.postingEnabled) renderDrawer(); return }
+  $('cBody').value = ''; cStatus('ok', 'Posted. Thanks!')
+  await refresh(); st.focus = null
+  const l = $('dList'); l.scrollTop = l.scrollHeight
+}
+
+// ------------------------------------------------------------------ your name, asked once, shown next to everything you give
+function ensureName() {
+  const have = store.getName(); if (have) return Promise.resolve(have)
+  return new Promise((done) => {
+    $('who').hidden = false; $('whoName').value = ''; setScreen()
+    setTimeout(() => $('whoName').focus(), 30)
+    const finish = (v) => { $('who').hidden = true; $('whoForm').onsubmit = null; $('whoCancel').onclick = null; setScreen(); done(v) }
+    $('whoForm').onsubmit = (e) => {
+      e.preventDefault(); const v = $('whoName').value.trim()
+      if (!v) { $('whoName').focus(); return }
+      store.setName(v); finish(store.getName())
+    }
+    $('whoCancel').onclick = () => finish(null)
+  })
 }
 
 // ------------------------------------------------------------------ wiring
 function wire() {
   document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { closeDrawer(); go(t.dataset.t) }))
-  $('notesBtn').onclick = openDrawer; $('drawClose').onclick = closeDrawer
+  $('notesBtn').onclick = () => openDrawer(); $('drawClose').onclick = closeDrawer
   $('drawer').addEventListener('click', async (e) => {
     if (e.target === $('drawer')) closeDrawer()
-    const del = e.target.closest('[data-del]'); if (del) { await store.remove(del.dataset.del); await refresh() }
+    const f = e.target.closest('[data-f]'); if (f) { st.filter = f.dataset.f; renderDrawer(); return }
+    const del = e.target.closest('[data-del]')
+    if (del) {
+      del.disabled = true
+      try { await store.remove(del.dataset.del) } catch { toast('That did not delete. Try again in a moment.') }
+      await refresh()
+    }
   })
-  $('sendBtn').onclick = send
-  addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('drawer').hidden) closeDrawer(); else if (!$('sheet').hidden) closeSheet(); else if (st.tab === 'look') closeCards() } })
+  $('cForm').addEventListener('submit', postComment)
+  $('cBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) postComment(e) })
+  $('cName').addEventListener('change', () => { if ($('cName').value.trim()) store.setName($('cName').value) })
+  for (const id of ['cName', 'cBody']) $(id).addEventListener('input', () => { if (/warn|ok/.test($('cStatus').className)) cStatus('', '') })
+  $('pins').addEventListener('click', (e) => { const b = e.target.closest('[data-note]'); if (b) openDrawer(b.dataset.note) })
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('who').hidden) $('whoCancel').click(); else if (!$('drawer').hidden) closeDrawer(); else if (!$('sheet').hidden) closeSheet(); else if (st.tab === 'look') closeCards() } })
 
   // taps on the 3D view (a short press without a drag)
   let down = null
-  $('stage').addEventListener('pointerdown', (e) => { down = e.target.closest('.bar') ? null : { x: e.clientX, y: e.clientY, t: performance.now() } })
+  $('stage').addEventListener('pointerdown', (e) => { down = e.target.closest('.bar, .pin') ? null : { x: e.clientX, y: e.clientY, t: performance.now() } })
   $('stage').addEventListener('pointerup', (e) => {
     if (!down || !st.ready) return; const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y), dt = performance.now() - down.t; down = null
     if (moved > 7 || dt > 600 || st.tab !== 'look') return
@@ -564,7 +675,7 @@ function wire() {
     closeCards(); st.mode = 'solid'; S.setMode('solid')
     document.querySelectorAll('#showAs .btn').forEach((x) => x.classList.toggle('on', x.dataset.m === 'solid'))
     document.querySelectorAll('#views .btn').forEach((x) => x.classList.toggle('on', x.dataset.v === 'corner'))
-    S.goView('corner'); toast('Back to the whole chair. Your notes are kept.')
+    S.goView('corner'); toast('Back to the whole chair. All the notes are kept.')
   }
   $('photoBack').onclick = exitPhoto
   $('photoPrev').onclick = () => showPhoto(st.pi - 1); $('photoNext').onclick = () => showPhoto(st.pi + 1)
@@ -574,8 +685,9 @@ function wire() {
   document.querySelectorAll('[data-close]').forEach((b) => (b.onclick = () => { if (st.photo) { cancelNote(); $('cardNote').hidden = true; setScreen(); S.request() } else closeCards() }))
   $('partSizes').addEventListener('click', (e) => { const li = e.target.closest('li[data-id]'); if (li) pickRow(li.dataset.id) })
   $('partOk').onclick = async () => {
-    await store.save({ id: store.newId('ok'), type: 'part_ok', model: `v${st.version}`, part: st.sel.name })
-    toast(`Saved: ${S.partName(st.sel.name).toLowerCase()} looks right`); closeCards(); refresh()
+    const part = st.sel.name
+    if (!await submit({ id: `ok-${part}`, type: 'part_ok', part })) return
+    toast(`Saved: ${S.partName(part).toLowerCase()} looks right`); closeCards(); refresh()
   }
   $('partOff').onclick = () => openNote(st.sel.name, st.sel.point)
   // note card
@@ -587,13 +699,14 @@ function wire() {
   $('notePhotos').addEventListener('change', async (e) => {
     const files = [...e.target.files]; e.target.value = ''
     for (const f of files) {
-      try { const id = await store.addPhoto(f); const ph = await store.photo(id); st.note?.photos.push({ id, url: URL.createObjectURL(ph.blob) }) } catch { toast('That photo could not be read.') }
+      if ((st.note?.photos.length || 0) >= 6) { toast('Up to 6 photos on one note.'); break }
+      try { const ph = await store.preparePhoto(f); st.note?.photos.push(ph) } catch { toast('That photo could not be read.') }
     }
     renderShots()
   })
   $('noteShots').addEventListener('click', (e) => {
     const b = e.target.closest('[data-ph]'); if (!b || !st.note) return
-    store.dropPhoto(b.dataset.ph); st.note.photos = st.note.photos.filter((p) => p.id !== b.dataset.ph); renderShots()
+    st.note.photos = st.note.photos.filter((p) => p.id !== b.dataset.ph); renderShots()
   })
   $('noteSave').onclick = saveNote
   $('noteCancel').onclick = () => { if (st.photo) { cancelNote(); $('cardNote').hidden = true; setScreen(); S.request() } else { cancelNote(); st.sel ? openPart(st.sel.name, st.sel.point) : closeCards() } }
@@ -625,5 +738,5 @@ function wire() {
 }
 
 // for the screenshot script and for debugging from the console
-window.__er = { S, st, openPart, openNote, go, showItem, openSheet, enterPhoto }
+window.__er = { S, st, store, openPart, openNote, openDrawer, go, showItem, openSheet, enterPhoto, refresh }
 boot()

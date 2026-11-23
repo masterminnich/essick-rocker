@@ -1,8 +1,78 @@
-// Saving for the review app. Everything Joe's reviewer gives (answers, pins, notes, photos) goes through this one module.
-// Today it saves to the device only (IndexedDB) and exports one file. Set REMOTE_URL to a Worker (see viewer/README.md,
-// "Saving") and every record is also sent there; records not yet sent are retried on the next load.
-export const REMOTE_URL = null          // e.g. 'https://essick-rocker-notes.<account>.workers.dev'
+// Saving for the review app. All feedback (comments, notes with pins and photos, size answers, "looks right") is
+// SHARED: on the live site it goes to Supabase (supabase/essick-feedback.sql) and everyone sees everyone's.
+// Anywhere else (the preview, a local copy) it is kept on this device only, so tests never touch the real feedback.
+//
+// A record, as the app sees it:
+//   { id, type: 'comment' | 'note' | 'answer' | 'question' | 'part_ok', who, mine, at (ms), text, photos: [photoId], ...details }
+// Your own records keep their id (for an answer it is `answer-<dimension id>`, so answering again replaces it).
 
+// The URL and the publishable key are public by design: the database only lets that key call the feedback functions.
+const SUPABASE_URL = 'https://cvfejlnfytsyswpkyamt.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_T53HgBKsth7uv4euw3vMpA_QyzO9se5'
+const LIVE_HOSTS = ['masterminnich.github.io']
+const BUCKET = 'essick-photos'
+export const SHARED = LIVE_HOSTS.includes(location.hostname)
+
+const NAME_KEY = 'er.comments.name', CLIENT_KEY = 'er.client'
+const ls = { get: (k) => { try { return localStorage.getItem(k) } catch { return null } }, set: (k, v) => { try { localStorage.setItem(k, v) } catch {} } }
+export const getName = () => ls.get(NAME_KEY) || ''
+export const setName = (n) => ls.set(NAME_KEY, String(n || '').trim().slice(0, 60))
+function client() {
+  let c = ls.get(CLIENT_KEY)
+  if (!/^[0-9a-f-]{36}$/.test(c || '')) { c = crypto.randomUUID(); ls.set(CLIENT_KEY, c) }
+  return c
+}
+export const newId = (p) => `${p}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+export const state = { postingEnabled: true, loadError: false }
+
+// An error the page can show as it is: .status 403 = closed, 429 = slow down.
+class SaveError extends Error { constructor(status, msg) { super(msg); this.status = status } }
+
+// ------------------------------------------------------------------ shared (Supabase)
+async function rpc(fn, args) {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000)
+  try {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, {
+      method: 'POST', signal: ctl.signal, body: JSON.stringify(args || {}),
+      headers: { apikey: SUPABASE_KEY, 'content-type': 'application/json', accept: 'application/json' },
+    })
+    const j = await r.json().catch(() => null)
+    if (!r.ok) throw new SaveError(r.status, (r.status === 400 && j?.code === 'PT400' && j.message) || '')
+    return j
+  } catch (e) {
+    if (e instanceof SaveError) throw e
+    throw new SaveError(0, 'Could not reach the server. Check your connection and try again.')
+  } finally { clearTimeout(t) }
+}
+const safeKey = (k) => String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 80)
+const DETAIL_SKIP = new Set(['id', 'type', 'who', 'mine', 'at', 'updated', 'text', 'body', 'synced', 'n'])
+function fromServer(i) {
+  return { ...(i.data || {}), id: i.mine ? i.key : i.id, type: i.kind, who: i.name, mine: !!i.mine, text: i.body || '',
+    at: Date.parse(i.created_at), updated: Date.parse(i.updated_at), photos: i.data?.photos || [] }
+}
+const remote = {
+  async all() {
+    const j = await rpc('essick_feedback_list', { p_client: client() })
+    state.postingEnabled = j?.postingEnabled !== false
+    return (j?.items || []).map(fromServer)
+  },
+  async save(rec, photos) {
+    for (const p of photos) {
+      const r = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${p.id}`, {
+        method: 'POST', body: p.blob, headers: { apikey: SUPABASE_KEY, 'content-type': 'image/jpeg', 'x-upsert': 'false' },
+      }).catch(() => null)
+      if (!r || !r.ok) throw new SaveError(r?.status === 429 ? 429 : 0, 'A photo did not upload. Try again, or save without it.')
+    }
+    const data = {}; for (const [k, v] of Object.entries(rec)) if (!DETAIL_SKIP.has(k) && v != null) data[k] = v
+    const j = await rpc('essick_feedback_post', { p_client: client(), p_key: safeKey(rec.id), p_kind: rec.type, p_name: rec.who,
+      p_body: rec.text || '', p_data: data, p_website: rec.website || '' })
+    return fromServer(j.item)
+  },
+  async remove(id) { await rpc('essick_feedback_delete', { p_client: client(), p_key: safeKey(id) }) },
+  async photoURL(id) { return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(id)}` },
+}
+
+// ------------------------------------------------------------------ this device only (preview and local copies)
 const DB = 'essick-rocker-review', STORE = 'records', PHOTOS = 'photos'
 let dbp = null
 function db() {
@@ -26,77 +96,58 @@ async function tx(store, mode, fn) {
   })
 }
 const req = (r) => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error) })
-
-export const newId = (p) => `${p}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
-
-// A record: { id, type: 'answer' | 'note' | 'part_ok' | 'question', at (ms), model, ...fields, photos: [photoId] }
-export async function save(rec) {
-  rec = { ...rec, at: rec.at || Date.now(), updated: Date.now(), synced: false }
-  await tx(STORE, 'readwrite', (s) => s.put(rec))
-  push(rec)
-  return rec
+const urls = new Map()
+const local = {
+  async all() { return ((await tx(STORE, 'readonly', (s) => req(s.getAll()))) || []).map((r) => ({ who: getName() || 'You', ...r, mine: true })) },
+  async save(rec, photos) {
+    for (const p of photos) await tx(PHOTOS, 'readwrite', (s) => s.put({ id: p.id, blob: p.blob }))
+    const old = await tx(STORE, 'readonly', (s) => req(s.get(rec.id)))
+    const { website, ...clean } = rec
+    const out = { ...clean, at: old?.at || Date.now(), updated: Date.now() }
+    await tx(STORE, 'readwrite', (s) => s.put(out))
+    return { ...out, mine: true }
+  },
+  async remove(id) {
+    const rec = await tx(STORE, 'readonly', (s) => req(s.get(id)))
+    await tx(STORE, 'readwrite', (s) => s.delete(id))
+    for (const p of rec?.photos || []) await tx(PHOTOS, 'readwrite', (s) => s.delete(p))
+  },
+  async photoURL(id) {
+    if (urls.has(id)) return urls.get(id)
+    const p = await tx(PHOTOS, 'readonly', (s) => req(s.get(id))); if (!p) return null
+    const u = URL.createObjectURL(p.blob); urls.set(id, u); return u
+  },
 }
+
+const B = SHARED ? remote : local
+
+// ------------------------------------------------------------------ what the app calls
+// Everyone's records, oldest first; notes numbered 1, 2, 3 in that order (the pin numbers everyone sees).
 export async function all() {
-  const rows = await tx(STORE, 'readonly', (s) => req(s.getAll()))
-  return (rows || []).sort((a, b) => a.at - b.at)
+  try {
+    const rows = (await B.all()).sort((a, b) => a.at - b.at)
+    let n = 0; for (const r of rows) if (r.type === 'note') r.n = ++n
+    state.loadError = false
+    return rows
+  } catch (e) { state.loadError = true; throw e }
 }
-export async function remove(id) {
-  const rec = await tx(STORE, 'readonly', (s) => req(s.get(id)))
-  await tx(STORE, 'readwrite', (s) => s.delete(id))
-  for (const p of rec?.photos || []) await tx(PHOTOS, 'readwrite', (s) => s.delete(p))
-  if (REMOTE_URL) fetch(`${REMOTE_URL}/records/${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => {})
+// rec needs id, type and who. photos: [{ id, blob }] from preparePhoto, uploaded now (so a cancelled note leaves nothing).
+export async function save(rec, photos = []) {
+  if (!state.postingEnabled) throw new SaveError(403, 'Feedback is closed for now.')
+  return B.save({ ...rec, photos: photos.map((p) => p.id) }, photos)
 }
+export const remove = (id) => B.remove(id)
+export const photoURL = (id) => B.photoURL(id)
 
-// Photos: downscaled on the device to about 1600 px on the long side, JPEG, before they are stored.
-export async function addPhoto(file, maxSide = 1600) {
+// Photos: downscaled on the device to about 1600 px on the long side, JPEG. Nothing is stored until the note is saved.
+export async function preparePhoto(file, maxSide = 1600) {
   const bmp = await (window.createImageBitmap ? createImageBitmap(file, { imageOrientation: 'from-image' }) : loadImg(file))
   const k = Math.min(1, maxSide / Math.max(bmp.width, bmp.height))
   const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k)
   c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height)
   const blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.84))
-  const id = newId('photo')
-  await tx(PHOTOS, 'readwrite', (s) => s.put({ id, blob, w: c.width, h: c.height, name: file.name || 'photo.jpg', synced: false }))
-  pushPhoto(id, blob)
-  return id
+  return { id: `${crypto.randomUUID()}.jpg`, blob, url: URL.createObjectURL(blob) }
 }
 function loadImg(file) {
   return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file) })
-}
-export async function photo(id) { return tx(PHOTOS, 'readonly', (s) => req(s.get(id))) }
-export async function dropPhoto(id) { await tx(PHOTOS, 'readwrite', (s) => s.delete(id)) }
-
-// One file with everything, photos embedded, for "Send to Joe".
-export async function exportFile(meta = {}) {
-  const records = await all(); const photos = {}
-  for (const r of records) for (const p of r.photos || []) {
-    const ph = await photo(p); if (ph) photos[p] = await blobToDataURL(ph.blob)
-  }
-  const out = { what: 'Essick rocker review: answers, notes and photos', exported: new Date().toISOString(), ...meta,
-    records: records.map(({ synced, ...r }) => r), photos }
-  const day = new Date().toISOString().slice(0, 10)
-  return new File([JSON.stringify(out, null, 1)], `essick-rocker-notes-${day}.json`, { type: 'application/json' })
-}
-const blobToDataURL = (b) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(b) })
-
-// ------------------------------------------------------------------ remote (off while REMOTE_URL is null)
-async function push(rec) {
-  if (!REMOTE_URL) return
-  try {
-    const { synced, ...body } = rec
-    const r = await fetch(`${REMOTE_URL}/records/${encodeURIComponent(rec.id)}`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
-    if (r.ok) await tx(STORE, 'readwrite', (s) => s.put({ ...rec, synced: true }))
-  } catch { /* offline: retried by syncAll() on the next load */ }
-}
-async function pushPhoto(id, blob) {
-  if (!REMOTE_URL) return
-  try {
-    const r = await fetch(`${REMOTE_URL}/photos/${encodeURIComponent(id)}`, { method: 'PUT', headers: { 'content-type': 'image/jpeg' }, body: blob })
-    if (r.ok) { const p = await photo(id); if (p) await tx(PHOTOS, 'readwrite', (s) => s.put({ ...p, synced: true })) }
-  } catch { /* retried */ }
-}
-export async function syncAll() {
-  if (!REMOTE_URL) return
-  const photos = await tx(PHOTOS, 'readonly', (s) => req(s.getAll()))
-  for (const p of photos || []) if (!p.synced) await pushPhoto(p.id, p.blob)
-  for (const r of await all()) if (!r.synced) await push(r)
 }
