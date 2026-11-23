@@ -4,7 +4,7 @@
 // The URL and the publishable (anon) key are public by design: the database only lets that key call the two
 // comment functions, which enforce the limits and spam rules.
 const SUPABASE_URL = 'https://cvfejlnfytsyswpkyamt.supabase.co'
-const SUPABASE_KEY = '' // the publishable / anon public key (never the secret / service_role key)
+const SUPABASE_KEY = 'sb_publishable_T53HgBKsth7uv4euw3vMpA_QyzO9se5' // the publishable / anon public key (never the secret / service_role key)
 const LIVE_HOSTS = ['masterminnich.github.io'] // the preview never touches the real comments
 const NAME_KEY = 'er.comments.name'
 const MAX_NAME = 60, MAX_BODY = 2000
