@@ -21,7 +21,8 @@ button { font: inherit; color: inherit; cursor: pointer }
 .tab:hover { color: var(--ink) }
 .tab.on { color: var(--ink); border-color: var(--teal) }
 .tab small { font: 500 14px var(--mono); color: var(--mute); background: var(--panel); padding: 3px 9px; border-radius: 99px }
-.notes { flex: 1 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 0; background: none; border: 0; font-weight: 600; font-size: 17px; white-space: nowrap; height: 56px }
+.topr { flex: 1 0 0; display: flex; justify-content: flex-end; align-items: center; gap: 26px; min-width: 0 }
+.notes { flex: none; display: flex; align-items: center; gap: 0; background: none; border: 0; font-weight: 600; font-size: 17px; white-space: nowrap; height: 56px }
 .notes b { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 99px; background: var(--ink); color: #fff; font: 500 15px var(--mono); margin-right: 8px }
 .notes:hover span { text-decoration: underline }
 
