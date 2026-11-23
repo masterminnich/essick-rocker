@@ -10,9 +10,10 @@ Joints (chair frame mm, right side; left = mirror):
                      a second Domino driven in from BEHIND across the seam between the leg's inner face and the seat's back edge
                      (seen from behind: parts/joints.json back_leg_rear)
   legs / rockers     feet carried down onto the rocker top and cut to its curve (hidden fastener not modelled: not seen)
+  (every coped end is made FLUSH by fill_to(): swept along its own axis into the other part, then cut by it; Joe, 2026-11-23)
   arm / back leg     arm end coped to the leg; a Domino driven in from BEHIND through the leg into the arm's end (its end shows on
                      the leg's rear face: parts/joints.json back_leg_rear; how far it goes into the arm is ASSUMED)
-  arm / front leg    leg top cut to the arm underside by build_model.py; a hidden vertical 10 mm Domino along the leg axis, from the
+  arm / front leg    leg top cut to the arm underside by build_model.py, then carried up and coped flush to it (fill_to); a hidden vertical 10 mm Domino along the leg axis, from the
                      leg top into the arm (ASSUMED: parts/joints.json; the oval on the left arm top is not over the leg, see there)
   crest / back legs  crest ends coped to the legs (hidden joint not modelled)
   slats              their stub ends become tenons; mortises cut into the seat and the crest
@@ -48,6 +49,63 @@ def unite(name, extra, why):
 
 def shifted(m, d):
     c = m.copy(); c.apply_translation(d); return c
+
+
+def fill_to(name, other, why, reach=12.0):
+    """Make the end of `name` sit FLUSH on `other` over its whole section (Joe, 2026-11-23: v24's arm end touched the curved back
+    leg along its top and stood up to 6 mm off it along its bottom; a plain cope `name - other` only removes wood, it never fills).
+    1. axis: the member's own direction at its end (the direction its side faces run in, 8-50 mm before the first contact), pointing at `other`
+    2. in the plane square to that axis: the member's section (a thin slab just before the first contact, 0.15 mm inset) intersected
+       with the outline of the other part's FACE that the end meets (its triangles facing back along the axis), so nothing is added
+       where that face is not behind (e.g. the crest's top above the leg's top) and nothing runs on beside a slanted side face
+    3. each face triangle's patch extruded along the axis from the slab to that triangle (faces more than `reach` mm past the last
+       contact are left alone), added to the member
+    4. the member cut by `other` (0.02 mm deep) and its main body kept: the end now IS the other part's face wherever it meets it."""
+    from scipy.spatial import cKDTree
+    A, B = M[name], M[other]
+    P, _ = trimesh.sample.sample_surface_even(A, 200000, radius=0.5, seed=1)
+    Q, _ = trimesh.sample.sample_surface_even(B, 200000, radius=0.5, seed=2); d, _ = cKDTree(Q).query(P); C = P[d < 1.0]
+    assert len(C) > 50, f"fill_to: {name} does not touch {other}"
+    cc = C.mean(0); near = P[np.linalg.norm(P - cc, axis=1) < 150]
+    _, _, vt = np.linalg.svd(near - near.mean(0), full_matrices=False); ax = vt[0] * np.sign(vt[0] @ (cc - near.mean(0)))   # rough, towards the joint
+
+    # the LOCAL direction at the end: the direction the member's side faces run in, i.e. the one most nearly square to all their
+    # normals, from samples 8-50 mm before the first contact (end faces and the other part's neighbourhood excluded)
+    P, fi = trimesh.sample.sample_surface_even(A, 200000, radius=0.5, seed=1); N = A.face_normals[fi]   # same seed: same points, now with faces
+    for _ in range(2):
+        sp = P @ ax; s0 = float((C @ ax).min()); band = (sp > s0 - 50) & (sp < s0 - 8) & (np.linalg.norm(P - cc, axis=1) < 110) & (np.abs(N @ ax) < 0.5)
+        _, _, vt = np.linalg.svd(N[band], full_matrices=False); ax = vt[2] * np.sign(vt[2] @ ax)
+    s = C @ ax; s0, s1 = float(s.min()), float(s.max())
+    slab = A.slice_plane(ax * (s0 - 4.0), ax, cap=True).slice_plane(ax * (s0 - 1.0), -ax, cap=True)
+    parts = slab.split(only_watertight=False); slab = min(parts, key=lambda m: np.linalg.norm(m.centroid - cc)) if len(parts) > 1 else slab   # the member's own end only
+    from shapely.geometry import Polygon, MultiPoint
+    u = np.cross(ax, [0, 0, 1.0] if abs(ax[2]) < 0.9 else [1.0, 0, 0]); u /= np.linalg.norm(u); v = np.cross(ax, u)   # plane square to the axis
+    to2 = lambda X: np.c_[X @ u, X @ v]
+    sec2 = MultiPoint(to2(np.asarray(slab.vertices))).convex_hull.buffer(-0.15)           # the member's section, 0.15 mm inset (no coincident skins)
+    # the other part's FACE that the end meets: its triangles facing back along the axis, near the joint, projected along the axis.
+    # (Its side faces are left out: a ray grazing a slanted side face would run on beside the part and leave a flap.)
+    T = B.triangles; nB = B.face_normals; ctr = T.mean(1); sc_ = ctr @ ax
+    face = (nB @ ax < -0.3) & (sc_ > s0 - 10) & (sc_ < s1 + reach) & (np.linalg.norm(ctr - cc, axis=1) < 120)
+    # each face triangle's patch of the section is extruded from the slab to just past that triangle (0.5 mm, cut off again below),
+    # so every ray of new wood ends ON the face it meets; where the face is out of reach nothing is added
+    R4 = np.eye(4); R4[:3, 0], R4[:3, 1], R4[:3, 2], R4[:3, 3] = u, v, ax, ax * (s0 - 4.0)
+    pieces = []
+    for t in T[face]:
+        g = sec2.intersection(Polygon(to2(t)).buffer(0.05))
+        if g.is_empty or g.area < 0.05: continue
+        depth = float((t @ ax).max()) + 0.5 - (s0 - 4.0)
+        if depth < 1.0: continue
+        for gg in ([g] if g.geom_type == "Polygon" else [x for x in getattr(g, "geoms", []) if x.geom_type == "Polygon"]):
+            if gg.area >= 0.05: pieces.append(trimesh.creation.extrude_polygon(gg, depth))
+    if not pieces: return
+    fill = trimesh.boolean.union(pieces, engine="manifold"); fill.apply_transform(R4)
+    Bc = trimesh.boolean.union([B, shifted(B, -ax * 0.02)], engine="manifold")              # cut 0.02 mm deep: two coincident faces triangulated
+    before = vol(A); res = trimesh.boolean.difference([trimesh.boolean.union([A, fill], engine="manifold"), Bc], engine="manifold")   # differently read as a film of overlap
+    M[name] = max(res.split(only_watertight=False), key=lambda m: abs(float(m.volume)))   # the member itself (any fill left beyond the other part is dropped)
+    rep["ops"].append({"part": name, "net_cm3": round(vol(M[name]) - before, 2), "axis": ax.round(3).tolist(),
+                       "contact_span_mm": round(s1 - s0, 1), "why": why})
+    rep["joints"][f"{name}~{other}_flush"] = {"method": "fill_to: the member's section where the other part's face lies ahead, extruded along the member's axis, then coped",
+                                              "axis": ax.round(3).tolist()}
 
 
 for k in M: M[k] = fixed(M[k])
@@ -119,7 +177,10 @@ for side, S in ((1, "R"), (-1, "L")):
         cut(L, wide, f"{L} foot cut to the rocker's top surface across the full width (contact face; the fastener is hidden and NOT modelled)")
         rep["joints"][f"{L}_foot"] = {"leg_axis": a.round(3).tolist(), "method": "swept along the leg axis, cut by the widened rocker"}
     # 4 arm coped to the back leg
-    cut(AR, M[BL], f"{AR} end coped to {BL} (it ran 4 mm into the leg; the Domino through the leg into the arm's end is added in 5c)")
+    fill_to(AR, BL, f"{AR} end flush on {BL}: swept along the arm into the leg and coped to it (v24 touched along the top only, "
+                    "up to 6 mm open along the bottom; the Domino through the leg into the arm's end is added in 5c)")
+    fill_to(FL, AR, f"{FL} top flush under {AR}: the leg carried up its own axis and coped to the arm's underside (v24's planar top "
+                    "stood 0.5-1.5 mm off the curved underside at its front and back)")
     cut(AR, M[FL], f"{AR} underside vs {FL} top: contact face")
     # 5 Dominos
     for L, key, base_depth in ((FL, "front_leg", None), (BL, "back_leg", 25.0)):
@@ -181,7 +242,7 @@ for side, S in ((1, "R"), (-1, "L")):
                                "bodies": int(len(dom.split(only_watertight=False))), "mm_of_the_end_in_the_leg": round(end_in_leg, 1),
                                "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"}
 # 6 crest coped to the back legs; slats into mortises in the seat and the crest
-for L in ("BLEG_R", "BLEG_L"): cut("CREST", M[L], f"crest end coped to {L} (the crest's joint into the leg is hidden and NOT modelled)")
+for L in ("BLEG_R", "BLEG_L"): fill_to("CREST", L, f"crest end flush on {L}: swept along the crest into the leg and coped to it (the crest's joint into the leg is hidden and NOT modelled)")
 for s_ in ("SLAT_C", "SLAT_R", "SLAT_L"):
     cut("SEAT", M[s_], f"mortise for {s_} in the seat (depth = how far the traced slat runs in; NOT measured)")
     cut("CREST", M[s_], f"mortise for {s_} in the crest (depth = how far the traced slat runs in; NOT measured)")
@@ -191,6 +252,15 @@ rep["open"] = ["arm / front leg: hidden; modelled as an ASSUMED vertical 10 mm D
                "back leg / seat from behind: at the rear the real seam sits 2.5-3.4 mm inboard of the model leg's inner face, so the model's rear Domino at the seat has less of its end in the leg than the photos show (photos: 14.2 of 24 mm; model: 'mm_of_the_end_in_the_leg' of DOMINO_RS*); leg placement, not changed",
                "Domino depth not visible; slat mortise depth not measured",
                "leg feet sit about 3 mm off the rocker faces in x (rocker width is a tape value, 31 mm); not changed"]
+# 7 debris: booleans of near-coincident faces leave zero-volume sheets (v24: 10 on each back leg; the flush fills add a few on the
+#   arms and crest). They render as loose shards beside the joints. Keep only bodies with real volume (> 0.01 cm3).
+for k in list(M):
+    bodies = M[k].split(only_watertight=False)
+    if len(bodies) < 2: continue
+    keep = [b for b in bodies if abs(float(b.volume)) > 10.0]
+    if len(keep) < len(bodies):
+        M[k] = trimesh.util.concatenate(keep) if len(keep) > 1 else keep[0]
+        rep["ops"].append({"part": k, "why": f"dropped {len(bodies) - len(keep)} zero-volume debris sheets left by the booleans"})
 out = trimesh.Scene()
 for k, m in M.items(): out.add_geometry(m, node_name=k, geom_name=k)
 out.export(dst)

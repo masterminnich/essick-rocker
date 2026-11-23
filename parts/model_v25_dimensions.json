@@ -1,0 +1,1050 @@
+{
+ "model": "parts/model_v25.glb",
+ "made_by": "tools/dimensions.py",
+ "frame": "chair frame, mm: +X chair's right, +Y forward, +Z up, table top Z = 0",
+ "rule": "value_mm is measured on the model between p1 and p2 (kind 'height': p1's z); file_value_mm is the parts file's own number; mirror true = drawn on the left twin with x -> -x; kind 'radius' has p1 = p2 = the corner and value 0 = sharp in the model",
+ "sources": {
+  "taped": "a tape reading backs it",
+  "photos": "worked out from the photos (tolerance_mm)",
+  "guess": "our guess: no photo or tape settles it"
+ },
+ "groups": {
+  "1": "Check these first \u00b7 we guessed",
+  "2": "Tape and photos disagree",
+  "3": "From photos and tape"
+ },
+ "dimensions": [
+  {
+   "id": "arm_front_thickness",
+   "part": "ARM_R",
+   "name": "Arm thickness, front end",
+   "kind": "length",
+   "p1": [
+    314.92,
+    500.0,
+    663.87
+   ],
+   "p2": [
+    314.92,
+    500.0,
+    642.66
+   ],
+   "value_mm": 21.21,
+   "source": "guess",
+   "tolerance_mm": 4.2,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/arm_underside.json",
+   "file_key": "design.h_outer_mm at y 500",
+   "file_value_mm": 21.2,
+   "agrees_mm": 0.01,
+   "mirror": true,
+   "note": "Outside face, straight up and down, about 1 1/4 in. back from the front tip. No photo sees the front end, so the model carries the line straight on.",
+   "reading": "M6",
+   "look_from": [
+    1,
+    0.25,
+    0.1
+   ],
+   "order": 1
+  },
+  {
+   "id": "rocker_thickness_mid",
+   "part": "ROCKER_R",
+   "name": "Rocker thickness, between the legs",
+   "kind": "length",
+   "p1": [
+    256.51,
+    335.81,
+    23.81
+   ],
+   "p2": [
+    220.77,
+    341.17,
+    24.92
+   ],
+   "value_mm": 36.16,
+   "source": "photos",
+   "tolerance_mm": 1.6,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/rocker_section.json",
+   "file_key": "design.T_mm at u 340",
+   "file_value_mm": 36.16,
+   "agrees_mm": -0.0,
+   "mirror": true,
+   "note": "Across the rocker, outside face to inside face, about a foot in front of the back leg. The photos may read the eased corners short; one caliper reading settles it.",
+   "reading": "M12",
+   "look_from": [
+    0.35,
+    0.2,
+    1
+   ],
+   "order": 2
+  },
+  {
+   "id": "seat_back_edge_round",
+   "part": "SEAT",
+   "name": "Seat back edge between the slats: how round?",
+   "kind": "radius",
+   "p1": [
+    150.0,
+    17.24,
+    332.06
+   ],
+   "p2": [
+    150.0,
+    17.24,
+    332.06
+   ],
+   "value_mm": 0.0,
+   "source": "guess",
+   "tolerance_mm": null,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/seat_back.json + parts/edge_radii.json",
+   "file_key": "design.top_arris at |x| 150; families.seat_top_back_edge (r >= 4-5 or roll-off; M13)",
+   "file_value_mm": 0.0,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "Where the seat top meets its back face, between a side slat and the back leg. The model has a sharp corner; the photos hint at a round of 3/16 in. or more, or a top that rolls off. A coin held in the corner tells.",
+   "reading": "M13",
+   "look_from": [
+    0.2,
+    -1,
+    0.9
+   ],
+   "surface_check_mm": 0.67,
+   "order": 3
+  },
+  {
+   "id": "arm_inner_thickness_back",
+   "part": "ARM_R",
+   "name": "Arm thickness, inside face, near the back leg",
+   "kind": "length",
+   "p1": [
+    214.38,
+    150.0,
+    551.27
+   ],
+   "p2": [
+    214.38,
+    150.0,
+    518.4
+   ],
+   "value_mm": 32.87,
+   "source": "photos",
+   "tolerance_mm": 3.6,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/arm_underside.json",
+   "file_key": "design.h_inner_mm at y 150",
+   "file_value_mm": 33.53,
+   "agrees_mm": -0.66,
+   "mirror": true,
+   "note": "Inside face (toward the seat), straight up and down. The photos see this face only from one angle; the left and right arms read differently.",
+   "reading": "M15",
+   "look_from": [
+    -1,
+    0.3,
+    0.15
+   ],
+   "order": 4
+  },
+  {
+   "id": "arm_inner_thickness_front",
+   "part": "ARM_R",
+   "name": "Arm thickness, inside face, near the front",
+   "kind": "length",
+   "p1": [
+    237.72,
+    400.0,
+    636.7
+   ],
+   "p2": [
+    237.72,
+    400.0,
+    614.55
+   ],
+   "value_mm": 22.15,
+   "source": "photos",
+   "tolerance_mm": 1.9,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/arm_underside.json",
+   "file_key": "design.h_inner_mm at y 400",
+   "file_value_mm": 23.05,
+   "agrees_mm": -0.9,
+   "mirror": true,
+   "note": "Inside face (toward the seat), straight up and down. The photos see this face only from one angle; the left and right arms read differently.",
+   "reading": "M15",
+   "look_from": [
+    -1,
+    0.3,
+    0.15
+   ],
+   "order": 5
+  },
+  {
+   "id": "seat_front_corners",
+   "part": "SEAT",
+   "name": "Seat width across the front corners",
+   "kind": "length",
+   "p1": [
+    268.08,
+    515.0,
+    420.7
+   ],
+   "p2": [
+    -268.08,
+    515.0,
+    420.7
+   ],
+   "value_mm": 536.16,
+   "source": "photos",
+   "tolerance_mm": 4.0,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/seat_front.json",
+   "file_key": "design.corner.abs_x (x2)",
+   "file_value_mm": 536.0,
+   "agrees_mm": 0.16,
+   "mirror": true,
+   "note": "Outside to outside of the seat, just in front of the front legs, a little below the top. The left side traced 3 mm narrower than the model there; the right would not solve.",
+   "reading": "seat front corner",
+   "look_from": [
+    0.1,
+    1,
+    0.5
+   ],
+   "order": 6
+  },
+  {
+   "id": "domino_end",
+   "part": "DOMINO_FR",
+   "name": "Domino end on the front leg, long way",
+   "kind": "length",
+   "p1": [
+    282.0,
+    479.87,
+    397.57
+   ],
+   "p2": [
+    282.0,
+    456.53,
+    392.03
+   ],
+   "value_mm": 23.99,
+   "source": "guess",
+   "tolerance_mm": 1.0,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/dominos.json",
+   "file_key": "design.tenon_section_mm[0]",
+   "file_value_mm": 24.0,
+   "agrees_mm": -0.01,
+   "mirror": true,
+   "note": "The Domino's end where it shows on the outside of the front leg under the seat. The photos read 25-26 mm with the glue line; we took it as a 10 mm Festool Domino.",
+   "reading": "M11",
+   "look_from": [
+    1,
+    0.15,
+    0.1
+   ],
+   "order": 7
+  },
+  {
+   "id": "slat_thickness",
+   "part": "SLAT_C",
+   "name": "Centre slat thickness",
+   "kind": "length",
+   "p1": [
+    0.0,
+    -45.75,
+    637.84
+   ],
+   "p2": [
+    0.0,
+    -36.73,
+    642.16
+   ],
+   "value_mm": 10.0,
+   "source": "guess",
+   "tolerance_mm": 2.0,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/slats.json",
+   "file_key": "thickness_mm",
+   "file_value_mm": 10.0,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "Front face to back face, half way up. The photos only say 'about 10 mm'; it is the thickness of the bent lamination stack.",
+   "reading": "M4",
+   "look_from": [
+    1,
+    0.1,
+    0.2
+   ],
+   "order": 8
+  },
+  {
+   "id": "rocker_tail_round",
+   "part": "ROCKER_R",
+   "name": "Rocker tail tip: corner round, seen from above",
+   "kind": "radius",
+   "p1": [
+    136.09,
+    -484.78,
+    175.99
+   ],
+   "p2": [
+    136.09,
+    -484.78,
+    175.99
+   ],
+   "value_mm": 0.0,
+   "source": "photos",
+   "tolerance_mm": 0.6,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/edge_radii.json",
+   "file_key": "families.rocker_ends_in_plan",
+   "file_value_mm": 0.0,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "The model's tail tip is square. One photo reads its corners as rounds of about 2.8 mm (1/8 in.). A coin or a radius gauge tells.",
+   "reading": "M16",
+   "look_from": [
+    0.3,
+    -0.6,
+    1
+   ],
+   "photos_mm": 2.8,
+   "order": 9
+  },
+  {
+   "id": "arm_edge_round",
+   "part": "ARM_R",
+   "name": "Arm top outside edge: how round?",
+   "kind": "radius",
+   "p1": [
+    294.4,
+    300.0,
+    606.72
+   ],
+   "p2": [
+    294.4,
+    300.0,
+    606.72
+   ],
+   "value_mm": 0.0,
+   "source": "guess",
+   "tolerance_mm": null,
+   "group": 1,
+   "group_name": "Check these first \u00b7 we guessed",
+   "file": "parts/edge_radii.json",
+   "file_key": "families.arm (not measured (M16))",
+   "file_value_mm": 0.0,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "The arm's top outside corner. No photo shows it close enough; the model has it sharp.",
+   "reading": "M16",
+   "look_from": [
+    1,
+    0.2,
+    0.6
+   ],
+   "order": 10
+  },
+  {
+   "id": "crest_height",
+   "part": "CREST",
+   "name": "Crest rail height, back face",
+   "kind": "length",
+   "p1": [
+    -75.0,
+    -195.94,
+    1076.57
+   ],
+   "p2": [
+    -75.0,
+    -183.28,
+    1002.97
+   ],
+   "value_mm": 74.68,
+   "source": "photos",
+   "tolerance_mm": 1.6,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/crest.json",
+   "file_key": "edges.top_rear / bottom_rear design at x -75 (section.height_tape_check.model_at_x-75_mm)",
+   "file_value_mm": 74.7,
+   "agrees_mm": -0.02,
+   "mirror": false,
+   "note": "Top edge to bottom edge on the back face, in the gap between the left slat and the centre slat. The tape (photo 1555) read 3 1/16 in.; the photos say less. A tape hooked over a rounded edge reads long.",
+   "reading": "M3",
+   "look_from": [
+    -0.2,
+    -1,
+    0.15
+   ],
+   "tape_mm": 77.5,
+   "order": 11
+  },
+  {
+   "id": "slat_width_top",
+   "part": "SLAT_C",
+   "name": "Centre slat width, just under the crest",
+   "kind": "length",
+   "p1": [
+    -50.13,
+    -163.06,
+    988.6
+   ],
+   "p2": [
+    50.13,
+    -163.06,
+    988.6
+   ],
+   "value_mm": 100.26,
+   "source": "photos",
+   "tolerance_mm": 1.0,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/model_v25_params.json (from parts/slats.json)",
+   "file_key": "parts.slats.centre_width_mm.under_crest",
+   "file_value_mm": 99.27,
+   "agrees_mm": 0.99,
+   "mirror": false,
+   "note": "Across the centre slat about 5/8 in. below the crest. The tape (photo 1553) read 3 7/8 in.; the edge traces say a little wider.",
+   "reading": "M5",
+   "look_from": [
+    0,
+    -1,
+    0.1
+   ],
+   "tape_mm": 98.3,
+   "order": 12
+  },
+  {
+   "id": "rocker_length_L",
+   "part": "ROCKER_L",
+   "name": "Left rocker, tail tip to front top corner",
+   "kind": "length",
+   "p1": [
+    -136.09,
+    -484.78,
+    175.99
+   ],
+   "p2": [
+    -300.59,
+    617.47,
+    123.49
+   ],
+   "value_mm": 1115.7,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/model_v25_params.json (from parts/rocker_ends.json)",
+   "file_key": "parts.rocker.tail_tip_to_nose_top_corner_mm",
+   "file_value_mm": 1115.7,
+   "agrees_mm": -0.0,
+   "mirror": false,
+   "note": "Straight line, outside face, from the tip of the tail to the top corner of the front end. The model uses one shape for both rockers; this rocker's own photos say 1118.6 mm. It is also the one check on the scale of the whole model.",
+   "reading": "M8",
+   "look_from": [
+    -1,
+    0,
+    0.1
+   ],
+   "photos_this_side_mm": 1118.6,
+   "order": 13
+  },
+  {
+   "id": "rocker_length_R",
+   "part": "ROCKER_R",
+   "name": "Right rocker, tail tip to front top corner",
+   "kind": "length",
+   "p1": [
+    136.09,
+    -484.78,
+    175.99
+   ],
+   "p2": [
+    300.59,
+    617.47,
+    123.49
+   ],
+   "value_mm": 1115.7,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/model_v25_params.json (from parts/rocker_ends.json)",
+   "file_key": "parts.rocker.tail_tip_to_nose_top_corner_mm",
+   "file_value_mm": 1115.7,
+   "agrees_mm": -0.0,
+   "mirror": false,
+   "note": "Straight line, outside face, from the tip of the tail to the top corner of the front end. The model uses one shape for both rockers; this rocker's own photos say 1112.3 mm. It is also the one check on the scale of the whole model.",
+   "reading": "M8",
+   "look_from": [
+    1,
+    0,
+    0.1
+   ],
+   "photos_this_side_mm": 1112.3,
+   "order": 14
+  },
+  {
+   "id": "seat_side_height_L",
+   "part": "SEAT",
+   "name": "Seat side edge off the table, left, behind the front leg",
+   "kind": "height",
+   "p1": [
+    -267.95,
+    434.0,
+    411.53
+   ],
+   "p2": [
+    -267.95,
+    434.0,
+    0.0
+   ],
+   "value_mm": 411.53,
+   "source": "photos",
+   "tolerance_mm": 1.5,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/seat_edge.json",
+   "file_key": "design.top_z_of_y at y 434 (fit beyond its valid y 110-400)",
+   "file_value_mm": 411.03,
+   "agrees_mm": 0.5,
+   "mirror": false,
+   "note": "Chair standing on the flat bench: bench top up to the top corner of the seat's side edge, just behind the front leg. The photos say the right side sits 3/16 in. lower than the left; the model uses the average.",
+   "reading": "M9",
+   "look_from": [
+    -1,
+    0.4,
+    0.1
+   ],
+   "photos_right_minus_left_mm": [
+    -5.9,
+    -3.7
+   ],
+   "order": 15
+  },
+  {
+   "id": "seat_side_height_R",
+   "part": "SEAT",
+   "name": "Seat side edge off the table, right, behind the front leg",
+   "kind": "height",
+   "p1": [
+    267.95,
+    434.0,
+    411.53
+   ],
+   "p2": [
+    267.95,
+    434.0,
+    0.0
+   ],
+   "value_mm": 411.53,
+   "source": "photos",
+   "tolerance_mm": 1.5,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/seat_edge.json",
+   "file_key": "design.top_z_of_y at y 434 (fit beyond its valid y 110-400)",
+   "file_value_mm": 411.03,
+   "agrees_mm": 0.5,
+   "mirror": false,
+   "note": "Chair standing on the flat bench: bench top up to the top corner of the seat's side edge, just behind the front leg. The photos say the right side sits 3/16 in. lower than the left; the model uses the average.",
+   "reading": "M9",
+   "look_from": [
+    1,
+    0.4,
+    0.1
+   ],
+   "photos_right_minus_left_mm": [
+    -5.9,
+    -3.7
+   ],
+   "order": 16
+  },
+  {
+   "id": "rocker_top_nose",
+   "part": "ROCKER_R",
+   "name": "Rocker top edge off the table, front end",
+   "kind": "height",
+   "p1": [
+    274.39,
+    620.0,
+    124.3
+   ],
+   "p2": [
+    274.39,
+    620.0,
+    0.0
+   ],
+   "value_mm": 124.3,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/rocker_profile.json + parts/rocker_ends.json (top outline; HUB_HANDOFF.md M14 quotes the model value)",
+   "file_key": "z at y 620",
+   "file_value_mm": 124.6,
+   "agrees_mm": -0.3,
+   "mirror": true,
+   "note": "Chair on the flat bench: bench top up to the rocker's top edge at the front top corner. The photos cannot fix the rocker's tilt better than about 1/8 in. over its length; both rockers, please.",
+   "reading": "M14",
+   "look_from": [
+    1,
+    0,
+    0.05
+   ],
+   "order": 17
+  },
+  {
+   "id": "rocker_top_tail",
+   "part": "ROCKER_R",
+   "name": "Rocker top edge off the table, near the tail",
+   "kind": "height",
+   "p1": [
+    113.53,
+    -435.0,
+    185.24
+   ],
+   "p2": [
+    113.53,
+    -435.0,
+    0.0
+   ],
+   "value_mm": 185.24,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 2,
+   "group_name": "Tape and photos disagree",
+   "file": "parts/rocker_profile.json + parts/rocker_ends.json (top outline; HUB_HANDOFF.md M14 quotes the model value)",
+   "file_key": "z at y -435",
+   "file_value_mm": 185.4,
+   "agrees_mm": -0.16,
+   "mirror": true,
+   "note": "Chair on the flat bench: bench top up to the rocker's top edge about 2 in. in from the tail tip. The photos cannot fix the rocker's tilt better than about 1/8 in. over its length; both rockers, please.",
+   "reading": "M14",
+   "look_from": [
+    1,
+    0,
+    0.05
+   ],
+   "order": 18
+  },
+  {
+   "id": "seat_front_thickness",
+   "part": "SEAT",
+   "name": "Seat front edge thickness, beside the middle",
+   "kind": "length",
+   "p1": [
+    10.0,
+    535.6,
+    423.1
+   ],
+   "p2": [
+    10.0,
+    535.6,
+    384.3
+   ],
+   "value_mm": 38.8,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/seat_front_face.json",
+   "file_key": "design.face_height_top_of_roll_to_bottom_arris_mm at |x| 10",
+   "file_value_mm": 38.8,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "Straight up the front face, 3/8 in. to one side of the point in the middle of the seat front: bottom corner to the top of the rolled edge.",
+   "reading": "M1",
+   "look_from": [
+    0.25,
+    1,
+    0.1
+   ],
+   "order": 19
+  },
+  {
+   "id": "seat_side_thickness",
+   "part": "SEAT",
+   "name": "Seat side edge thickness, half way back",
+   "kind": "length",
+   "p1": [
+    255.97,
+    250.0,
+    374.13
+   ],
+   "p2": [
+    255.97,
+    250.0,
+    331.96
+   ],
+   "value_mm": 42.16,
+   "source": "photos",
+   "tolerance_mm": 3.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/seat_edge.json",
+   "file_key": "edge_thickness.vertical_top_to_bottom_arris_mm.mean (design top_z - bottom_z at y 250)",
+   "file_value_mm": 42.05,
+   "agrees_mm": 0.11,
+   "mirror": true,
+   "note": "On the side of the seat half way between the legs, straight up: from the bottom corner of the under-bevel to the top corner.",
+   "reading": "M2",
+   "look_from": [
+    1,
+    0.25,
+    -0.15
+   ],
+   "order": 20
+  },
+  {
+   "id": "crest_top_height",
+   "part": "CREST",
+   "name": "Top of the crest off the table, in the middle",
+   "kind": "height",
+   "p1": [
+    0.0,
+    -170.37,
+    1082.67
+   ],
+   "p2": [
+    0.0,
+    -170.37,
+    0.0
+   ],
+   "value_mm": 1082.67,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/crest.json + model params overall.bbox_max_mm",
+   "file_key": "highest point of the crest at x 0 (key_points.top_centre_z is the REAR arris, 1078.5)",
+   "file_value_mm": 1082.7,
+   "agrees_mm": -0.03,
+   "mirror": false,
+   "note": "Chair on the flat bench: bench top up to the highest point of the crest rail in the middle. The tallest number on the chair, and a check on the scale of the whole model.",
+   "reading": "M7",
+   "look_from": [
+    0.3,
+    1,
+    0.15
+   ],
+   "order": 21
+  },
+  {
+   "id": "seat_scallop",
+   "part": "SEAT",
+   "name": "Seat front: depth of the hollow",
+   "kind": "length",
+   "p1": [
+    126.0,
+    514.4,
+    402.2
+   ],
+   "p2": [
+    126.22,
+    535.68,
+    402.2
+   ],
+   "value_mm": 21.28,
+   "source": "photos",
+   "tolerance_mm": 2.5,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/seat_front.json",
+   "file_key": "design.front_y_of_abs_x (straightedge from pommel_tip to corner)",
+   "file_value_mm": 21.3,
+   "agrees_mm": -0.02,
+   "mirror": true,
+   "note": "Lay a straightedge across the front of the seat touching the middle point and one front corner; this is the biggest gap to the seat's front edge in the hollow.",
+   "reading": "M10",
+   "look_from": [
+    0.1,
+    0.5,
+    1
+   ],
+   "order": 22
+  },
+  {
+   "id": "rocker_thickness_tail",
+   "part": "ROCKER_R",
+   "name": "Rocker thickness near the tail tip",
+   "kind": "length",
+   "p1": [
+    138.98,
+    -465.62,
+    176.78
+   ],
+   "p2": [
+    109.61,
+    -461.22,
+    177.7
+   ],
+   "value_mm": 29.71,
+   "source": "taped",
+   "tolerance_mm": 1.6,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/rocker_section.json",
+   "file_key": "design.T_mm at u -470 (tape IMG_1493: 30.5)",
+   "file_value_mm": 29.71,
+   "agrees_mm": 0.0,
+   "mirror": true,
+   "note": "Across the rocker 5/8 to 1 in. from the tail tip. The tape (photo 1493) read 1 3/16 in.",
+   "look_from": [
+    0.4,
+    -0.5,
+    1
+   ],
+   "tape_mm": 30.5,
+   "order": 23
+  },
+  {
+   "id": "bleg_width_top",
+   "part": "BLEG_R",
+   "name": "Back leg width, just below the crest",
+   "kind": "length",
+   "p1": [
+    215.65,
+    -148.95,
+    985.0
+   ],
+   "p2": [
+    254.53,
+    -148.95,
+    985.0
+   ],
+   "value_mm": 38.88,
+   "source": "taped",
+   "tolerance_mm": 1.2,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/back_legs.json (via model params back_leg.width_across_mm) + tape IMG_1556",
+   "file_key": "tape_readings.csv IMG_1556 BLEG_L 1.55 in",
+   "file_value_mm": 39.37,
+   "agrees_mm": -0.49,
+   "mirror": true,
+   "note": "Across the back leg, seen from behind, just under the crest rail. The tape (photo 1556) read 1 9/16 in.",
+   "look_from": [
+    0.2,
+    -1,
+    0.1
+   ],
+   "tape_mm": 39.4,
+   "order": 24
+  },
+  {
+   "id": "fleg_thickness",
+   "part": "FLEG_R",
+   "name": "Front leg thickness, side to side, low down",
+   "kind": "length",
+   "p1": [
+    258.59,
+    530.35,
+    150.0
+   ],
+   "p2": [
+    289.25,
+    530.35,
+    150.0
+   ],
+   "value_mm": 30.66,
+   "source": "photos",
+   "tolerance_mm": 3.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/side_frame.json (via model params front_leg.thickness_across_mm.v150)",
+   "file_key": "parts.front_leg.thickness_across_mm.v150",
+   "file_value_mm": 30.31,
+   "agrees_mm": 0.35,
+   "mirror": true,
+   "note": "Across the front leg seen from the front, about 2 in. above the rocker. The tape (photo 1495) read 1 1/4 in. but could not tell the edge from its round.",
+   "look_from": [
+    0.2,
+    1,
+    0.1
+   ],
+   "tape_mm": 32.3,
+   "order": 25
+  },
+  {
+   "id": "crest_span",
+   "part": "CREST",
+   "name": "Crest length between the back legs",
+   "kind": "length",
+   "p1": [
+    -218.17,
+    -157.96,
+    1035.0
+   ],
+   "p2": [
+    218.17,
+    -157.96,
+    1035.0
+   ],
+   "value_mm": 436.33,
+   "source": "photos",
+   "tolerance_mm": 1.6,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/crest.json",
+   "file_key": "joints.left/right.leg_inner_face_x",
+   "file_value_mm": 436.7,
+   "agrees_mm": -0.37,
+   "mirror": false,
+   "note": "The crest rail's visible length: inside face of one back leg to the other, along the back of the crest near its bottom.",
+   "look_from": [
+    0,
+    -1,
+    0.15
+   ],
+   "order": 26
+  },
+  {
+   "id": "side_slat_width_top",
+   "part": "SLAT_R",
+   "name": "Side slat width, just under the crest",
+   "kind": "length",
+   "p1": [
+    84.06,
+    -160.03,
+    988.6
+   ],
+   "p2": [
+    136.64,
+    -160.03,
+    988.6
+   ],
+   "value_mm": 52.58,
+   "source": "photos",
+   "tolerance_mm": 1.6,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/slats.json (via model params)",
+   "file_key": "parts.slats.outer_width_mm.under_crest",
+   "file_value_mm": 52.29,
+   "agrees_mm": 0.29,
+   "mirror": true,
+   "note": "Across one side slat, about 5/8 in. below the crest, seen from behind.",
+   "look_from": [
+    0,
+    -1,
+    0.1
+   ],
+   "order": 27
+  },
+  {
+   "id": "seat_depth",
+   "part": "SEAT",
+   "name": "Seat depth in the middle, back edge to front point",
+   "kind": "length",
+   "p1": [
+    0.0,
+    -3.71,
+    324.8
+   ],
+   "p2": [
+    0.0,
+    536.12,
+    423.7
+   ],
+   "value_mm": 548.81,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/seat_back.json + parts/seat_front.json + parts/seat_front_face.json",
+   "file_key": "design.top_arris (y, z) at x 0 to design.pommel_tip.y at top_of_roll_z (x 8); straight line",
+   "file_value_mm": 549.68,
+   "agrees_mm": -0.87,
+   "mirror": false,
+   "note": "Down the middle of the seat, from its back edge (between the slats) straight to the point at the front, tape held straight, not following the dish.",
+   "look_from": [
+    1,
+    0.2,
+    0.5
+   ],
+   "surface_check_mm": 0.44,
+   "level_mm": 539.83,
+   "order": 28
+  },
+  {
+   "id": "overall_width",
+   "part": "ARM_R",
+   "name": "Width across the arms, outside to outside",
+   "kind": "length",
+   "p1": [
+    -315.66,
+    503.85,
+    643.61
+   ],
+   "p2": [
+    315.66,
+    503.85,
+    643.61
+   ],
+   "value_mm": 631.33,
+   "source": "photos",
+   "tolerance_mm": 2.0,
+   "group": 3,
+   "group_name": "From photos and tape",
+   "file": "parts/model_v25_params.json (from parts/arms.json)",
+   "file_key": "parts.overall.bbox_max_mm[0] - bbox_min_mm[0]",
+   "file_value_mm": 631.4,
+   "agrees_mm": -0.07,
+   "mirror": false,
+   "note": "The widest point of the chair: outside of one arm to the outside of the other.",
+   "look_from": [
+    0,
+    1,
+    0.6
+   ],
+   "order": 29
+  }
+ ],
+ "questions": [
+  {
+   "id": "slat_turn",
+   "name": "Side slats: turned or flat?",
+   "part": "SLAT_R",
+   "group": 1,
+   "m": "slat turn yes/no",
+   "file": "parts/slat_turn.json",
+   "file_key": "apply_in_build (false); design.turn_deg",
+   "model": "flat",
+   "choices": [
+    [
+     "flat",
+     "Flat, like the model"
+    ],
+    [
+     "turned",
+     "Turned toward the middle"
+    ]
+   ],
+   "turn_deg": [
+    7.15,
+    3.31
+   ],
+   "note": "Look down on the side slats. Are they flat across, like the model, or is each one turned so its outside edge comes forward (about 7 degrees at the seat, 3 1/2 at the top)?"
+  }
+ ],
+ "left_out": [
+  {
+   "id": "arm_length",
+   "name": "Arm length",
+   "reason": "The arm curves outward in plan, so a straight front-to-back line between two points on the arm does not follow it; arms_geom.json lengths.plan (463.9 mm) is measured along the curve. Check it against the arm template instead."
+  }
+ ]
+}
