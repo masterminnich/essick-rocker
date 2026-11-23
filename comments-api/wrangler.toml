@@ -1,0 +1,18 @@
+# ESSICK rocker comments Worker. Deployed by .github/workflows/deploy-comments.yml on every
+# push to main that touches comments-api/. Never `wrangler deploy` by hand.
+name = "essick-rocker-comments"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+account_id = "b08f3c47604042d9401f88f7dc4fa12a" # Marcella Foundation
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "essick-rocker-comments"
+# The deploy workflow creates the database the first time and fills in its id here
+# before deploying. Its own small database: not the Foundation's feedtahoe.
+database_id = "__D1_DATABASE_ID__"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true

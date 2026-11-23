@@ -1,9 +1,10 @@
 // Public comments. Stays hidden unless the comments API answers with a list: until the backend is live the page
 // must look exactly as it did. All comment text goes in with textContent, never innerHTML.
-const API = 'https://marcella-api.sean-b08.workers.dev/api/essick-rocker/comments'
+// Its own small Worker + D1 database, deployed from comments-api/ in this repo.
+const API = 'https://essick-rocker-comments.sean-b08.workers.dev/comments'
 const TURNSTILE_SITE_KEY = '' // set to the Cloudflare Turnstile site key to require a check; empty skips it
 const NAME_KEY = 'er.comments.name'
-const MAX_NAME = 80, MAX_BODY = 2000
+const MAX_NAME = 60, MAX_BODY = 2000
 
 const $ = (id) => document.getElementById(id)
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e }
@@ -16,7 +17,7 @@ async function load() {
     const r = await fetch(API, { signal: ctl.signal, headers: { accept: 'application/json' } })
     if (!r.ok) return null
     const j = await r.json()
-    return Array.isArray(j?.comments) ? j.comments : null
+    return Array.isArray(j?.comments) ? { comments: j.comments, postingEnabled: j.postingEnabled !== false } : null
   } catch { return null } finally { clearTimeout(t) }
 }
 
@@ -89,7 +90,7 @@ async function post(e) {
   if (r.status === 429) { status('warn', 'Slow down a little. Wait a minute, then post again.'); return }
   if (r.status === 403) { closeForm(); return }
   if (!r.ok) {
-    let msg = ''; try { msg = (await r.json())?.error || '' } catch {}
+    let msg = ''; try { const e = (await r.json())?.error; msg = typeof e === 'string' ? e : e?.message || '' } catch {}
     status('err', typeof msg === 'string' && msg ? msg : 'That did not post. Try again in a moment.'); return
   }
   let c = null; try { const j = await r.json(); c = j?.comment || (j?.id ? j : null) } catch {}
@@ -134,9 +135,9 @@ function close() {
 }
 
 async function init() {
-  const comments = await load()
-  if (!comments) return // backend not live (404, unreachable, bad answer): leave everything hidden
-  st.comments = comments
+  const got = await load()
+  if (!got) return // backend not live (404, unreachable, bad answer): leave everything hidden
+  st.comments = got.comments
   try { $('cmtName').value = localStorage.getItem(NAME_KEY) || '' } catch {}
   $('cmtName').maxLength = MAX_NAME; $('cmtBody').maxLength = MAX_BODY
   render()
@@ -148,7 +149,7 @@ async function init() {
   $('cmtForm').addEventListener('submit', post)
   $('cmtBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) post(e) })
   for (const id of ['cmtName', 'cmtBody']) $(id).addEventListener('input', () => { if ($('cmtStatus').classList.contains('warn') || $('cmtStatus').classList.contains('ok')) status('', '') })
-  loadTurnstile()
+  if (!got.postingEnabled) closeForm(); else loadTurnstile()
   if (location.hash === '#comments') open()
 }
 init()
