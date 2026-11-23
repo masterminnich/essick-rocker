@@ -1291,3 +1291,28 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - The review app picks the newest model with a dimensions file: a new model number needs `tools/py.sh tools/dimensions.py
   --model N` before the app moves to it.
 - NEXT: Joe reviews the PR; a remote store if he wants answers to arrive without "Send to Joe".
+
+## 2026-11-23 15:45 PST model v25: every coped joint made flush (Joe's request on v24)
+- RUN ON Opus 5.5, Joe's session. Joe, with a screenshot of the right arm meeting the back leg: "the wood should sit flush
+  with the pieces it intersects ... there is a small gap where it should be flush. can you check all those joints".
+- MEASURED: `tools/flush_audit.py` (new; samples member A's surface near B at 0.5 mm, casts along A's normal; contact <= 0.15 mm,
+  open = 0.15-10 mm within 12 mm of contact). 22 joints. v24 open: ARM~BLEG 2.3/2.4 cm2 (up to 6 mm, a band along the arm
+  end's bottom), ARM~FLEG and FLEG~ARM 1.7-4.3 cm2 (0.5-1.5 mm, front and back of the leg top), CREST ends ~0 (a cosmetic step
+  only), seat/legs, feet/rockers, slats 0.1-0.9 cm2 (rim samples, unchanged).
+- CAUSE: joinery.py coped ends by subtraction only (`A - B`). Where the member's end, as built, stopped short of a curved face,
+  the cut removed nothing there and the gap stayed. 
+- FIX: `fill_to(A, B)` in joinery.py: A's local axis from its side-face normals 8-50 mm before contact; A's section (slab hull,
+  0.15 mm inset) extruded per face triangle of B (normal against the axis) to just past that triangle; union with A; cut by B
+  (0.02 mm deep, against a coincident-face overlap film); main body kept. Applied to both arm ends, both front-leg tops (then
+  the arm cut by the new leg top), both crest ends. New step 7 drops zero-volume debris sheets (v24 back legs had 10 each).
+- RESULT v25: ARM~BLEG open 0.7/0.6 cm2, contact 8.7->10.9 / 8.8->10.3; FLEG~ARM open 0.5/0.5, contact 5.2->6.3 / 2.7->6.3;
+  what is left is rim samples. Nets: arm -5.85 cm3 each (end re-cut), front-leg tops +0.05-0.07, crest -4.31 per end.
+  Assembly check PASS. Critique: held-out median |gap| 1.262 -> 1.262 mm (915 shared regions); 7 regions moved > 0.1 mm, all at
+  the changed joints; ranked items 36 -> 40: crest end top/outer and top/bottom x 200-250 (-2.3, -2.6; v24 had the same
+  readings on too few photos to rank), arm inner/front y 450 -1.34 -> -1.70, rocker bottom/inner y 50 unchanged in value but now
+  under the 0.8 joint tolerance.
+- DEAD ENDS: full-matrix SVD on 100k points (12 GB, killed); prism along a PCA axis (shards beside the leg); section-centroid
+  axis (L/R asymmetric, BLEG_L~CREST overlap); shadow/footprint fills (flaps beside slanted side faces, blocks in mid-air).
+- OPEN: arm and leg templates want a rerun against v25; feather edges where the arm (0.3-1 mm wider than the leg) wraps the
+  leg's edge are pre-existing; the crest end's exposed back 6 mm beyond the leg stays a flat end (traced geometry).
+- Viewer: `parts/model_v25_dimensions.json` (tools/dimensions.py --model 25) so the review app moves to v25; all 29 sizes equal v24's.
