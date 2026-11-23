@@ -60,8 +60,8 @@ language sql immutable set search_path = '' as $$
   select btrim(
     regexp_replace(
       replace(replace(coalesce(t, ''), E'\r\n', E'\n'), E'\r', E'\n'),
-      '[\x01-\x08\x0B-\x1F\x7F​-‏‪-‮⁦-⁩]', '', 'g'),
-    E' \t\n ')
+      '[\x01-\x08\x0B-\x1F\x7F\u200B-\u200F\u202A-\u202E\u2066-\u2069]', '', 'g'),
+    E' \t\n' || chr(160))
 $$;
 
 create or replace function public.essick_comments_list() returns json
