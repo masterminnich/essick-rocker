@@ -79,6 +79,15 @@
      - [x] 6c edge radii: DONE, PR #37, NO model change (stays v24; `parts/edge_radii.json`, see phase 6c).
      - Hub's unattended work is COMPLETE (2026-11-21). Every hub item of the v24 ranked list is fixed or measured; what is
        left waits on Joe: the slat turn yes/no, the seat front corner reading and M1-M16 (list in `HUB_HANDOFF.md`).
+     - [x] joints FLUSH (Joe, 2026-11-23, on v24: "the wood should sit flush with the pieces it intersects"): DONE, model v25.
+       `tools/flush_audit.py` (new) measures, per joint, how much of a member's end stands off the part it meets
+       (`reports/flush_v24.json`, `reports/flush_v25.json`). v24: the arm end touched the back leg along its top and stood up to
+       6 mm off it along its bottom (21% of the end face open); the front-leg tops stood 0.5-1.5 mm under the curved arm
+       underside (24-59% open). `tools/joinery.py` `fill_to()` now sweeps each coped end along its own axis into the other part
+       and cuts it there: arm ends, front-leg tops, crest ends. v25: only rim samples left (6-8%, edges of the face); seat, feet
+       and slats were already flush and are unchanged. Figures `figures/joint_flush/`. TEMPLATES: the arm template's back end and
+       the front-leg tops changed (arm up to 6 mm longer along its bottom at the back, leg tops up to 0.9 mm taller at the
+       corners); `templates/arms.py` and `templates/legs.py` want a rerun against v25.
    - Requests to the joinery session (its files; not fixed by the hub):
      - [ ] back-leg foot (z 0-100) +2.1..+4.1 on every edge [+2.3..+3.5]: the real foot is about 3 mm narrower than the model
        (`figures/critique/top_back_leg_foot_IMG_1503.jpg`).
