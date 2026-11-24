@@ -88,6 +88,14 @@
        and slats were already flush and are unchanged. Figures `figures/joint_flush/`. TEMPLATES: the arm template's back end and
        the front-leg tops changed (arm up to 6 mm longer along its bottom at the back, leg tops up to 0.9 mm taller at the
        corners); `templates/arms.py` and `templates/legs.py` want a rerun against v25.
+     - [x] arm / back leg EDGES ALIGNED, right arm PILOT (Joe, 2026-11-23: "the arm rest does not align with the outside edge of
+       the back leg"): DONE for the right arm, model v26. The rule is `parts/joint_rules.json` arm_back_leg (the dots rule: the
+       arm's 4 edges end on the leg's 4 front corners, a bilinear correction fading over 100 mm), built by
+       `tools/build_model.py` + `tools/joint_ends.py`, checked by `tools/joint_quality.py` (in model.sh). Figures
+       `figures/arm_joint_pilot/`.
+       - [ ] left arm: same rule once Joe approves its dots (add "L" to `sides`; ARM_L is still the v25 mirror, coped).
+       - [ ] other joints (front-leg tops, crest ends): wait for Joe's approval of their dots.
+       - [ ] `templates/arms.py` rerun for the new right-arm end.
    - Requests to the joinery session (its files; not fixed by the hub):
      - [ ] back-leg foot (z 0-100) +2.1..+4.1 on every edge [+2.3..+3.5]: the real foot is about 3 mm narrower than the model
        (`figures/critique/top_back_leg_foot_IMG_1503.jpg`).

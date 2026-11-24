@@ -11,7 +11,7 @@ Joints (chair frame mm, right side; left = mirror):
                      (seen from behind: parts/joints.json back_leg_rear)
   legs / rockers     feet carried down onto the rocker top and cut to its curve (hidden fastener not modelled: not seen)
   (every coped end is made FLUSH by fill_to(): swept along its own axis into the other part, then cut by it; Joe, 2026-11-23)
-  arm / back leg     arm end coped to the leg; a Domino driven in from BEHIND through the leg into the arm's end (its end shows on
+  arm / back leg     arm end coped to the leg (sides in parts/joint_rules.json arm_back_leg: built ON the leg by build_model.py, not cut); a Domino driven in from BEHIND through the leg into the arm's end (its end shows on
                      the leg's rear face: parts/joints.json back_leg_rear; how far it goes into the arm is ASSUMED)
   arm / front leg    leg top cut to the arm underside by build_model.py, then carried up and coped flush to it (fill_to); a hidden vertical 10 mm Domino along the leg axis, from the
                      leg top into the arm (ASSUMED: parts/joints.json; the oval on the left arm top is not over the leg, see there)
@@ -151,6 +151,8 @@ def leg_depth_at(leg, p, side):
     return float(xs.max() - xs.min()) if len(xs) > 1 else 33.0
 
 
+_JRF = ROOT / "parts/joint_rules.json"
+ARM_ON_LEG = json.load(open(_JRF))["arm_back_leg"]["sides"] if _JRF.exists() else []   # arm ends built on the back leg (build_model.py)
 for side, S in ((1, "R"), (-1, "L")):
     FL, BL, RK, AR = f"FLEG_{S}", f"BLEG_{S}", f"ROCKER_{S}", f"ARM_{S}"
     # 1 front leg / seat: lap. The model's leg overlapped the seat edge by 4-9 mm; trim the seat to the leg's inner face (contact face)
@@ -177,8 +179,9 @@ for side, S in ((1, "R"), (-1, "L")):
         cut(L, wide, f"{L} foot cut to the rocker's top surface across the full width (contact face; the fastener is hidden and NOT modelled)")
         rep["joints"][f"{L}_foot"] = {"leg_axis": a.round(3).tolist(), "method": "swept along the leg axis, cut by the widened rocker"}
     # 4 arm coped to the back leg
-    fill_to(AR, BL, f"{AR} end flush on {BL}: swept along the arm into the leg and coped to it (v24 touched along the top only, "
-                    "up to 6 mm open along the bottom; the Domino through the leg into the arm's end is added in 5c)")
+    if S in ARM_ON_LEG: rep["ops"].append({"part": AR, "why": f"{AR} end already built ON {BL} by build_model.py (parts/joint_rules.json arm_back_leg): no cope, no fill"})
+    else: fill_to(AR, BL, f"{AR} end flush on {BL}: swept along the arm into the leg and coped to it (v24 touched along the top only, "
+                          "up to 6 mm open along the bottom; the Domino through the leg into the arm's end is added in 5c)")
     fill_to(FL, AR, f"{FL} top flush under {AR}: the leg carried up its own axis and coped to the arm's underside (v24's planar top "
                     "stood 0.5-1.5 mm off the curved underside at its front and back)")
     cut(AR, M[FL], f"{AR} underside vs {FL} top: contact face")
