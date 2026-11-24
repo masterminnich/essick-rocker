@@ -4,8 +4,9 @@
 #   1. tools/build_model.py   the parts as traced            -> <out>_shapes.glb, <out>_params.json, <out>_edges.json
 #   2. tools/joinery.py       the joints cut into them        -> <out>.glb (the chair), <out>_joinery.json
 #   3. tools/audit_joints.py  the assembly check on <out>.glb -> <out>_joints.json, then tools/joints_gate.py prints PASS / FAIL
-#   4. tools/joint_quality.py flush faces / shards / steps at the arm end on the back leg -> <out>_joint_quality.json (a report;
-#                             it does not fail the build while only the right arm is built by rule)
+#   4. tools/joint_quality.py the dots-rule joints (arms, crest ends, feet, front-leg tops, both sides): corners on the dots,
+#                             flush, shards, sharp short edges, bulge, gap -> <out>_joint_quality.json; a FAIL fails the build
+#                             (since v27: every rule joint is built by rule, so every one must pass)
 # --shapes-only stops after step 1 and writes <out>.glb as before (for quick trials of one part).
 cd "$(dirname "$0")/.."
 out=""; shapes_only=0; args=()
@@ -34,5 +35,7 @@ mkdir -p work/logs; L="work/logs/$(basename "$out")"
 run tools/safe_run.sh -m 3 -t 5 -- $JOIN tools/joinery.py "${out}_shapes.glb" "${out}.glb" > "${L}_joinery.log" || { tail -5 "${L}_joinery.log"; echo "model.sh: joinery failed"; exit 1; }
 run tools/safe_run.sh -m 3 -t 6 -- $JOIN tools/audit_joints.py "${out}.glb" "${out}_joints.json" > "${L}_joints.log" || { tail -5 "${L}_joints.log"; echo "model.sh: assembly check failed to run"; exit 1; }
 python3 -I tools/joints_gate.py "${out}_joints.json" "${out}_joinery.json"; rc=$?
-run tools/safe_run.sh -m 3 -t 5 -- $JOIN tools/joint_quality.py "${out}.glb" "${out}_joint_quality.json" | grep -E '^ARM_'
+run tools/safe_run.sh -m 3 -t 5 -- $JOIN tools/joint_quality.py "${out}.glb" "${out}_joint_quality.json" > "${L}_joint_quality.log"; rq=$?
+grep -E '~|^joint quality' "${L}_joint_quality.log"; grep -q '^joint quality: PASS' "${L}_joint_quality.log" || { [ $rq = 0 ] && rq=1; tail -3 "${L}_joint_quality.log"; }
+[ $rc = 0 ] && rc=$rq
 exit $rc

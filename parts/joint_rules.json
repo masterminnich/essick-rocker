@@ -2,9 +2,10 @@
  "about": "How the parts meet at each visible joint: which faces run flush and where an end sits. The build makes the parts obey these rules (tools/joint_ends.py), instead of cutting one rough mesh with another. Joe, 2026-11-23: 'the wood sits flush ... the arm rest does not align with the outside edge of the back leg'. Chair frame mm, +y forward, z up, right side +x.",
  "arm_back_leg": {
   "sides": [
-   "R"
+   "R",
+   "L"
   ],
-  "sides_note": "PILOT: right arm only (Joe, 2026-11-23: 'do right arm as a pilot'). The left arm is still built the v25 way (mirror of the traced arm, coped by tools/joinery.py fill_to) until Joe approves.",
+  "sides_note": "Both arms (Joe, 2026-11-23, approving figures/joint_dots/dots_other_joints.png panel 1: 'they all look fantastic. make the changes'). The pilot (PR #47) was the right arm only; the left arm is its mirror (the back legs are mirrors), so its dots are the right arm's mirrored: v25 moves 7.5 / 3.9 / 2.3 / 2.9 mm.",
   "edges_flush": {
    "arm outer face": "spans between the arm's outer-top and outer-bottom edges, which end on the leg's outer front corner: flush with the leg's outer face, no step",
    "arm inner face": "the same on the inner side"
@@ -18,5 +19,53 @@
    "(2) a per-height correction s * (1 - u)^2 fading to y 300, fitted separately for each grid column from that column's own entry y: the lower outer face bulged past the leg (options.png option 2)."
   ],
   "provenance": "Joe's reading of the real chair; photos IMG_1481 (inside, close) and IMG_1517 (left side): the arm's side faces carry straight into the leg's. Critique on v24, right arm outer edges at y < 90: 1.4-2.5 mm outboard of the model in most photos (top/outer y 0 R -1.39 [held -2.50], bottom/outer y 50 R -1.38 [-2.46]); the plan lines in parts/arms.json were traced only to y 68.2 and extrapolated into the leg. v25 at the leg: arm 33.5-34.5 wide, leg 39.5 thick; arm outer face 3.5-7.6 mm inside the leg's outer face, inner face within 2.5 mm of the leg's inner face."
+ },
+ "crest_back_leg": {
+  "sides": [
+   "R",
+   "L"
+  ],
+  "approved": "Joe, 2026-11-23, figures/joint_dots/dots_other_joints.png panel 2 ('they all look fantastic. make the changes').",
+  "edges_flush": {
+   "crest front face": "spans between the crest's top-front and bottom-front edges, which end on the leg's inner-face FRONT edge: flush with the leg's front face",
+   "crest rear face": "the same on the back: ends on the leg's inner-face BACK edge, flush with the leg's back face"
+  },
+  "end": "the crest's end sits ON the back leg's inner face: every end point slid along the crest's own line (in x) until it lies on the leg",
+  "dots": "GREEN dots: the back leg's inner-face front and back edges, where its front and back faces (planes y = a + b x + c z fitted by tools/joint_ends.face_planes, axis y) meet its inner face, at the heights of the crest's top and bottom edges. The crest's 4 long edges (top front, top rear, bottom front, bottom rear) END exactly on them. RED dots: where the traced edges ended in v25 (moves 0 / 3.9 / 4.1 / 2.8 mm on the dots sheet: the fill_to cope's jagged end, 2 mm into the leg).",
+  "fade_length_mm": 100.0,
+  "correction": "As for the arm, turned 90 degrees: each edge gets a y correction dy_e = green y minus the traced edge's y at the dot's x (z follows from the edge). Bilinear across the section (t rear -> front, l bottom -> top), so at any x each face is the straight surface between its two edges; fades along the crest as (1 - u)^2, u = |x - x_e| / L from each edge's own dot, L = 100 mm (the crest spans about 375 mm between the legs, so the two ends' fades never meet). Each end has its own correction (the left from BLEG_L).",
+  "top_lip": "The back legs' tops are a PLANE through the crest's top arch at the leg's centre (build_model.py, 'leg tops flush, arch carried over them'), so at the leg's inner face the crest's top edges stand up to about 1.3 mm above the leg top. There the crest's end is the leg's inner face carried straight up (the dots there sit on the leg's inner-face edges extended up). Making the leg top follow the arch is a separate change, not in this rule.",
+  "provenance": "Joe's reading of the real chair on the dots sheet (crest front and back faces run straight into the leg's front and back faces). v25 built the crest 2 mm into each leg and coped it with tools/joinery.py fill_to, which left a jagged notch at the end.",
+  "face_follow": "Added in v27 (build_model.py crest_follow): the back leg's front face is hollow about 0.6 mm between the crest's top and bottom edges (the leg bends), so straight crest faces between the corrected edges stood up to 0.75 mm proud of it at mid height. The crest's front and rear faces also follow the leg's face (plane fitted at each grid height, as for the dots): residual in y at the 7 interior heights, 0 at the edges (the dots do not move), linear across the section, same (1 - u)^2 fade over 100 mm."
+ },
+ "foot_rocker": {
+  "sides": [
+   "R",
+   "L"
+  ],
+  "parts": [
+   "FLEG",
+   "BLEG"
+  ],
+  "approved": "Joe, 2026-11-23, figures/joint_dots/dots_other_joints.png panels 3 (front foot) and 4 (back foot).",
+  "edges_flush": {
+   "leg outer face": "spans between the leg's outer-front and outer-rear edges, which end on the rocker's OUTER top edge: flush with the rocker's outer face",
+   "leg inner face": "the same on the inner side, on the rocker's inner top edge"
+  },
+  "end": "the foot sits ON the rocker's top: every foot point slid along the leg's own line (down the leg) until it lies on the rocker",
+  "dots": "GREEN dots: the rocker's top edges (where its side faces, planes x = a + b y + c z fitted by tools/joint_ends.face_planes, meet its top), at the fore-aft position of each of the leg's 4 edges (outer front, outer rear, inner front, inner rear) where that edge comes down. RED dots: where the traced edges met the rocker in v25 (moves front foot 1.6 / 3.5 / 3.3 / 0.2 mm, back foot 3.2 / 7.8 / 1.5 / 0.8 mm on the dots sheet; v25's joinery swept the foot 12 mm down its axis and cut it with a widened rocker, which left wedge-shaped steps).",
+  "fade_length_mm": 100.0,
+  "correction": "Each edge gets an x correction dx_e = green x minus the traced edge's x at the dot's height (y and z follow from the edge). Bilinear across the section (t inner -> outer, l rear -> front); fades up the leg as (1 - u)^2, u = (s - s_e) / L from each edge's own dot, L = 100 mm (s = v in the side plane for the front leg, the centre line's z for the back leg). Above that the leg is exactly as traced.",
+  "provenance": "Joe's reading of the real chair on the dots sheet: the legs' side faces run straight into the rockers'. NOTE the critique's request in PLAN.md (back-leg foot z 0-100 +2.1..+4.1 mm on every edge: the real foot about 3 mm NARROWER than the model) points the other way for the back foot's width; the rule follows Joe's approval and the critique numbers are reported in the PR."
+ },
+ "front_leg_arm": {
+  "sides": [
+   "R",
+   "L"
+  ],
+  "approved": "Joe, 2026-11-23, figures/joint_dots/dots_other_joints.png panel 5.",
+  "end": "the front leg's top sits ON the arm's underside with no gap: every point of the leg's top (its 4 corners and everything between) carried straight on along the leg's own line until it meets the arm (bisection on containment). No edge correction: the leg stays as traced, narrower than the arm and inset from its sides, as in the photos.",
+  "dots": "GREEN dots: where each of the leg's 4 edges, carried on along its own line, meets the arm's underside. The dots sheet drew them straight up from v25's corners (back two corners 6.3 and 7.8 mm low); along the leg's own lines they land within a mm of those (the leg leans a little).",
+  "provenance": "v25's leg top was a plane cut at the arm underside's slope at the leg centre, then fill_to carried it up; the underside is not a plane, so the back corners stood 6.3 and 7.8 mm below it."
  }
 }

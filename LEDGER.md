@@ -1350,3 +1350,39 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - OPEN: the left arm and every other joint wait for Joe to approve their dots; `templates/arms.py` wants a rerun for the new
   right-arm end; a sub-pixel (about 0.1 mm) line of the leg's front face shows along the crease at extreme zoom (the leg's
   faceted side vs its fitted plane).
+
+## 2026-11-23 18:10 PST model v27: the dots rule on every approved joint, both sides
+- RUN ON Opus 5.5, Joe's session. Joe on `figures/joint_dots/dots_other_joints.png`: "they all look fantastic. make the
+  changes". Five joints, right and left (left = mirror): (1) left arm, (2) crest ends on the back legs, (3) front feet and
+  (4) back feet on the rockers, (5) front-leg tops under the arms. Not in scope: slats, the Domino sliver at seat / back leg,
+  the seat bulge.
+- METHOD (`parts/joint_rules.json`, `tools/build_model.py` + `tools/joint_ends.py`, structured grids, no booleans): as the
+  arm. `joint_ends.dots_end` / `corrected` generalise the arm code to any axis; green dots use B's face planes fitted LOCALLY
+  at each edge (`face_planes`, narrow along the curved direction: a 120 mm fit of the back leg's front face had 0.29-0.38 mm
+  rms). Joinery skips its sweeps, fills and cuts for joints built by rule (feet, front-leg tops, crest ends).
+  - crest: y corrections top front +1.95, top rear +2.59, bottom front -0.67, bottom rear +3.35 mm. The back leg's front face
+    is hollow about 0.6 mm between the crest's top and bottom edges (the leg bends), so straight crest faces stood up to
+    0.75 mm proud mid height. Added for the crest only: its front and rear faces follow the leg's face at each grid height
+    (residual -0.62 front / -0.14 rear at mid height, 0 at the edges), same fade. The top lip (crest top 1.04 mm above the
+    leg's planar top) stays as documented.
+  - back feet x corrections outer front +3.32, outer rear -2.56, inner front +7.17, inner rear +1.72 mm; front feet -0.87,
+    -0.80, -3.47, -3.22 mm. Front-leg tops: the leg's own columns carried up onto the arm's underside (corners 0.000 mm off).
+- RESULT v27: assembly check PASS; `tools/joint_quality.py` PASS on all 10 joints: corners to dots <= 0.022 mm, crease flush
+  |median| <= 0.14 mm, 0 shards, 0 sharp short edges, end outline past B's sides <= 0.18 mm, faces off edge lines <= 0.13 mm
+  (crest, following the leg), gap <= 0.059 mm. v26 (same check): every joint but ARM_R failed (reports/joint_quality_v26.json).
+- `tools/joint_quality.py` generalised: each joint turned into the arm's frame (a rotation or mirror; FRAMES), then the arm
+  checks. Changes: dots from planes fitted at each corner (arm: at the end centre, as v26); bulge (a) against B's own side-face
+  samples (the 120 mm planes misread curved faces; plane numbers still reported); bulge (b) traces each side face's own segments
+  (the old outline extremes picked end-face points where an end slopes, e.g. 0.80 mm on the back foot); new gap check (end-face
+  samples' distance to B, samples whose normal misses B, the crest's lip, counted). model.sh now fails on a joint FAIL.
+- joinery.py: the leg's Domino mortise (FR/BR) is cut with the Domino plus a copy 0.02 mm further out: with the v27 front leg
+  manifold left 0.13 cm3 of DOMINO_FR~FLEG_R overlap (gate FAIL); now 0.00.
+- Flush audit v26 -> v27: ARM_L~BLEG_L contact 10.3 -> 12.0, open 0.6 -> 0.2 cm2; CREST~BLEG contact 19.9 -> 17.1 cm2, open
+  0.0 -> 0.0 (the v26 number counted the cope's fill); feet open 0.1-0.3 -> 0.4 cm2 (the acute wedge between the leg's
+  front/back face and the rocker top ahead of it, not a gap: joint_quality gap <= 0.033 mm), BLEG contact 16.2 -> 13.1.
+  Critique items 40 -> 36. Near the joints (|median| of regions): back feet 1.80 -> 1.34, arm back ends 0.66 -> 0.38, front-leg
+  tops 1.20 -> 1.13, front feet 0.91 -> 1.23, crest ends 1.01 -> 1.31 mm. Dimensions: 28 of 29 unchanged; fleg_thickness
+  30.66 -> 31.13 (file 30.31).
+- OPEN: the critique's back-foot request (real foot about 3 mm narrower) points the other way from the rule (the foot is
+  widened to the rocker's top edges); the front feet and crest ends read a little worse against the photos; `templates/legs.py`
+  and `templates/arms.py` want reruns.

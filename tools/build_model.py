@@ -33,6 +33,49 @@ P = lambda k: PRM[k][0]
 C = np.load(ROOT / "work/dense/chair_dense.npy"); C = C[C[:, 2] > 6][:, :3]
 Cm = C.copy(); Cm[:, 0] = np.abs(Cm[:, 0])          # mirrored onto the right side (design intent)
 report = {}; meshes = {}
+# how the parts meet at each visible joint (parts/joint_rules.json; Joe's dots rule), built by tools/joint_ends.py
+_JRF = ROOT / "parts/joint_rules.json"; JR = json.load(open(_JRF)) if _JRF.exists() else {}
+sys.path.insert(0, str(ROOT / "tools")); import joint_ends as je
+NT_J, NL_J = 7, 9                                          # grid columns across / through a member built by rule
+def rule_sides(key, part=None):
+    r = JR.get(key, {}); return [] if part is not None and part not in r.get("parts", [part]) else list(r.get("sides", []))
+def lin_ex(z, Z, V):
+    """V (n, k) given at increasing Z, linear in between and carried on straight past both ends"""
+    z = np.asarray(z, float); V = np.asarray(V, float).reshape(len(Z), -1); out = np.empty((len(z), V.shape[1]))
+    for j in range(V.shape[1]):
+        out[:, j] = np.interp(z, Z, V[:, j]); lo, hi = z < Z[0], z > Z[-1]
+        out[lo, j] = V[0, j] + (z[lo] - Z[0]) * (V[1, j] - V[0, j]) / (Z[1] - Z[0]); out[hi, j] = V[-1, j] + (z[hi] - Z[-1]) * (V[-1, j] - V[-2, j]) / (Z[-1] - Z[-2])
+    return out
+def cols():
+    T_, L_ = np.meshgrid(np.linspace(0, 1, NT_J), np.linspace(0, 1, NL_J), indexing="ij"); return T_.ravel(), L_.ravel()
+def x_clamp(planes, ax, extra=None):
+    """keep a point within the other part's two faces square to `ax` (0.5 mm in): only to bracket the bisection"""
+    def f(X):
+        X = np.array(X, float); X[:, ax] = np.clip(X[:, ax], je.plane_at(planes["minus"], X) + 0.5, je.plane_at(planes["plus"], X) - 0.5)
+        return extra(X) if extra else X
+    return f
+def foot_on_rocker(p, rk, s_out, s_in, label):
+    """the dots rule at a leg's foot (parts/joint_rules.json foot_rocker): p(S, T, Lc) the leg as traced, S up the leg, T inner -> outer,
+    Lc rear -> front. Its 4 edges get an x correction so they end on the rocker's top edges (outer edges on the outer face, inner on the
+    inner), faded up the leg. Returns the corrected leg, the foot end S per column, and the report."""
+    rule = JR["foot_rocker"]; Lf = float(rule["fade_length_mm"])
+    EDG = {"outer_front": (1.0, 1.0, "plus"), "outer_rear": (1.0, 0.0, "plus"), "inner_front": (0.0, 1.0, "minus"), "inner_rear": (0.0, 0.0, "minus")}
+    c0 = p(np.array([float(s_in + s_out) / 2]), np.array([0.5]), np.array([0.5]))[0]
+    PLr = je.face_planes(rk, c0, 0, win=60.0); clamp = x_clamp(PLr, 0)
+    # the dots: the rocker's side faces fitted locally at each edge (narrow along the rocker, whose faces curve gently in plan)
+    green, red, cor, used = je.dots_end(rk, p, EDG, 0, lambda nm, r: je.face_planes(rk, r, 0, win=(15.0, 60.0)), s_out, s_in, +1, clamp=clamp)
+    pc = je.corrected(p, EDG, cor, 0, Lf, +1); T_, L_ = cols()
+    Se = je.enter(rk, lambda S_: clamp(pc(S_, T_, L_)), np.full(len(T_), float(s_out)), np.full(len(T_), float(s_in)))
+    for k_, (te, le, _) in EDG.items(): Se[(T_ == te) & (L_ == le)] = cor[k_][0]
+    end = pc(Se, T_, L_); off = trimesh.proximity.closest_point(rk, end)[1]
+    r3 = lambda v: np.round(np.asarray(v, float), 2).tolist()
+    rep = {"rule": "parts/joint_rules.json foot_rocker (the dots rule)", "method": "tools/joint_ends.py: structured grid, foot row ON the rocker (no boolean)",
+           "rocker_side_planes_at_each_edge": {k: {"x_eq_a_by_cz": np.round(v["coef"], 5).tolist(), "fit_rms_mm": round(v["rms_mm"], 3), "n": v["n"]} for k, v in used.items()},
+           "green_dots_rocker_top_edges": {k: r3(v) for k, v in green.items()}, "red_dots_traced_edge_ends": {k: r3(v) for k, v in red.items()},
+           "red_to_green_mm": {k: round(float(np.linalg.norm(green[k] - red[k])), 2) for k in EDG}, "x_correction_at_dot_mm": {k: round(v[1], 2) for k, v in cor.items()},
+           "fade_length_mm": Lf, "dot_s": {k: round(v[0], 2) for k, v in cor.items()}, "foot_points_off_rocker_max_mm": round(float(off.max()), 4),
+           "end_corner_to_dot_mm": {k: round(float(np.linalg.norm(end[(T_ == te) & (L_ == le)][0] - green[k])), 4) for k, (te, le, _) in EDG.items()}}
+    return pc, Se, T_, L_, rep
 
 
 def rpoly(x, y, deg, clip=2.0, iters=6):
@@ -183,6 +226,12 @@ if SFL:
     rt_m = to_mean(np.c_[U, rtop]); cut = lambda u_: np.maximum(vv, np.interp(u_, rt_m[:, 0], rt_m[:, 1]))
     sec = np.stack([np.c_[uF, cut(uF), dF], np.c_[uR, cut(uR), dF], np.c_[uI, cut(uI), dI], np.c_[uF, cut(uF), dI]], 1)
     meshes["FLEG_R"] = loft4(from_plane(sec.reshape(-1, 3), +1).reshape(-1, 4, 3)); meshes["FLEG_L"] = mirror(meshes["FLEG_R"])
+    def p_fleg(S_, T_, L_):
+        """the front leg as traced, carried on straight past both ends: S_ = v (side plane, up), T_ inner -> outer, L_ rear -> front.
+        The section is the loft's quad: outer face (uR..uF at depth dF), inner face (uI..uF at dI), bevelled rear face between."""
+        S_ = np.asarray(S_, float); T_ = np.asarray(T_, float); L_ = np.asarray(L_, float)
+        uF_, dF_, uR_, dI_ = sf_at(QF, S_, 0), sf_at(QF, S_, 2), sf_at(QR, S_, 0), sf_at(QI, S_, 2); uI_ = np.minimum(sf_at(QI, S_, 0), uR_)
+        ur = uI_ + T_ * (uR_ - uI_); return from_plane(np.c_[ur + L_ * (uF_ - ur), S_, dI_ + T_ * (dF_ - dI_)], +1)
     old_w = fl_front - fl_rear
     report["front_leg"] = {"profile": "triangulated per line from near-frontal side photos (tools/edge_tri.py), L and R averaged; outlines +-1 mm, rear outer-face ridge is a soft line +-2 mm",
                            "outer_face_width_mm": {f"v{int(v)}": float(np.interp(v, vv, uF - uR)) for v in (150, 300, 360, 500, 600)},
@@ -309,6 +358,20 @@ if SFL and "bleg_front_hi" in SFL and "bleg_rear_hi" in SFL:
               "width_fore_aft_mm": {f"z{int(z)}": float(np.interp(z, z_, f_new - r_new)) for z in (620, 700, 800, 900, 1000)},
               "width_square_to_leg_mm": {f"z{int(z)}": float(np.interp(z, z_, w_side)) for z in (620, 700, 800, 900, 1000)}, "crest_pin": pin_rep, "one_board": one_board}
 meshes["BLEG_R"] = sweep(allc, e_acr, e_side, w_acr, w_side); meshes["BLEG_L"] = mirror(meshes["BLEG_R"])
+if "R" in rule_sides("foot_rocker", "BLEG"):
+    # back foot ON the rocker by the dots rule (Joe, 2026-11-23): the same bar as the sweep (sections at the centre line's z), as a grid
+    Zc = allc[:, 2]; assert np.all(np.diff(Zc) > 0)
+    def p_bleg(S_, T_, L_):
+        S_ = np.asarray(S_, float); C_ = lin_ex(S_, Zc, allc); EA = lin_ex(S_, Zc, e_acr); ES = lin_ex(S_, Zc, e_side)
+        EA /= np.linalg.norm(EA, axis=1, keepdims=True); ES /= np.linalg.norm(ES, axis=1, keepdims=True)
+        WA, WS = lin_ex(S_, Zc, w_acr)[:, 0], lin_ex(S_, Zc, w_side)[:, 0]
+        return C_ + EA * (WA * (np.asarray(T_, float) - 0.5))[:, None] + ES * (WS * (np.asarray(L_, float) - 0.5))[:, None]
+    pcB, SeB, T_, L_, repB = foot_on_rocker(p_bleg, meshes["ROCKER_R"], 95.0, 0.0, "BLEG_R")
+    keep = Zc[Zc > SeB.max() + 3.0]; nf = max(3, int(np.ceil((keep[0] - SeB.min()) / 4.0)))
+    rows = [SeB + f_ * (keep[0] - SeB) for f_ in np.linspace(0, 1, nf + 1)[:-1]] + [np.full(len(T_), z_) for z_ in keep]
+    G = np.stack([pcB(r_, T_, L_) for r_ in rows]).reshape(len(rows), NT_J, NL_J, 3)
+    meshes["BLEG_R"] = je.block_solid(G); report["foot_rocker_BLEG_R"] = repB
+    meshes["BLEG_L"] = mirror(meshes["BLEG_R"]) if "L" in rule_sides("foot_rocker", "BLEG") else mirror(sweep(allc, e_acr, e_side, w_acr, w_side))
 report["back_leg"] = {"lower": bl_low_src, "upper": bl_up_src, "upper_side_view": up_rep,
                       "front_edge_scatter_mm": n_bf, "rear_edge_scatter_mm": n_br, "width_side_view_mm": {f"z{int(z)}": float(np.interp(z, zb, w_side)) for z in (100, 300, 450, 600, 800, 1000)},
                       "across": bl_src, "width_across_mm": {f"z{int(z)}": float(np.interp(z, allc[:, 2], w_acr)) for z in (100, 300, 450, 600, 800, 1000)}, "top_centre": up_center[-1].round(1).tolist(), "splay_top_x_mm": float(up_center[-1, 0])}
@@ -662,9 +725,77 @@ else:
         p_, n_ = p0 * [sg, 1, 1], nrm * [sg, 1, 1]
         try: meshes[k_] = meshes[k_].slice_plane(p_, -n_, cap=True)
         except Exception: meshes[k_] = meshes[k_].slice_plane(p_, -n_, cap=False)
+    crest_rep = {}
+    if "R" in rule_sides("crest_back_leg"):
+        # crest ends ON the back legs' inner faces by the dots rule (Joe, 2026-11-23): its 4 long edges (front and rear, top and bottom)
+        # get a y correction so they end on the leg's inner-face front and back edges at their own height, faded along the crest
+        rule = JR["crest_back_leg"]; Lf = float(rule["fade_length_mm"])
+        EDGc = {"top_front": (1.0, 1.0, "plus"), "top_rear": (0.0, 1.0, "minus"), "bottom_front": (1.0, 0.0, "plus"), "bottom_rear": (0.0, 0.0, "minus")}
+        cfun = {k: (lambda X_, k=k: np.c_[X_, ev(E[k]["y_even_poly"], X_), ev(E[k]["z_even_poly"], X_)]) for k in E}
+        def p_crest(S_, T_, L_):
+            """the crest as traced (its 4 arrises, straight between them), carried on past the legs: S_ = x, T_ rear -> front, L_ bottom -> top"""
+            S_ = np.asarray(S_, float); T_ = np.asarray(T_, float)[:, None]; L_ = np.asarray(L_, float)[:, None]
+            tp_ = cfun["top_rear"](S_) * (1 - T_) + cfun["top_front"](S_) * T_; bt_ = cfun["bottom_rear"](S_) * (1 - T_) + cfun["bottom_front"](S_) * T_
+            return bt_ * (1 - L_) + tp_ * L_
+        pcC = p_crest; ends = {}; T_, L_ = cols()
+        for sg, k_ in ((1, "BLEG_R"), (-1, "BLEG_L")):
+            leg = meshes[k_]; pp_, nn_ = p0 * [sg, 1, 1], nrm * [sg, 1, 1]
+            ztop = lambda X_, pp_=pp_, nn_=nn_: pp_[2] - (nn_[0] * (X_[:, 0] - pp_[0]) + nn_[1] * (X_[:, 1] - pp_[1])) / nn_[2]   # the leg's top (cut plane above)
+            cz = p_crest(np.array([sg * (jx + 15.0)]), np.array([0.5]), np.array([0.5]))[0]
+            PLc = je.face_planes(leg, cz, 1, win=45.0)
+            # bracket only: within the leg's front and back faces, and under its top (the crest's top edges stand up to ~1.3 mm above the
+            # leg's planar top at its inner face: there the end is the leg's inner face carried straight up)
+            def zcl(X_, ztop=ztop): X_[:, 2] = np.minimum(X_[:, 2], ztop(X_) - 0.5); return X_
+            clamp = x_clamp(PLc, 1, zcl)
+            s_out, s_in = sg * (jx - 30.0), sg * (jx + 30.0)
+            # the dots: the leg's front and back faces fitted locally at each edge's height (narrow in z: the leg's front face curves)
+            green, red, cor, used = je.dots_end(leg, p_crest, EDGc, 1, lambda nm, r, leg=leg: je.face_planes(leg, r, 1, win=(60.0, 15.0)), s_out, s_in, -sg, clamp=clamp)
+            pcC = je.corrected(pcC, EDGc, cor, 1, Lf, -sg)
+            ends[k_] = (clamp, s_out, s_in, cor, green, red, used, ztop)
+        # the leg's front and back faces are not flat over the crest's height (the back leg bends: about 0.7 mm hollow between the
+        # crest's top and bottom edges on the front face). Straight crest faces between the corrected edges then stand proud of the
+        # leg at mid height. So the crest's front and rear faces also follow the leg's face line at each of the grid's heights: the
+        # residual (leg face minus crest face, in y, at the end) at the interior heights, 0 at the edges (already on the dots), linear
+        # across the section (T), faded the same way. The edges and the dots do not move.
+        def crest_follow(pf, leg, clamp, s_out, s_in, sg, ztop):
+            Lv = np.unique(L_)[1:-1]; res = {}
+            for te in (0.0, 1.0):
+                Tq = np.full(len(Lv), te); se = je.enter(leg, lambda S_: clamp(pf(S_, Tq, Lv)), np.full(len(Lv), s_out), np.full(len(Lv), s_in))
+                Xc = pf(se, Tq, Lv); Xq = Xc.copy(); Xq[:, 2] = np.minimum(Xq[:, 2], ztop(Xq) - 0.5)   # (above the leg top: its face carried up)
+                # the leg's face at each height: a plane fitted locally there, as for the dots (narrow in z)
+                yf = np.array([float(je.plane_at(je.face_planes(leg, x_, 1, win=(60.0, 15.0))["plus" if te else "minus"], x_)[0]) for x_ in Xq])
+                res[te] = (se, yf - Xc[:, 1])
+            def pc(S_, T_, Lc):
+                X = pf(S_, T_, Lc).copy(); S_ = np.asarray(S_, float); T_ = np.asarray(T_, float); Lc = np.asarray(Lc, float)
+                for te, (se, r) in res.items():
+                    rr = np.interp(Lc, np.r_[0.0, Lv, 1.0], np.r_[0.0, r, 0.0]); s0 = np.interp(Lc, Lv, se)
+                    X[:, 1] += (T_ if te else 1 - T_) * rr * (1.0 - np.minimum(-sg * (S_ - s0) / Lf, 1.0)) ** 2
+                return X
+            return pc, {("front" if te else "rear"): np.round(r, 3).tolist() for te, (se, r) in res.items()}
+        follow = {}
+        for k_, (clamp, s_out, s_in, cor, green, red, used_, ztop) in ends.items():
+            sg_ = 1.0 if k_ == "BLEG_R" else -1.0; follow[k_] = []
+            for _ in range(2):                                  # twice: the first pass moves the end a little along the leg's inner face
+                pcC, fr_ = crest_follow(pcC, meshes[k_], clamp, s_out, s_in, sg_, ztop); follow[k_].append(fr_)
+        Xe = {}
+        for k_, (clamp, s_out, s_in, cor, green, red, used_, ztop) in ends.items():
+            Xe[k_] = je.enter(meshes[k_], lambda S_, clamp=clamp: clamp(pcC(S_, T_, L_)), np.full(len(T_), s_out), np.full(len(T_), s_in))
+            for c_, (te, le, _) in EDGc.items(): Xe[k_][(T_ == te) & (L_ == le)] = cor[c_][0]
+        ncs = len(xs_); G = np.stack([pcC(Xe["BLEG_L"] + f_ * (Xe["BLEG_R"] - Xe["BLEG_L"]), T_, L_) for f_ in np.linspace(0, 1, ncs)]).reshape(ncs, NT_J, NL_J, 3)
+        meshes["CREST"] = je.block_solid(G); r3 = lambda v: np.round(np.asarray(v, float), 2).tolist()
+        for k_, (clamp, s_out, s_in, cor, green, red, used_, ztop) in ends.items():
+            endp = pcC(Xe[k_], T_, L_); offl = trimesh.proximity.closest_point(meshes[k_], endp)[1]; above = endp[:, 2] - ztop(endp)
+            crest_rep[k_] = {"rule": "parts/joint_rules.json crest_back_leg (the dots rule)", "method": "tools/joint_ends.py: structured grid, end row ON the leg's inner face (no boolean)",
+                             "leg_face_planes_at_each_edge": {k: {"y_eq_a_bx_cz": np.round(v["coef"], 5).tolist(), "fit_rms_mm": round(v["rms_mm"], 3), "n": v["n"]} for k, v in used_.items()},
+                             "green_dots_leg_inner_face_edges": {k: r3(v) for k, v in green.items()}, "red_dots_traced_edge_ends": {k: r3(v) for k, v in red.items()},
+                             "red_to_green_mm": {k: round(float(np.linalg.norm(green[k] - red[k])), 2) for k in EDGc},
+                             "y_correction_at_dot_mm": {k: round(v[1], 2) for k, v in cor.items()}, "dot_x": {k: round(v[0], 2) for k, v in cor.items()},
+                             "end_corner_to_dot_mm": {k: round(float(np.linalg.norm(endp[(T_ == te) & (L_ == le)][0] - green[k])), 4) for k, (te, le, _) in EDGc.items()},
+                             "face_follow_y_mm_at_interior_heights": {"heights_L": np.unique(L_)[1:-1].round(3).tolist(), "pass_1": follow[k_][0], "pass_2_residual": follow[k_][1]},
+                             "end_points_off_leg_max_mm": round(float(offl[above < 0].max()), 4), "end_above_leg_top_max_mm": round(float(above.max()), 2), "fade_length_mm": Lf}
     report["crest"] = {"source": "parts/crest.json (four arrises triangulated from overhead + rear photos; design = even polynomials)",
                        "span_between_legs_mm": float(2 * jx), "top_centre_z": float(ev(E["top_rear"]["z_even_poly"], 0)), "top_at_leg_centre_z": float(zr_),
-                       "back_leg_top_cut": {"before_z_max": bl_top_before, "plane_point": p0.round(1).tolist(), "slope_dzdx": float(sx), "slope_dzdy": float(sy)}}
+                       "back_leg_top_cut": {"before_z_max": bl_top_before, "plane_point": p0.round(1).tolist(), "slope_dzdx": float(sx), "slope_dzdy": float(sy)}, "ends_by_rule": crest_rep}
     # arms: design version (right arm; left = mirror)
     AJ = json.load(open(TOPF[1])); D_ = AJ["design"]; th = AJ["thickness"]["value_mm"]
     pin, pout = np.array(D_["inner_x_of_y"]["poly_in_(y-300)"]), np.array(D_["outer_x_of_y"]["poly_in_(y-300)"])
@@ -690,7 +821,6 @@ else:
     # arm / back leg built to parts/joint_rules.json (Joe, 2026-11-23): the arm's 4 long edges end ON the back leg's front corners
     JRF = ROOT / "parts/joint_rules.json"
     if JRF.exists() and UJ is not None and "R" in json.load(open(JRF))["arm_back_leg"]["sides"]:
-        sys.path.insert(0, str(ROOT / "tools")); import joint_ends as je
         rule = json.load(open(JRF))["arm_back_leg"]; Lf = float(rule["fade_length_mm"]); leg = meshes["BLEG_R"]; nl = 9
         tt_, ll_ = np.meshgrid(np.linspace(0, 1, nt), np.linspace(0, 1, nl), indexing="ij"); tt_, ll_ = tt_.ravel(), ll_.ravel()   # one column per (t, l)
         EDG = {"top_outer": (1.0, 1.0), "top_inner": (0.0, 1.0), "bottom_outer": (1.0, 0.0), "bottom_inner": (0.0, 0.0)}   # (t across inner->outer, l bottom->top)
@@ -736,6 +866,7 @@ else:
             else: G[i] = arm_pt(Yh + f_ * (yend_ - Yh), tt_, ll_)
         G = G.reshape(ns, nt, nl, 3)
         amR = je.block_solid(G); meshes["ARM_R"] = amR
+        if "L" in rule["sides"]: meshes["ARM_L"] = mirror(amR)     # the left arm: the mirror (the back legs are mirrors too)
         cl = trimesh.proximity.closest_point(leg, G[0].reshape(-1, 3))[1]
         cidx = {"top_outer": (-1, -1), "top_inner": (0, -1), "bottom_outer": (-1, 0), "bottom_inner": (0, 0)}
         r3 = lambda v: np.round(np.asarray(v, float), 2).tolist()
@@ -749,13 +880,36 @@ else:
                                     "traced_beyond_y": round(max(v[0] for v in COR.values()) + Lf, 1),
                                     "end_corner_to_dot_mm": {k: round(float(np.linalg.norm(G[0, ti, li] - green[k])), 3) for k, (ti, li) in cidx.items()},
                                     "end_y_range": [round(float(Yh.min()), 2), round(float(Yh.max()), 2)], "end_points_off_leg_max_mm": round(float(cl.max()), 4),
-                                    "left": "PILOT: ARM_L is still the mirror of the traced arm (coped by joinery.py fill_to)"}
+                                    "left": "ARM_L = mirror of ARM_R (same rule)" if "L" in rule["sides"] else "ARM_L is still the mirror of the traced arm (coped by joinery.py fill_to)"}
     # front-leg tops vs the arm underside
     fv = meshes["FLEG_R"].vertices; tp = fv[fv[:, 2] > fv[:, 2].max() - 15]; yc, xc = float(tp[:, 1].mean()), float(tp[:, 0].mean())
     zu = float(zb(xc, yc))
     fl = {"leg_top_z": float(fv[:, 2].max()), "arm_underside_z_at_leg": zu, "leg_top_xy": [round(xc, 1), round(yc, 1)],
           "arm_x_range_at_leg": [float(np.polyval(pin, yc - 300)), float(np.polyval(pout, yc - 300))]}
-    if fl["leg_top_z"] > zu:
+    FL_FOOT, FL_TOP = "R" in rule_sides("foot_rocker", "FLEG"), "R" in rule_sides("front_leg_arm")
+    if SFL and (FL_FOOT or FL_TOP):
+        # the front leg rebuilt as a grid by rule (Joe, 2026-11-23): foot ON the rocker (foot_rocker, the dots rule), top ON the arm's
+        # underside (front_leg_arm: every column carried straight on along its own line until it meets the arm; no edge correction, the
+        # leg stays inset from the arm's sides as traced). Otherwise as traced (the loft's ends).
+        pcF = p_fleg; T_, L_ = cols(); v0, v1 = float(vv[0]), float(vv[-1])
+        if FL_FOOT:
+            pcF, SeF, T_, L_, repF = foot_on_rocker(p_fleg, meshes["ROCKER_R"], 150.0, 40.0, "FLEG_R"); report["foot_rocker_FLEG_R"] = repF
+        else: SeF = np.array([je.enter(meshes["ROCKER_R"], lambda S_: p_fleg(S_, T_, L_), np.full(len(T_), 150.0), np.full(len(T_), 40.0))]).ravel()
+        if FL_TOP:
+            armR = meshes["ARM_R"]; StF = je.enter(armR, lambda S_: pcF(S_, T_, L_), np.full(len(T_), 560.0), np.full(len(T_), 720.0))
+            top = pcF(StF, T_, L_); offa = trimesh.proximity.closest_point(armR, top)[1]
+            nm_ = {"outer_front": (1.0, 1.0), "outer_rear": (1.0, 0.0), "inner_front": (0.0, 1.0), "inner_rear": (0.0, 0.0)}
+            # the dots sheet's green dots were drawn straight up from v25's corners; along the leg's own edge lines they land here
+            report["front_leg_arm_R"] = {"rule": "parts/joint_rules.json front_leg_arm", "method": "tools/joint_ends.py: structured grid, top row ON the arm underside (no boolean)",
+                                         "top_corners": {k: np.round(top[(T_ == te) & (L_ == le)][0], 2).tolist() for k, (te, le) in nm_.items()},
+                                         "top_points_off_arm_max_mm": round(float(offa.max()), 4), "top_v_range": [round(float(StF.min()), 2), round(float(StF.max()), 2)]}
+        else: StF = np.full(len(T_), v1)
+        nr = max(int(np.ceil((StF - SeF).max() / 4.5)), 20)
+        G = np.stack([pcF(SeF + f_ * (StF - SeF), T_, L_) for f_ in np.linspace(0, 1, nr + 1)]).reshape(nr + 1, NT_J, NL_J, 3)
+        meshes["FLEG_R"] = je.block_solid(G)
+        meshes["FLEG_L"] = mirror(meshes["FLEG_R"])   # (the rules are applied to both sides: parts/joint_rules.json sides)
+        fl["action"] = "built by rule (parts/joint_rules.json: " + ", ".join(k for k, on in (("foot_rocker", FL_FOOT), ("front_leg_arm", FL_TOP)) if on) + ")"
+    elif fl["leg_top_z"] > zu:
         if UJ: su = float(zb(xc, yc + 1) - zb(xc, yc - 1)) / 2; sx_ = float(zb(xc + 1, yc) - zb(xc - 1, yc)) / 2      # the underside's own slopes at the leg
         else: su = np.polyval(np.polyder(pz), yc - 300); sx_ = 0.0
         n_ = np.array([-sx_, -su, 1.0]); n_ /= np.linalg.norm(n_); p_ = np.array([xc, yc, zu])

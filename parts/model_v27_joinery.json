@@ -1,0 +1,541 @@
+{
+ "source": "parts/model_v27_shapes.glb",
+ "ops": [
+  {
+   "part": "SEAT",
+   "why": "seat mesh closed with pymeshfix (it had open edges along the scalloped front top edge: build_model.py's Delaunay triangle filter drops slivers there). Root cause belongs in build_model.py."
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 24.6,
+   "why": "FLEG_R lap: seat side edge trimmed to the leg's inner face"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 53.76,
+   "why": "BLEG_R butt joint: seat side edge stops at the leg (front face), nothing of the seat inside or outside the leg"
+  },
+  {
+   "part": "FLEG_R",
+   "why": "FLEG_R foot already built ON ROCKER_R by build_model.py (parts/joint_rules.json foot_rocker): no sweep, no cut"
+  },
+  {
+   "part": "BLEG_R",
+   "why": "BLEG_R foot already built ON ROCKER_R by build_model.py (parts/joint_rules.json foot_rocker): no sweep, no cut"
+  },
+  {
+   "part": "ARM_R",
+   "why": "ARM_R end already built ON BLEG_R by build_model.py (parts/joint_rules.json arm_back_leg): no cope, no fill"
+  },
+  {
+   "part": "FLEG_R",
+   "why": "FLEG_R top already built ON ARM_R's underside by build_model.py (parts/joint_rules.json front_leg_arm): no fill, no cut"
+  },
+  {
+   "part": "FLEG_R",
+   "removed_cm3": 6.28,
+   "why": "mortise for DOMINO_FR in FLEG_R"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 5.47,
+   "why": "mortise for DOMINO_FR in the seat edge"
+  },
+  {
+   "part": "BLEG_R",
+   "removed_cm3": 3.83,
+   "why": "mortise for DOMINO_BR in BLEG_R"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 1.7,
+   "why": "mortise for DOMINO_BR in the seat edge"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 24.6,
+   "why": "FLEG_L lap: seat side edge trimmed to the leg's inner face"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 53.39,
+   "why": "BLEG_L butt joint: seat side edge stops at the leg (front face), nothing of the seat inside or outside the leg"
+  },
+  {
+   "part": "FLEG_L",
+   "why": "FLEG_L foot already built ON ROCKER_L by build_model.py (parts/joint_rules.json foot_rocker): no sweep, no cut"
+  },
+  {
+   "part": "BLEG_L",
+   "why": "BLEG_L foot already built ON ROCKER_L by build_model.py (parts/joint_rules.json foot_rocker): no sweep, no cut"
+  },
+  {
+   "part": "ARM_L",
+   "why": "ARM_L end already built ON BLEG_L by build_model.py (parts/joint_rules.json arm_back_leg): no cope, no fill"
+  },
+  {
+   "part": "FLEG_L",
+   "why": "FLEG_L top already built ON ARM_L's underside by build_model.py (parts/joint_rules.json front_leg_arm): no fill, no cut"
+  },
+  {
+   "part": "FLEG_L",
+   "removed_cm3": 6.28,
+   "why": "mortise for DOMINO_FL in FLEG_L"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 5.47,
+   "why": "mortise for DOMINO_FL in the seat edge"
+  },
+  {
+   "part": "BLEG_L",
+   "removed_cm3": 3.83,
+   "why": "mortise for DOMINO_BL in BLEG_L"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 1.7,
+   "why": "mortise for DOMINO_BL in the seat edge"
+  },
+  {
+   "part": "FLEG_R",
+   "removed_cm3": 5.46,
+   "why": "mortise for DOMINO_AR in the top of FLEG_R"
+  },
+  {
+   "part": "ARM_R",
+   "removed_cm3": 3.27,
+   "why": "mortise for DOMINO_AR in the underside of ARM_R"
+  },
+  {
+   "part": "FLEG_L",
+   "removed_cm3": 5.46,
+   "why": "mortise for DOMINO_AL in the top of FLEG_L"
+  },
+  {
+   "part": "ARM_L",
+   "removed_cm3": 3.27,
+   "why": "mortise for DOMINO_AL in the underside of ARM_L"
+  },
+  {
+   "part": "BLEG_R",
+   "removed_cm3": 2.4,
+   "why": "mortise for DOMINO_RSR in the rear face of BLEG_R"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 2.97,
+   "why": "mortise for DOMINO_RSR in the seat's back edge"
+  },
+  {
+   "part": "BLEG_R",
+   "removed_cm3": 9.81,
+   "why": "mortise for DOMINO_RAR in the rear face of BLEG_R"
+  },
+  {
+   "part": "ARM_R",
+   "removed_cm3": 5.49,
+   "why": "mortise for DOMINO_RAR in the end of ARM_R"
+  },
+  {
+   "part": "BLEG_L",
+   "removed_cm3": 2.4,
+   "why": "mortise for DOMINO_RSL in the rear face of BLEG_L"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 2.93,
+   "why": "mortise for DOMINO_RSL in the seat's back edge"
+  },
+  {
+   "part": "BLEG_L",
+   "removed_cm3": 9.81,
+   "why": "mortise for DOMINO_RAL in the rear face of BLEG_L"
+  },
+  {
+   "part": "ARM_L",
+   "removed_cm3": 5.49,
+   "why": "mortise for DOMINO_RAL in the end of ARM_L"
+  },
+  {
+   "part": "CREST",
+   "why": "crest end already built ON BLEG_R's inner face by build_model.py (parts/joint_rules.json crest_back_leg): no fill, no cope"
+  },
+  {
+   "part": "CREST",
+   "why": "crest end already built ON BLEG_L's inner face by build_model.py (parts/joint_rules.json crest_back_leg): no fill, no cope"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 2.47,
+   "why": "mortise for SLAT_C in the seat (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "CREST",
+   "removed_cm3": 20.54,
+   "why": "mortise for SLAT_C in the crest (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 1.96,
+   "why": "mortise for SLAT_R in the seat (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "CREST",
+   "removed_cm3": 11.55,
+   "why": "mortise for SLAT_R in the crest (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "SEAT",
+   "removed_cm3": 1.97,
+   "why": "mortise for SLAT_L in the seat (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "CREST",
+   "removed_cm3": 11.55,
+   "why": "mortise for SLAT_L in the crest (depth = how far the traced slat runs in; NOT measured)"
+  },
+  {
+   "part": "BLEG_R",
+   "why": "dropped 35 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "BLEG_L",
+   "why": "dropped 55 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "SEAT",
+   "why": "dropped 66 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "ARM_R",
+   "why": "dropped 5 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "ARM_L",
+   "why": "dropped 4 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "DOMINO_BR",
+   "why": "dropped 5 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "DOMINO_BL",
+   "why": "dropped 3 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "DOMINO_RAR",
+   "why": "dropped 3 zero-volume debris sheets left by the booleans"
+  },
+  {
+   "part": "DOMINO_RAL",
+   "why": "dropped 3 zero-volume debris sheets left by the booleans"
+  }
+ ],
+ "joints": {
+  "DOMINO_FR": {
+   "centre_xyz": [
+    284.4,
+    468.2,
+    394.8
+   ],
+   "section_mm": [
+    24.0,
+    10.0
+   ],
+   "depth_mm": 53.9,
+   "tilt_deg": 15,
+   "provenance": "section + position measured on leg-face orthophotos (parts/dominos.json); depth ASSUMED (leg thickness + 25 mm into the seat edge)"
+  },
+  "DOMINO_BR": {
+   "centre_xyz": [
+    225.3,
+    76.5,
+    322.8
+   ],
+   "section_mm": [
+    24.0,
+    10.0
+   ],
+   "depth_mm": 25.0,
+   "tilt_deg": 5,
+   "provenance": "section + position measured on leg-face orthophotos (parts/dominos.json); depth ASSUMED (25 mm, straddling the leg/seat joint line)"
+  },
+  "DOMINO_FL": {
+   "centre_xyz": [
+    -284.4,
+    468.2,
+    394.8
+   ],
+   "section_mm": [
+    24.0,
+    10.0
+   ],
+   "depth_mm": 53.9,
+   "tilt_deg": 15,
+   "provenance": "section + position measured on leg-face orthophotos (parts/dominos.json); depth ASSUMED (leg thickness + 25 mm into the seat edge)"
+  },
+  "DOMINO_BL": {
+   "centre_xyz": [
+    -225.3,
+    76.5,
+    322.8
+   ],
+   "section_mm": [
+    24.0,
+    10.0
+   ],
+   "depth_mm": 25.0,
+   "tilt_deg": 5,
+   "provenance": "section + position measured on leg-face orthophotos (parts/dominos.json); depth ASSUMED (25 mm, straddling the leg/seat joint line)"
+  },
+  "DOMINO_AR": {
+   "centre_xyz": [
+    268.2,
+    438.4,
+    625.7
+   ],
+   "axis": [
+    0.013,
+    -0.109,
+    0.994
+   ],
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": [
+    25,
+    15
+   ],
+   "provenance": "ASSUMED, hidden joint (parts/joints.json arm_front_leg)"
+  },
+  "DOMINO_AL": {
+   "centre_xyz": [
+    -268.2,
+    437.9,
+    625.6
+   ],
+   "axis": [
+    -0.013,
+    -0.109,
+    0.994
+   ],
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": [
+    25,
+    15
+   ],
+   "provenance": "ASSUMED, hidden joint (parts/joints.json arm_front_leg)"
+  },
+  "DOMINO_RSR": {
+   "centre_xyz": [
+    186.8,
+    32.3,
+    313.6
+   ],
+   "axis": [
+    -0.0003,
+    0.9944,
+    0.1053
+   ],
+   "long_axis": "level, along x",
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": 25,
+   "through_the_leg_mm": null,
+   "rear_face_fit_rms_mm": 0.34,
+   "volume_cm3": 5.37,
+   "in_leg_cm3": 2.4,
+   "in_seat_cm3": 2.97,
+   "bodies": 1,
+   "mm_of_the_end_in_the_leg": 10.8,
+   "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"
+  },
+  "DOMINO_RAR": {
+   "centre_xyz": [
+    211.3,
+    -0.4,
+    476.8
+   ],
+   "axis": [
+    -0.0005,
+    0.958,
+    0.2867
+   ],
+   "long_axis": "level, along x",
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": 70.5,
+   "through_the_leg_mm": 45.5,
+   "rear_face_fit_rms_mm": 0.36,
+   "volume_cm3": 15.3,
+   "in_leg_cm3": 9.81,
+   "in_arm_cm3": 5.49,
+   "bodies": 4,
+   "mm_of_the_end_in_the_leg": 24.0,
+   "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"
+  },
+  "DOMINO_RSL": {
+   "centre_xyz": [
+    -186.8,
+    32.3,
+    313.6
+   ],
+   "axis": [
+    -0.0001,
+    0.9945,
+    0.1051
+   ],
+   "long_axis": "level, along x",
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": 25,
+   "through_the_leg_mm": null,
+   "rear_face_fit_rms_mm": 0.34,
+   "volume_cm3": 5.33,
+   "in_leg_cm3": 2.4,
+   "in_seat_cm3": 2.93,
+   "bodies": 1,
+   "mm_of_the_end_in_the_leg": 10.8,
+   "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"
+  },
+  "DOMINO_RAL": {
+   "centre_xyz": [
+    -211.3,
+    -0.4,
+    476.8
+   ],
+   "axis": [
+    0.0001,
+    0.958,
+    0.2867
+   ],
+   "long_axis": "level, along x",
+   "section_mm": [
+    24,
+    10
+   ],
+   "depth_mm": 70.5,
+   "through_the_leg_mm": 45.5,
+   "rear_face_fit_rms_mm": 0.36,
+   "volume_cm3": 15.3,
+   "in_leg_cm3": 9.81,
+   "in_arm_cm3": 5.49,
+   "bodies": 4,
+   "mm_of_the_end_in_the_leg": 24.0,
+   "provenance": "end seen from behind: position and section measured on rear-face orthophotos (parts/joints.json back_leg_rear); driven square to the rear face and depth: ASSUMED"
+  }
+ },
+ "open": [
+  "arm / front leg: hidden; modelled as an ASSUMED vertical 10 mm Domino (the oval on the left arm top is not over the leg)",
+  "legs / rockers, crest / back legs: the joints are hidden; contact faces only",
+  "arm / back leg: a Domino end shows on the leg's rear face; how far it runs into the arm's end is ASSUMED (25 mm)",
+  "back leg / seat from behind: at the rear the real seam sits 2.5-3.4 mm inboard of the model leg's inner face, so the model's rear Domino at the seat has less of its end in the leg than the photos show (photos: 14.2 of 24 mm; model: 'mm_of_the_end_in_the_leg' of DOMINO_RS*); leg placement, not changed",
+  "Domino depth not visible; slat mortise depth not measured",
+  "leg feet: built on the rocker by the dots rule (parts/joint_rules.json foot_rocker): the legs' side faces run flush into the rocker's"
+ ],
+ "parts": {
+  "ROCKER_R": {
+   "volume_cm3": 1031.7,
+   "watertight": true
+  },
+  "ROCKER_L": {
+   "volume_cm3": 1031.7,
+   "watertight": true
+  },
+  "FLEG_R": {
+   "volume_cm3": 595.1,
+   "watertight": true
+  },
+  "FLEG_L": {
+   "volume_cm3": 595.1,
+   "watertight": true
+  },
+  "BLEG_R": {
+   "volume_cm3": 1506.5,
+   "watertight": true
+  },
+  "BLEG_L": {
+   "volume_cm3": 1506.5,
+   "watertight": true
+  },
+  "SEAT": {
+   "volume_cm3": 8367.1,
+   "watertight": true
+  },
+  "ARM_R": {
+   "volume_cm3": 673.2,
+   "watertight": true
+  },
+  "ARM_L": {
+   "volume_cm3": 673.2,
+   "watertight": true
+  },
+  "CREST": {
+   "volume_cm3": 948.0,
+   "watertight": true
+  },
+  "SLAT_C": {
+   "volume_cm3": 627.2,
+   "watertight": true
+  },
+  "SLAT_R": {
+   "volume_cm3": 334.7,
+   "watertight": true
+  },
+  "SLAT_L": {
+   "volume_cm3": 334.7,
+   "watertight": true
+  },
+  "DOMINO_FR": {
+   "volume_cm3": 11.7,
+   "watertight": true
+  },
+  "DOMINO_BR": {
+   "volume_cm3": 5.5,
+   "watertight": true
+  },
+  "DOMINO_FL": {
+   "volume_cm3": 11.7,
+   "watertight": true
+  },
+  "DOMINO_BL": {
+   "volume_cm3": 5.5,
+   "watertight": true
+  },
+  "DOMINO_AR": {
+   "volume_cm3": 8.7,
+   "watertight": true
+  },
+  "DOMINO_AL": {
+   "volume_cm3": 8.7,
+   "watertight": true
+  },
+  "DOMINO_RSR": {
+   "volume_cm3": 5.4,
+   "watertight": true
+  },
+  "DOMINO_RAR": {
+   "volume_cm3": 15.3,
+   "watertight": true
+  },
+  "DOMINO_RSL": {
+   "volume_cm3": 5.3,
+   "watertight": true
+  },
+  "DOMINO_RAL": {
+   "volume_cm3": 15.3,
+   "watertight": true
+  }
+ }
+}
