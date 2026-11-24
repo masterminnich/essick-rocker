@@ -582,6 +582,20 @@ async function renderDrawer() {
   $('dList').innerHTML = `<ol class="dl">${show.map((r) => rowHTML(r, urls)).join('')}</ol>`
   if (st.focus) { $('dList').querySelector(`[data-id="${CSS.escape(st.focus)}"]`)?.scrollIntoView({ block: 'center' }); st.focus = null }
 }
+// photos on a comment: prepared on the device, uploaded only when Post is pressed
+let cPhotos = []
+function renderCShots() {
+  const box = $('cShots'); box.hidden = !cPhotos.length
+  box.innerHTML = cPhotos.map((p) => `<div class="th"><img alt="" src="${p.url}"><button type="button" aria-label="Remove photo" data-ph="${p.id}">×</button></div>`).join('')
+}
+async function addCPhotos(e) {
+  const files = [...e.target.files]; e.target.value = ''
+  for (const f of files) {
+    if (cPhotos.length >= 6) { cStatus('warn', 'Up to 6 photos on one comment.'); break }
+    try { cPhotos.push(await store.preparePhoto(f)) } catch { cStatus('err', 'That photo could not be read.') }
+  }
+  renderCShots()
+}
 function cStatus(kind, text) { const s = $('cStatus'); s.className = 'cstatus' + (kind ? ' ' + kind : ''); s.textContent = text || '' }
 async function postComment(e) {
   e.preventDefault()
@@ -591,15 +605,14 @@ async function postComment(e) {
   store.setName(name)
   $('cPost').disabled = true; $('cPost').textContent = 'Posting…'; cStatus('', '')
   let saved = null
-  try { saved = await store.save({ id: store.newId('comment'), type: 'comment', who: name, text: body, website: $('cWebsite').value, model: `v${st.version}` }) } catch (err) {
+  try { saved = await store.save({ id: store.newId('comment'), type: 'comment', who: name, text: body, website: $('cWebsite').value, model: `v${st.version}` }, cPhotos) } catch (err) {
     if (err.status === 403) store.state.postingEnabled = false
     cStatus(err.status === 429 ? 'warn' : 'err', err.status === 429 ? 'Slow down a little. Wait a few minutes, then post again.' : err.message || 'That did not post. Try again in a moment.')
   }
   $('cPost').disabled = false; $('cPost').textContent = 'Post'
   if (!saved) { if (!store.state.postingEnabled) renderDrawer(); return }
-  $('cBody').value = ''; cStatus('ok', 'Posted. Thanks!')
-  await refresh(); st.focus = null
-  const l = $('dList'); l.scrollTop = l.scrollHeight
+  $('cBody').value = ''; cPhotos = []; renderCShots(); cStatus('ok', 'Posted. Thanks!')
+  st.focus = saved.id; await refresh()
 }
 
 // ------------------------------------------------------------------ your name, asked once, shown next to everything you give
@@ -633,6 +646,8 @@ function wire() {
     }
   })
   $('cForm').addEventListener('submit', postComment)
+  $('cPhotos').addEventListener('change', addCPhotos)
+  $('cShots').addEventListener('click', (e) => { const b = e.target.closest('[data-ph]'); if (b) { cPhotos = cPhotos.filter((p) => p.id !== b.dataset.ph); renderCShots() } })
   $('cBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) postComment(e) })
   $('cName').addEventListener('change', () => { if ($('cName').value.trim()) store.setName($('cName').value) })
   for (const id of ['cName', 'cBody']) $(id).addEventListener('input', () => { if (/warn|ok/.test($('cStatus').className)) cStatus('', '') })
