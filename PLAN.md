@@ -93,8 +93,11 @@
        arm's 4 edges end on the leg's 4 front corners, a bilinear correction fading over 100 mm), built by
        `tools/build_model.py` + `tools/joint_ends.py`, checked by `tools/joint_quality.py` (in model.sh). Figures
        `figures/arm_joint_pilot/`.
-       - [ ] left arm: same rule once Joe approves its dots (add "L" to `sides`; ARM_L is still the v25 mirror, coped).
-       - [ ] other joints (front-leg tops, crest ends): wait for Joe's approval of their dots.
+       - [x] left arm: same rule, model v27 (Joe approved the dots on `figures/joint_dots/dots_other_joints.png`).
+       - [x] other joints, model v27 (same approval): crest ends on the back legs, front and back feet on the rockers,
+         front-leg tops under the arms, both sides (`parts/joint_rules.json` crest_back_leg, foot_rocker, front_leg_arm).
+         Every rule joint passes `tools/joint_quality.py`, which now fails the build (model.sh). Figures `figures/joint_dots/`.
+       - [ ] `templates/legs.py` rerun: the feet and the front-leg tops changed in v27 (foot corners up to 7.2 mm).
        - [ ] `templates/arms.py` rerun for the new right-arm end.
    - Requests to the joinery session (its files; not fixed by the hub):
      - [ ] back-leg foot (z 0-100) +2.1..+4.1 on every edge [+2.3..+3.5]: the real foot is about 3 mm narrower than the model
