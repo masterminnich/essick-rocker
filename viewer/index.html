@@ -142,7 +142,8 @@
     </div>
     <label class="cfield"><span class="lbl">Comment</span><textarea id="cBody" name="body" rows="2" maxlength="2000" placeholder="What do you think of the chair?" required></textarea></label>
     <div class="hp" aria-hidden="true"><label>Website <input id="cWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
-    <div class="csend"><p class="cstatus" id="cStatus" role="status"></p><button class="btn pri" id="cPost" type="submit">Post</button></div>
+    <div class="shots cshots" id="cShots" hidden></div>
+    <div class="csend"><label class="btn cph"><input type="file" accept="image/*" multiple id="cPhotos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></label><p class="cstatus" id="cStatus" role="status"></p><button class="btn pri" id="cPost" type="submit">Post</button></div>
   </form>
   <div class="cclosed" id="cClosed" hidden><b>Feedback is closed for now</b>You can still read what people have said.</div>
 </div></div>

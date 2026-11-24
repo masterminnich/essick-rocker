@@ -39,7 +39,12 @@
 .cfield input::placeholder, .cfield textarea::placeholder { color: #a9a394 }
 .hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden }
 .csend { display: flex; align-items: center; gap: 16px }
-.csend .btn { flex: none; margin-left: auto; height: 52px; padding: 0 28px }
+.csend .btn.pri { flex: none; margin-left: auto; height: 52px; padding: 0 28px }
+.cph { flex: none; position: relative; overflow: hidden; height: 52px; padding: 0 18px; gap: 8px }
+.cph input { position: absolute; inset: 0; opacity: 0; cursor: pointer }
+.cph svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round }
+.cshots[hidden] { display: none }
+.cshots .th { width: 64px; height: 64px }
 .cstatus { font-size: 15px; line-height: 1.3; color: var(--mute); min-width: 0 }
 .cstatus:empty { display: none }
 .cstatus::before { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: currentColor; content: "" }
@@ -74,7 +79,8 @@
   .fdraw > .mute { padding: 2px 18px 10px; font-size: 15px }
   .cform { padding: 12px 18px 16px; gap: 8px }
   .cfield textarea { min-height: 56px }
-  .csend .btn { height: 48px; padding: 0 22px }
+  .csend .btn.pri { height: 48px; padding: 0 22px }
+  .cph { height: 48px; padding: 0 14px }
   .cclosed { padding: 18px }
   .tally { margin-top: 6px; font-size: 14px }
   .tally .t em { max-width: 150px }
