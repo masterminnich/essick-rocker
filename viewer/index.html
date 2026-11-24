@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="review.css">
-<link rel="stylesheet" href="feedback.css">
+<link rel="stylesheet" href="review.css?v=20261123c">
+<link rel="stylesheet" href="feedback.css?v=20261123c">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
@@ -142,11 +142,12 @@
     </div>
     <label class="cfield"><span class="lbl">Comment</span><textarea id="cBody" name="body" rows="2" maxlength="2000" placeholder="What do you think of the chair?" required></textarea></label>
     <div class="hp" aria-hidden="true"><label>Website <input id="cWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></label></div>
-    <div class="shots cshots" id="cShots" hidden></div>
-    <div class="csend"><label class="btn cph"><input type="file" accept="image/*" multiple id="cPhotos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Photo</span></label><p class="cstatus" id="cStatus" role="status"></p><button class="btn pri" id="cPost" type="submit">Post</button></div>
+    <div class="shots cshots" id="cShots"><label class="btn addph"><input type="file" accept="image/*" multiple id="cPhotos"><span>＋ Add photos</span></label></div>
+    <div class="csend"><p class="cstatus" id="cStatus" role="status"></p><button class="btn pri" id="cPost" type="submit">Post</button></div>
   </form>
   <div class="cclosed" id="cClosed" hidden><b>Feedback is closed for now</b>You can still read what people have said.</div>
 </div></div>
+<div class="lbox" id="lbox" hidden role="dialog" aria-label="Photo"><img id="lboxImg" alt="Photo"><button class="lbx" id="lboxClose" aria-label="Close">×</button><button class="lbn prev" id="lboxPrev" aria-label="Previous photo">‹</button><button class="lbn next" id="lboxNext" aria-label="Next photo">›</button><span class="lbc mono" id="lboxN"></span></div>
 <div class="who" id="who" hidden><form class="whoin" id="whoForm" role="dialog" aria-labelledby="whoTitle" novalidate>
   <span class="lbl">Before you save</span>
   <h2 id="whoTitle">What’s your name?</h2>
@@ -158,6 +159,6 @@
 
 <a class="wb" href="workbench.html">Workbench</a>
 <span class="sid" id="sid">er.look</span>
-<script type="module" src="review.js"></script>
+<script type="module" src="review.js?v=20261123c"></script>
 </body>
 </html>

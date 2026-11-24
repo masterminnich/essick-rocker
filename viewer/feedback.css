@@ -24,8 +24,9 @@
 .drow p.say { color: var(--ink); font-size: 17px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px }
 .drow .k.cm { background: none; border: 1.5px solid var(--rule) }
 .drow .k.cm svg { width: 17px; height: 17px; fill: none; stroke: var(--mute); stroke-width: 1.8; stroke-linejoin: round }
-.drow .ths a { display: block; border-radius: 8px; overflow: hidden }
-.drow .ths img { display: block; width: 72px; height: 72px }
+.drow .ths a { display: block; border-radius: 8px; overflow: hidden; cursor: zoom-in; transition: transform .12s }
+.drow .ths a:hover { transform: scale(1.04) }
+.drow .ths img { display: block; width: 88px; height: 88px; object-fit: cover; border-radius: 0 }
 .drow .del { align-self: start }
 
 /* comment box at the bottom of the drawer */
@@ -40,11 +41,6 @@
 .hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden }
 .csend { display: flex; align-items: center; gap: 16px }
 .csend .btn.pri { flex: none; margin-left: auto; height: 52px; padding: 0 28px }
-.cph { flex: none; position: relative; overflow: hidden; height: 52px; padding: 0 18px; gap: 8px }
-.cph input { position: absolute; inset: 0; opacity: 0; cursor: pointer }
-.cph svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round }
-.cshots[hidden] { display: none }
-.cshots .th { width: 64px; height: 64px }
 .cstatus { font-size: 15px; line-height: 1.3; color: var(--mute); min-width: 0 }
 .cstatus:empty { display: none }
 .cstatus::before { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: currentColor; content: "" }
@@ -80,10 +76,22 @@
   .cform { padding: 12px 18px 16px; gap: 8px }
   .cfield textarea { min-height: 56px }
   .csend .btn.pri { height: 48px; padding: 0 22px }
-  .cph { height: 48px; padding: 0 14px }
   .cclosed { padding: 18px }
   .tally { margin-top: 6px; font-size: 14px }
   .tally .t em { max-width: 150px }
   .whoin { padding: 22px 20px 18px }
   .whoin h2 { font-size: 26px }
 }
+
+/* a photo, big */
+.lbox { position: fixed; inset: 0; z-index: 30; background: rgba(20, 22, 25, .92); display: grid; place-items: center; padding: 56px 72px; animation: up .14s ease-out }
+.lbox[hidden] { display: none }
+.lbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5) }
+.lbox button { position: absolute; border: 0; background: rgba(255, 255, 255, .12); color: #fff; border-radius: 50%; width: 52px; height: 52px; font-size: 32px; line-height: 1; cursor: pointer; transition: background .12s }
+.lbox button:hover { background: rgba(255, 255, 255, .24) }
+.lbox button[hidden] { display: none }
+.lbx { top: 14px; right: 14px }
+.lbn { top: 50%; margin-top: -26px }
+.lbn.prev { left: 12px } .lbn.next { right: 12px }
+.lbc { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, .75); font-size: 14px }
+@media (max-width: 700px) { .lbox { padding: 64px 8px } .lbn { top: auto; bottom: 10px; margin: 0 } }
