@@ -1316,3 +1316,37 @@ blending across a thick part. No COLMAP re-solve; every job ran through tools/py
 - OPEN: arm and leg templates want a rerun against v25; feather edges where the arm (0.3-1 mm wider than the leg) wraps the
   leg's edge are pre-existing; the crest end's exposed back 6 mm beyond the leg stays a flat end (traced geometry).
 - Viewer: `parts/model_v25_dimensions.json` (tools/dimensions.py --model 25) so the review app moves to v25; all 29 sizes equal v24's.
+
+## 2026-11-23 17:30 PST model v26: right-arm pilot, the arm's 4 edges end on the back leg's front corners (the dots rule)
+- RUN ON Opus 5.5, Joe's session. Joe on v25: "the arm rest does not align with the outside edge of the back leg"; v25 also
+  had a shard and a double corner at the arm end from the cope. Joe approved the method on `figures/arm_joint_pilot/dots.png`
+  ("do right arm as a pilot"; the correction "fades over roughly the first 100 mm").
+- RULE (`parts/joint_rules.json` arm_back_leg, built by `tools/build_model.py` with `tools/joint_ends.py`, no booleans): GREEN
+  dots = the back leg's 4 front corners (its side planes, `joint_ends.side_planes`, meeting its front face) at the heights of
+  the arm's top and bottom edges. Each of the arm's 4 long edges gets an x correction dx_e (green x minus the traced edge's x at
+  the dot's y): top outer +7.44, top inner +1.83, bottom outer +1.00, bottom inner -2.83 mm. Across the section the correction
+  is bilinear in (t across, l through), so at any y each face is the straight surface between its two edges; along the arm it
+  fades as (1 - u)^2, u = (y - y_e) / 100 mm, from each edge's own dot y_e. Beyond y 151 the arm is exactly as traced. The 4
+  edge columns end on their dots; every other end point slides along its own line onto the leg's front face (bisection).
+- RESULT v26 (right arm; ARM_L is still v25's): corners to dots 0.001-0.015 mm (v25: top outer 7.15 mm); crease step
+  outer -0.12, inner -0.08 mm (v25 outer -3.07); shards 0 (v25 94 points), sharp short edges 0 (v25 180); end outline past the
+  leg's sides 0.20 mm max; faces off their edge lines 0.02 mm max. Flush audit ARM_R~BLEG_R contact 10.9 -> 11.8 cm2, open
+  0.7 -> 0.2 cm2. Assembly check PASS. Arm surface vs v25: y 152-700 unchanged (<= 0.011 mm) except the front-leg Domino
+  mortise; y 100-140 up to 0.94 mm, y 0-100 up to 6.7 mm (the fade). Other parts identical except DOMINO_AR and its mortises
+  in FLEG_R / ARM_R, 0.40 mm in x: joinery.py centres that Domino on the arm/leg contact patch, found from an even surface
+  sample of the whole arm, and the arm mesh changed. Critique: held-out |median| over region sides 1.390 -> 1.384, items
+  40 -> 40 (ARM inner/front y 450 out, BLEG inner/front z 500 in; both borderline, 1-photo changes); right arm near the leg
+  (held-out, 1-4 photos): crease top/outer y 0 +1.80 -> -0.47, y 50 +1.65 -> -0.17; sil top/outer y 50 -3.03 -> -1.73.
+  Dimensions: 29 equal v25's.
+- `tools/joint_quality.py` (in model.sh): flush is now the step AT the crease (arm side-face points within 0.5 mm of the leg vs
+  the leg's face beside them); the v25 band measure is kept as `flush_band` (it reads the arm's 13-degree plan angle as a step:
+  +1.22 / -1.60 on v26). New: corners vs dots, bulge = end outline past the leg's side planes + faces off their edge lines (the
+  literal "arm points within 5 mm of the leg past its side planes" is only reported: 1.32 mm on v26, the traced arm leaving the
+  leg at its own angle; only the rejected tangent option could make it zero). Leg samples inside the Domino's box are left out
+  (the mortise walls also face +-x and had pulled the fitted side planes 0.8 mm in).
+- DEAD ENDS (pilot journey, figures/arm_joint_pilot/options.png): (1) faces tangent to the leg's sides over the last 80 mm:
+  an 18-degree curl ("needless curvature"); (2) a correction fitted per grid column, each with its own entry y, fading to
+  y 300: the lower outer face bulged past the leg.
+- OPEN: the left arm and every other joint wait for Joe to approve their dots; `templates/arms.py` wants a rerun for the new
+  right-arm end; a sub-pixel (about 0.1 mm) line of the leg's front face shows along the crease at extreme zoom (the leg's
+  faceted side vs its fitted plane).

@@ -1,0 +1,22 @@
+{
+ "about": "How the parts meet at each visible joint: which faces run flush and where an end sits. The build makes the parts obey these rules (tools/joint_ends.py), instead of cutting one rough mesh with another. Joe, 2026-11-23: 'the wood sits flush ... the arm rest does not align with the outside edge of the back leg'. Chair frame mm, +y forward, z up, right side +x.",
+ "arm_back_leg": {
+  "sides": [
+   "R"
+  ],
+  "sides_note": "PILOT: right arm only (Joe, 2026-11-23: 'do right arm as a pilot'). The left arm is still built the v25 way (mirror of the traced arm, coped by tools/joinery.py fill_to) until Joe approves.",
+  "edges_flush": {
+   "arm outer face": "spans between the arm's outer-top and outer-bottom edges, which end on the leg's outer front corner: flush with the leg's outer face, no step",
+   "arm inner face": "the same on the inner side"
+  },
+  "end": "the arm's end sits ON the back leg's front face: every end point slid along the arm's own curve until it lies on the leg",
+  "dots": "GREEN dots: the back leg's 4 front corners, where its front face meets its outer and inner side faces (planes fitted by tools/joint_ends.side_planes), at the heights of the arm's top and bottom edges. The arm's 4 long edges (outer-top, inner-top, outer-bottom, inner-bottom) END exactly on them. RED dots: where the traced edges ended in v25 (top outer 7.5 mm short, top inner 3.9, bottom outer 2.3, bottom inner 2.9). Joe approved, 2026-11-23 (figures/arm_joint_pilot/dots.png).",
+  "fade_length_mm": 100.0,
+  "correction": "Each edge gets an x correction dx_e = green x minus the traced edge's x at the green dot's y (y and z follow from the end lying on the leg). Across the section the correction is bilinear in (t across, l through) between the 4 edge corrections, so at any y each face is the straight surface spanned between its two edges (no per-column fitting, no bulge). It fades along the arm as (1 - u)^2, u = (y - y_e) / L, measured from each edge's own dot y_e (the end face stays on the leg; full at the dot, zero with zero slope at y_e + L, L = 100 mm, Joe: 'fades over roughly the first 100 mm'). Beyond y_e + L (about y 151) the arm is exactly as traced. Every interior end point is slid along its own line onto the leg's front face by bisection.",
+  "rejected": [
+   "(1) faces made tangent to the leg's side faces over the last 80 mm: the arm turned 18 degrees, a visible curl (Joe, 2026-11-23: 'needless curvature', figures/arm_joint_pilot/options.png option 1).",
+   "(2) a per-height correction s * (1 - u)^2 fading to y 300, fitted separately for each grid column from that column's own entry y: the lower outer face bulged past the leg (options.png option 2)."
+  ],
+  "provenance": "Joe's reading of the real chair; photos IMG_1481 (inside, close) and IMG_1517 (left side): the arm's side faces carry straight into the leg's. Critique on v24, right arm outer edges at y < 90: 1.4-2.5 mm outboard of the model in most photos (top/outer y 0 R -1.39 [held -2.50], bottom/outer y 50 R -1.38 [-2.46]); the plan lines in parts/arms.json were traced only to y 68.2 and extrapolated into the leg. v25 at the leg: arm 33.5-34.5 wide, leg 39.5 thick; arm outer face 3.5-7.6 mm inside the leg's outer face, inner face within 2.5 mm of the leg's inner face."
+ }
+}

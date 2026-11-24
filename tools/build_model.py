@@ -687,6 +687,69 @@ else:
         slope = np.arctan(np.polyval(np.polyder(pz), Y - 300)); Zb = Z - th / np.cos(slope)
         zb = lambda x, y: np.polyval(pz, y - 300) - th / np.cos(np.arctan(np.polyval(np.polyder(pz), y - 300)))
     am = grid_solid(np.dstack([X, Y, Z]), np.dstack([X, Y, Zb]), ns, nt); meshes["ARM_R"] = am; meshes["ARM_L"] = mirror(am)
+    # arm / back leg built to parts/joint_rules.json (Joe, 2026-11-23): the arm's 4 long edges end ON the back leg's front corners
+    JRF = ROOT / "parts/joint_rules.json"
+    if JRF.exists() and UJ is not None and "R" in json.load(open(JRF))["arm_back_leg"]["sides"]:
+        sys.path.insert(0, str(ROOT / "tools")); import joint_ends as je
+        rule = json.load(open(JRF))["arm_back_leg"]; Lf = float(rule["fade_length_mm"]); leg = meshes["BLEG_R"]; nl = 9
+        tt_, ll_ = np.meshgrid(np.linspace(0, 1, nt), np.linspace(0, 1, nl), indexing="ij"); tt_, ll_ = tt_.ravel(), ll_.ravel()   # one column per (t, l)
+        EDG = {"top_outer": (1.0, 1.0), "top_inner": (0.0, 1.0), "bottom_outer": (1.0, 0.0), "bottom_inner": (0.0, 0.0)}   # (t across inner->outer, l bottom->top)
+        def arm_z(Yv, t, l):
+            zt_ = np.polyval(pz, Yv - 300) + (t - 0.5) * np.polyval(pzx, Yv - 300)
+            zb_ = np.polyval(pz, Yv - 300) + 0.5 * np.polyval(pzx, Yv - 300) - hu(Yv, t); return zb_ + l * (zt_ - zb_)
+        def traced_x(Yv, t):
+            return np.polyval(pin, Yv - 300) + t * (np.polyval(pout, Yv - 300) - np.polyval(pin, Yv - 300))
+        COR = None                                            # set below: per edge (dot y, x correction)
+        def arm_pt(Yv, t, l, clamp=False, x_at=None):
+            """point of the arm at y = Yv, fraction t across (inner -> outer), l through (bottom -> top). Traced arm plus an x
+            correction that is bilinear in (t, l) between the 4 edges' own corrections dx_e, each faded as (1 - u)^2 with
+            u = (y - y_e) / L from its own dot's y_e (full at the dot, zero with zero slope at y_e + L, nothing beyond). At one y the
+            correction is linear across each face, so every face is the surface spanned between its two edges. clamp: keep the
+            point within the leg's side faces (only to bracket the bisection inside the leg). x_at: x taken at this y (front row)."""
+            Yv = np.asarray(Yv, float); yx = Yv if x_at is None else x_at; z_ = arm_z(Yv, t, l); x_ = traced_x(yx, t)
+            if COR is not None:
+                for k_, (te, le) in EDG.items():
+                    w = (t if te else 1 - t) * (l if le else 1 - l); ye, dx = COR[k_]
+                    x_ = x_ + w * dx * (1.0 - np.minimum((yx - ye) / Lf, 1.0)) ** 2
+            if clamp: x_ = np.clip(x_, je.plane_x(PL["minus_x"], Yv, z_) + 0.5, je.plane_x(PL["plus_x"], Yv, z_) - 0.5)
+            return np.c_[x_, Yv, z_]
+        PL = je.side_planes(leg, arm_pt(np.array([45.0]), 0.5, 0.5)[0])   # the leg's side faces near the joint (planes x = a + b y + c z)
+        lo_, hi_ = np.full(1, 20.0), np.full(1, 90.0); red, green = {}, {}
+        for k_, (te, le) in EDG.items():
+            tin = 0.98 if te else 0.02                        # containment is tested just inside the side faces (0.7 mm)
+            # RED: where the traced edge (extrapolated into the leg) enters it
+            yr = float(je.first_inside(leg, lambda Yv: arm_pt(Yv, tin, le, clamp=True), lo_, hi_)[0]); red[k_] = arm_pt(np.array([yr]), te, le)[0]
+            # GREEN: the leg's front corner at this edge's height: along the leg's side plane, at the arm edge's own z(y), where it meets the front face
+            pk = PL["plus_x" if te else "minus_x"]; sgi = -0.4 if te else 0.4   # tested 0.4 mm in: the fitted plane is within ~0.2 mm of the leg's face
+            fz = lambda Yv: np.c_[je.plane_x(pk, Yv, arm_z(Yv, te, le)) + sgi, Yv, arm_z(Yv, te, le)]
+            Ys = np.arange(90.0, 10.0, -0.5); k0 = int(np.argmax(leg.contains(fz(Ys))))   # the first point inside, coming back from the front
+            yg = float(je.first_inside(leg, fz, Ys[k0:k0 + 1], Ys[k0 - 1:k0])[0]); zg = float(arm_z(np.array([yg]), te, le)[0])
+            green[k_] = np.array([float(je.plane_x(pk, yg, zg)), yg, zg])
+        COR = {k_: (green[k_][1], float(green[k_][0] - traced_x(np.array([green[k_][1]]), EDG[k_][0])[0])) for k_ in EDG}
+        tev = np.clip(tt_, 0.02, 0.98)                         # (the clamp keeps the bracket inside the leg, 0.5 mm in)
+        Yh = je.first_inside(leg, lambda Yv: arm_pt(Yv, tev, ll_, clamp=True), np.full(len(tt_), 20.0), np.full(len(tt_), 90.0))
+        for k_, (te, le) in EDG.items(): Yh[(tt_ == te) & (ll_ == le)] = green[k_][1]   # the 4 edges end exactly on their dots
+        yend_ = ci_[1] + tt_ * (co_[1] - ci_[1]); yfr = np.polyval(pf, arm_pt(yend_, tt_, ll_)[:, 0])   # front row as above
+        G = np.zeros((ns, nt * nl, 3))
+        for i, f_ in enumerate(np.linspace(0, 1, ns)):
+            if i == ns - 1: G[i] = arm_pt(yfr, tt_, ll_, x_at=yend_)
+            else: G[i] = arm_pt(Yh + f_ * (yend_ - Yh), tt_, ll_)
+        G = G.reshape(ns, nt, nl, 3)
+        amR = je.block_solid(G); meshes["ARM_R"] = amR
+        cl = trimesh.proximity.closest_point(leg, G[0].reshape(-1, 3))[1]
+        cidx = {"top_outer": (-1, -1), "top_inner": (0, -1), "bottom_outer": (-1, 0), "bottom_inner": (0, 0)}
+        r3 = lambda v: np.round(np.asarray(v, float), 2).tolist()
+        report["arm_back_leg_R"] = {"rule": "parts/joint_rules.json arm_back_leg (the dots rule)", "method": "tools/joint_ends.py: structured grid, end row ON the leg (no boolean)",
+                                    "grid_ns_nt_nl": [ns, nt, nl], "fade_length_mm": Lf, "fade_coordinate": "each edge's correction fades from its own green dot's y; bilinear across the section",
+                                    "leg_side_planes": {k: {"x_eq_a_by_cz": np.round(v["coef"], 5).tolist(), "fit_rms_mm": round(v["rms_mm"], 3), "n": v["n"]} for k, v in PL.items()},
+                                    "green_dots_leg_front_corners": {k: r3(v) for k, v in green.items()},
+                                    "red_dots_traced_edge_ends": {k: r3(v) for k, v in red.items()},
+                                    "red_to_green_mm": {k: round(float(np.linalg.norm(green[k] - red[k])), 2) for k in EDG},
+                                    "x_correction_at_dot_mm": {k: round(COR[k][1], 2) for k in EDG},
+                                    "traced_beyond_y": round(max(v[0] for v in COR.values()) + Lf, 1),
+                                    "end_corner_to_dot_mm": {k: round(float(np.linalg.norm(G[0, ti, li] - green[k])), 3) for k, (ti, li) in cidx.items()},
+                                    "end_y_range": [round(float(Yh.min()), 2), round(float(Yh.max()), 2)], "end_points_off_leg_max_mm": round(float(cl.max()), 4),
+                                    "left": "PILOT: ARM_L is still the mirror of the traced arm (coped by joinery.py fill_to)"}
     # front-leg tops vs the arm underside
     fv = meshes["FLEG_R"].vertices; tp = fv[fv[:, 2] > fv[:, 2].max() - 15]; yc, xc = float(tp[:, 1].mean()), float(tp[:, 0].mean())
     zu = float(zb(xc, yc))

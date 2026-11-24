@@ -1,0 +1,464 @@
+{
+ "ARM_R~BLEG_R": {
+  "joint": "arm end coped to the back leg",
+  "contact_cm2": 11.8,
+  "open_cm2": 0.2,
+  "open_max_mm": 9.86,
+  "open_p95_mm": 9.49,
+  "open_median_mm": 5.31,
+  "open_over_0.5mm_cm2": 0.18,
+  "open_bbox": [
+   [
+    191.0,
+    38.0,
+    482.0
+   ],
+   [
+    228.0,
+    46.0,
+    504.0
+   ]
+  ]
+ },
+ "ARM_L~BLEG_L": {
+  "joint": "arm end coped to the back leg",
+  "contact_cm2": 10.3,
+  "open_cm2": 0.6,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.4,
+  "open_median_mm": 2.77,
+  "open_over_0.5mm_cm2": 0.56,
+  "open_bbox": [
+   [
+    -228.0,
+    38.0,
+    472.0
+   ],
+   [
+    -192.0,
+    49.0,
+    505.0
+   ]
+  ]
+ },
+ "ARM_R~FLEG_R": {
+  "joint": "arm underside on the front-leg top",
+  "contact_cm2": 6.4,
+  "open_cm2": 0.8,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.33,
+  "open_median_mm": 5.23,
+  "open_over_0.5mm_cm2": 0.77,
+  "open_bbox": [
+   [
+    252.0,
+    422.0,
+    621.0
+   ],
+   [
+    281.0,
+    454.0,
+    629.0
+   ]
+  ]
+ },
+ "ARM_L~FLEG_L": {
+  "joint": "arm underside on the front-leg top",
+  "contact_cm2": 6.5,
+  "open_cm2": 0.7,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.4,
+  "open_median_mm": 5.17,
+  "open_over_0.5mm_cm2": 0.65,
+  "open_bbox": [
+   [
+    -283.0,
+    421.0,
+    621.0
+   ],
+   [
+    -252.0,
+    451.0,
+    629.0
+   ]
+  ]
+ },
+ "FLEG_R~ARM_R": {
+  "joint": "front-leg top under the arm",
+  "contact_cm2": 6.3,
+  "open_cm2": 0.5,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.91,
+  "open_median_mm": 5.18,
+  "open_over_0.5mm_cm2": 0.52,
+  "open_bbox": [
+   [
+    252.0,
+    423.0,
+    620.0
+   ],
+   [
+    280.0,
+    453.0,
+    629.0
+   ]
+  ]
+ },
+ "FLEG_L~ARM_L": {
+  "joint": "front-leg top under the arm",
+  "contact_cm2": 6.3,
+  "open_cm2": 0.5,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.74,
+  "open_median_mm": 4.45,
+  "open_over_0.5mm_cm2": 0.48,
+  "open_bbox": [
+   [
+    -285.0,
+    423.0,
+    620.0
+   ],
+   [
+    -252.0,
+    453.0,
+    629.0
+   ]
+  ]
+ },
+ "CREST~BLEG_R": {
+  "joint": "crest end coped to the back leg",
+  "contact_cm2": 19.9,
+  "open_cm2": 0.0,
+  "open_max_mm": 7.58,
+  "open_p95_mm": 7.21,
+  "open_median_mm": 3.86,
+  "open_over_0.5mm_cm2": 0.02,
+  "open_bbox": [
+   [
+    216.0,
+    -167.0,
+    1002.0
+   ],
+   [
+    217.0,
+    -140.0,
+    1011.0
+   ]
+  ]
+ },
+ "CREST~BLEG_L": {
+  "joint": "crest end coped to the back leg",
+  "contact_cm2": 19.9,
+  "open_cm2": 0.0,
+  "open_max_mm": 8.02,
+  "open_p95_mm": 7.6,
+  "open_median_mm": 5.04,
+  "open_over_0.5mm_cm2": 0.04,
+  "open_bbox": [
+   [
+    -220.0,
+    -164.0,
+    999.0
+   ],
+   [
+    -217.0,
+    -140.0,
+    1035.0
+   ]
+  ]
+ },
+ "SEAT~BLEG_R": {
+  "joint": "seat side edge butting the back leg",
+  "contact_cm2": 30.4,
+  "open_cm2": 0.3,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 10.0,
+  "open_median_mm": 1.19,
+  "open_over_0.5mm_cm2": 0.25,
+  "open_bbox": [
+   [
+    187.0,
+    32.0,
+    294.0
+   ],
+   [
+    225.0,
+    79.0,
+    339.0
+   ]
+  ]
+ },
+ "SEAT~BLEG_L": {
+  "joint": "seat side edge butting the back leg",
+  "contact_cm2": 29.7,
+  "open_cm2": 0.5,
+  "open_max_mm": 10.0,
+  "open_p95_mm": 9.97,
+  "open_median_mm": 5.09,
+  "open_over_0.5mm_cm2": 0.47,
+  "open_bbox": [
+   [
+    -225.0,
+    32.0,
+    294.0
+   ],
+   [
+    -187.0,
+    88.0,
+    343.0
+   ]
+  ]
+ },
+ "SEAT~FLEG_R": {
+  "joint": "seat side edge in the front-leg lap",
+  "contact_cm2": 29.8,
+  "open_cm2": 0.5,
+  "open_max_mm": 9.86,
+  "open_p95_mm": 9.76,
+  "open_median_mm": 5.07,
+  "open_over_0.5mm_cm2": 0.43,
+  "open_bbox": [
+   [
+    252.0,
+    446.0,
+    368.0
+   ],
+   [
+    268.0,
+    486.0,
+    421.0
+   ]
+  ]
+ },
+ "SEAT~FLEG_L": {
+  "joint": "seat side edge in the front-leg lap",
+  "contact_cm2": 30.2,
+  "open_cm2": 0.5,
+  "open_max_mm": 9.99,
+  "open_p95_mm": 9.55,
+  "open_median_mm": 4.68,
+  "open_over_0.5mm_cm2": 0.5,
+  "open_bbox": [
+   [
+    -268.0,
+    446.0,
+    368.0
+   ],
+   [
+    -252.0,
+    487.0,
+    421.0
+   ]
+  ]
+ },
+ "FLEG_R~ROCKER_R": {
+  "joint": "front foot on the rocker",
+  "contact_cm2": 10.2,
+  "open_cm2": 0.1,
+  "open_max_mm": 8.84,
+  "open_p95_mm": 8.27,
+  "open_median_mm": 1.71,
+  "open_over_0.5mm_cm2": 0.14,
+  "open_bbox": [
+   [
+    262.0,
+    534.0,
+    89.0
+   ],
+   [
+    291.0,
+    565.0,
+    100.0
+   ]
+  ]
+ },
+ "FLEG_L~ROCKER_L": {
+  "joint": "front foot on the rocker",
+  "contact_cm2": 10.3,
+  "open_cm2": 0.1,
+  "open_max_mm": 9.63,
+  "open_p95_mm": 9.17,
+  "open_median_mm": 1.17,
+  "open_over_0.5mm_cm2": 0.14,
+  "open_bbox": [
+   [
+    -291.0,
+    533.0,
+    89.0
+   ],
+   [
+    -263.0,
+    565.0,
+    100.0
+   ]
+  ]
+ },
+ "BLEG_R~ROCKER_R": {
+  "joint": "back foot on the rocker",
+  "contact_cm2": 16.2,
+  "open_cm2": 0.3,
+  "open_max_mm": 9.65,
+  "open_p95_mm": 9.31,
+  "open_median_mm": 2.33,
+  "open_over_0.5mm_cm2": 0.27,
+  "open_bbox": [
+   [
+    174.0,
+    28.0,
+    33.0
+   ],
+   [
+    211.0,
+    67.0,
+    43.0
+   ]
+  ]
+ },
+ "BLEG_L~ROCKER_L": {
+  "joint": "back foot on the rocker",
+  "contact_cm2": 16.3,
+  "open_cm2": 0.3,
+  "open_max_mm": 9.5,
+  "open_p95_mm": 9.02,
+  "open_median_mm": 3.51,
+  "open_over_0.5mm_cm2": 0.3,
+  "open_bbox": [
+   [
+    -211.0,
+    28.0,
+    34.0
+   ],
+   [
+    -174.0,
+    67.0,
+    43.0
+   ]
+  ]
+ },
+ "SLAT_C~SEAT": {
+  "joint": "slat shoulder on the seat",
+  "contact_cm2": 12.9,
+  "open_cm2": 0.8,
+  "open_max_mm": 9.9,
+  "open_p95_mm": 9.53,
+  "open_median_mm": 4.81,
+  "open_over_0.5mm_cm2": 0.78,
+  "open_bbox": [
+   [
+    -38.0,
+    47.0,
+    331.0
+   ],
+   [
+    38.0,
+    53.0,
+    333.0
+   ]
+  ]
+ },
+ "SLAT_R~SEAT": {
+  "joint": "slat shoulder on the seat",
+  "contact_cm2": 8.6,
+  "open_cm2": 0.4,
+  "open_max_mm": 9.89,
+  "open_p95_mm": 9.62,
+  "open_median_mm": 5.1,
+  "open_over_0.5mm_cm2": 0.4,
+  "open_bbox": [
+   [
+    69.0,
+    53.0,
+    334.0
+   ],
+   [
+    108.0,
+    60.0,
+    338.0
+   ]
+  ]
+ },
+ "SLAT_L~SEAT": {
+  "joint": "slat shoulder on the seat",
+  "contact_cm2": 9.0,
+  "open_cm2": 0.4,
+  "open_max_mm": 9.64,
+  "open_p95_mm": 9.31,
+  "open_median_mm": 5.31,
+  "open_over_0.5mm_cm2": 0.35,
+  "open_bbox": [
+   [
+    -108.0,
+    53.0,
+    333.0
+   ],
+   [
+    -68.0,
+    61.0,
+    338.0
+   ]
+  ]
+ },
+ "SLAT_C~CREST": {
+  "joint": "slat shoulder at the crest",
+  "contact_cm2": 55.0,
+  "open_cm2": 3.7,
+  "open_max_mm": 9.97,
+  "open_p95_mm": 9.31,
+  "open_median_mm": 5.12,
+  "open_over_0.5mm_cm2": 3.55,
+  "open_bbox": [
+   [
+    -51.0,
+    -176.0,
+    1003.0
+   ],
+   [
+    51.0,
+    -164.0,
+    1006.0
+   ]
+  ]
+ },
+ "SLAT_R~CREST": {
+  "joint": "slat shoulder at the crest",
+  "contact_cm2": 33.0,
+  "open_cm2": 1.4,
+  "open_max_mm": 9.95,
+  "open_p95_mm": 9.14,
+  "open_median_mm": 4.06,
+  "open_over_0.5mm_cm2": 1.36,
+  "open_bbox": [
+   [
+    85.0,
+    -169.0,
+    1002.0
+   ],
+   [
+    137.0,
+    -160.0,
+    1006.0
+   ]
+  ]
+ },
+ "SLAT_L~CREST": {
+  "joint": "slat shoulder at the crest",
+  "contact_cm2": 32.8,
+  "open_cm2": 1.6,
+  "open_max_mm": 9.97,
+  "open_p95_mm": 9.07,
+  "open_median_mm": 4.36,
+  "open_over_0.5mm_cm2": 1.52,
+  "open_bbox": [
+   [
+    -137.0,
+    -169.0,
+    1002.0
+   ],
+   [
+    -85.0,
+    -160.0,
+    1005.0
+   ]
+  ]
+ }
+}
