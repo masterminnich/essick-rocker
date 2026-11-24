@@ -45,7 +45,7 @@ async function rpc(fn, args) {
   } finally { clearTimeout(t) }
 }
 const safeKey = (k) => String(k).replace(/[^A-Za-z0-9_.-]/g, '_').slice(0, 80)
-const DETAIL_SKIP = new Set(['id', 'type', 'who', 'mine', 'at', 'updated', 'text', 'body', 'synced', 'n'])
+const DETAIL_SKIP = new Set(['id', 'type', 'who', 'mine', 'at', 'updated', 'text', 'body', 'synced', 'n', 'website'])
 function fromServer(i) {
   return { ...(i.data || {}), id: i.mine ? i.key : i.id, type: i.kind, who: i.name, mine: !!i.mine, text: i.body || '',
     at: Date.parse(i.created_at), updated: Date.parse(i.updated_at), photos: i.data?.photos || [] }

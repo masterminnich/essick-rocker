@@ -2,7 +2,7 @@
 // not sure) and Templates. All feedback is shared (everyone sees everyone's) and saved by store.js; the Feedback drawer
 // lists it with the general comments. The old tools live in workbench.html.
 import * as S from './scene.js'
-import * as store from './store.js'
+import * as store from './store.js?v=20261123c'
 import { inch, mmText, parse, MM } from './inches.js'
 
 const $ = (id) => document.getElementById(id)
@@ -554,7 +554,7 @@ function rowHTML(r, urls) {
   else if (r.type === 'answer') { const c = kindOf(r); k = `<span class="k ${c}">${{ ok: '✓', no: '✕', q: '?' }[c]}</span>`; title = r.name; body = `<p>${r.verdict === 'wrong' ? `Should be <span class="v">${inch(r.value_mm)}</span> (${mmText(r.value_mm)}); model has ${inch(r.model_mm)}` : r.verdict === 'right' ? `Right: <span class="v">${inch(r.value_mm)}</span>` : 'Not sure'}</p>` }
   else if (r.type === 'question') { k = `<span class="k ${r.choice === 'unsure' ? 'q' : 'ok'}">${r.choice === 'unsure' ? '?' : '✓'}</span>`; title = r.name; body = `<p>${r.choice === 'unsure' ? 'Not sure' : esc(r.choice)}</p>` }
   else { k = '<span class="k ok">✓</span>'; title = `${S.partName(r.part)} looks right`; body = '' }
-  const ths = (r.photos || []).filter((p) => urls[p]).map((p) => `<a href="${urls[p]}" target="_blank" rel="noopener"><img alt="Photo" loading="lazy" src="${urls[p]}"></a>`).join('')
+  const ths = (r.photos || []).filter((p) => urls[p]).map((p, i) => `<a href="${urls[p]}" data-lb="${esc(r.id)}" data-i="${i}"><img alt="Photo" loading="lazy" src="${urls[p]}"></a>`).join('')
   const head = `<div class="dwho"><b>${esc(r.mine ? `${r.who} (you)` : r.who)}</b><time>${esc(when(r.at))}</time></div>`
   return `<li class="drow${r.id === st.focus ? ' fresh' : ''}" data-id="${esc(r.id)}">${k}<div>${head}${title ? `<h4>${esc(title)}</h4>` : ''}${body}${ths ? `<div class="ths">${ths}</div>` : ''}</div>` +
     (r.mine ? `<button class="del" data-del="${esc(r.id)}">Delete</button>` : '<span></span>') + '</li>'
@@ -582,11 +582,28 @@ async function renderDrawer() {
   $('dList').innerHTML = `<ol class="dl">${show.map((r) => rowHTML(r, urls)).join('')}</ol>`
   if (st.focus) { $('dList').querySelector(`[data-id="${CSS.escape(st.focus)}"]`)?.scrollIntoView({ block: 'center' }); st.focus = null }
 }
+// a photo, big: tap a thumbnail in the feed; arrows step through that item's photos
+const lbx = { list: [], i: 0 }
+function showLightbox() {
+  $('lboxImg').src = lbx.list[lbx.i]
+  const many = lbx.list.length > 1
+  $('lboxPrev').hidden = $('lboxNext').hidden = !many
+  $('lboxN').textContent = many ? `${lbx.i + 1} of ${lbx.list.length}` : ''
+}
+function openLightbox(list, i) { lbx.list = list; lbx.i = i || 0; showLightbox(); $('lbox').hidden = false }
+function closeLightbox() { $('lbox').hidden = true; $('lboxImg').removeAttribute('src') }
+function stepLightbox(d) { lbx.i = (lbx.i + d + lbx.list.length) % lbx.list.length; showLightbox() }
+
 // photos on a comment: prepared on the device, uploaded only when Post is pressed
 let cPhotos = []
 function renderCShots() {
-  const box = $('cShots'); box.hidden = !cPhotos.length
-  box.innerHTML = cPhotos.map((p) => `<div class="th"><img alt="" src="${p.url}"><button type="button" aria-label="Remove photo" data-ph="${p.id}">×</button></div>`).join('')
+  const box = $('cShots')
+  box.querySelectorAll('.th').forEach((e) => e.remove())
+  for (const p of cPhotos) {
+    const d = document.createElement('div'); d.className = 'th'
+    d.innerHTML = `<img alt="" src="${p.url}"><button type="button" aria-label="Remove photo" data-ph="${p.id}">×</button>`
+    box.insertBefore(d, box.lastElementChild)
+  }
 }
 async function addCPhotos(e) {
   const files = [...e.target.files]; e.target.value = ''
@@ -638,6 +655,8 @@ function wire() {
   $('drawer').addEventListener('click', async (e) => {
     if (e.target === $('drawer')) closeDrawer()
     const f = e.target.closest('[data-f]'); if (f) { st.filter = f.dataset.f; renderDrawer(); return }
+    const lb = e.target.closest('[data-lb]')
+    if (lb) { e.preventDefault(); openLightbox([...lb.parentElement.querySelectorAll('a')].map((a) => a.href), +lb.dataset.i); return }
     const del = e.target.closest('[data-del]')
     if (del) {
       del.disabled = true
@@ -647,12 +666,15 @@ function wire() {
   })
   $('cForm').addEventListener('submit', postComment)
   $('cPhotos').addEventListener('change', addCPhotos)
+  $('lbox').addEventListener('click', (e) => {
+    if (e.target.closest('#lboxPrev')) stepLightbox(-1); else if (e.target.closest('#lboxNext')) stepLightbox(1); else if (e.target.id !== 'lboxImg') closeLightbox()
+  })
   $('cShots').addEventListener('click', (e) => { const b = e.target.closest('[data-ph]'); if (b) { cPhotos = cPhotos.filter((p) => p.id !== b.dataset.ph); renderCShots() } })
   $('cBody').addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) postComment(e) })
   $('cName').addEventListener('change', () => { if ($('cName').value.trim()) store.setName($('cName').value) })
   for (const id of ['cName', 'cBody']) $(id).addEventListener('input', () => { if (/warn|ok/.test($('cStatus').className)) cStatus('', '') })
   $('pins').addEventListener('click', (e) => { const b = e.target.closest('[data-note]'); if (b) openDrawer(b.dataset.note) })
-  addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('who').hidden) $('whoCancel').click(); else if (!$('drawer').hidden) closeDrawer(); else if (!$('sheet').hidden) closeSheet(); else if (st.tab === 'look') closeCards() } })
+  addEventListener('keydown', (e) => { if (!$('lbox').hidden) { if (e.key === 'Escape') closeLightbox(); else if (e.key === 'ArrowLeft') stepLightbox(-1); else if (e.key === 'ArrowRight') stepLightbox(1); return } if (e.key === 'Escape') { if (!$('who').hidden) $('whoCancel').click(); else if (!$('drawer').hidden) closeDrawer(); else if (!$('sheet').hidden) closeSheet(); else if (st.tab === 'look') closeCards() } })
 
   // taps on the 3D view (a short press without a drag)
   let down = null
